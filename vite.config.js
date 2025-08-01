@@ -1,9 +1,11 @@
+// vite.config.js
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import tailwindcss from '@tailwindcss/vite';
 import { VitePWA } from 'vite-plugin-pwa';
 
 export default defineConfig({
+  base: '/Modawen/',    // ← غيّر هنا من '/' إلى '/Modawen/'
   plugins: [
     react(),
     tailwindcss(),
@@ -16,16 +18,8 @@ export default defineConfig({
         description: 'My awesome PWA built with Vite + React',
         theme_color: '#ffffff',
         icons: [
-          {
-            src: 'pwa-192x192.png',
-            sizes: '192x192',
-            type: 'image/png'
-          },
-          {
-            src: 'pwa-512x512.png',
-            sizes: '512x512',
-            type: 'image/png'
-          }
+          { src: 'pwa-192x192.png', sizes: '192x192', type: 'image/png' },
+          { src: 'pwa-512x512.png', sizes: '512x512', type: 'image/png' }
         ]
       },
       workbox: {
@@ -35,10 +29,7 @@ export default defineConfig({
             handler: 'CacheFirst',
             options: {
               cacheName: 'images-cache',
-              expiration: {
-                maxEntries: 50,
-                maxAgeSeconds: 60 * 60 * 24 * 30 // 30 أيام
-              }
+              expiration: { maxEntries: 50, maxAgeSeconds: 60 * 60 * 24 * 30 }
             }
           }
         ]
