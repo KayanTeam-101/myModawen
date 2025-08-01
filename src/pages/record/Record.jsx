@@ -6,7 +6,7 @@ const Record = () => {
      useEffect(() => {
     const metaTheme = document.querySelector('meta[name="theme-color"]');
     if (metaTheme) {
-      metaTheme.setAttribute('content', '#555');
+      metaTheme.setAttribute('content', '#fff');
     }
   }, []);
   return (
