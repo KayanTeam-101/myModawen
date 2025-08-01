@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState,useEffect } from 'react';
 import { IoMdClose } from 'react-icons/io';
 import { BsCheck } from 'react-icons/bs';
 
@@ -13,6 +13,13 @@ const AddBalance = ({ onClose }) => {
     localStorage.setItem('balance',value)
     window.location.reload()
   };
+
+    useEffect(() => {
+    const metaTheme = document.querySelector('meta[name="theme-color"]');
+    if (metaTheme) {
+      metaTheme.setAttribute('content', '#555');
+    }
+  }, []);
 
   return (
     <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4 showSmoothy">
