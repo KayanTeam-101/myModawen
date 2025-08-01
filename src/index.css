@@ -1,0 +1,33 @@
+  @import url('https://fonts.googleapis.com/css2?family=Beiruti:wght@200..900&display=swap');
+@import "tailwindcss";
+
+*{
+    font-family: "Beiruti", sans-serif ;
+}
+body {
+  margin: 0;
+  padding: 0;
+
+}
+:root {
+  direction: rtl;
+}
+a.active {
+  color: #2a1ddd;
+}
+.super-shadow {
+  box-shadow: 0 0 15px -10px #000000;
+}
+.showSmoothy{
+  animation: showSmoothy .3s ease-in-out;
+}
+@keyframes showSmoothy {
+  0%{
+  opacity: 0;
+  margin: 0;
+
+  }
+  100%{
+    opacity: 1;
+  }
+}
