@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { RiWallet3Line, RiAddCircleLine, RiMoneyCnyCircleLine, RiArrowDownCircleLine } from "react-icons/ri";
+import { RiWallet3Line, RiAddCircleLine, RiMoneyPoundCircleLine, RiArrowDownCircleLine } from "react-icons/ri";
 import { Utilities } from "../../../utilities/utilities.js";
 import Addbalance from "./Addbalance.jsx";
 
@@ -70,7 +70,7 @@ const Moneypanel = () => {
           <div className="bg-white rounded-2xl shadow-xl p-6 w-full max-w-md">
             <div className="flex flex-col items-center text-center">
               <div className="bg-indigo-100 w-20 h-20 rounded-full flex items-center justify-center mb-4">
-                <RiMoneyCnyCircleLine className="text-indigo-600 text-4xl" />
+                <RiMoneyPoundCircleLine className="text-indigo-600 text-4xl" />
               </div>
               <h3 className="text-xl font-bold text-gray-800 mb-2">لا يوجد رصيد</h3>
               <p className="text-gray-500 mb-6">أضف رصيدًا لبدء تتبع مصروفاتك</p>

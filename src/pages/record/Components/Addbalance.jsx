@@ -78,7 +78,7 @@ const AddBalance = ({ onClose }) => {
         <div className="py-7 px-5 relative ">
           <div className="relative z-10">
             <div className="flex justify-center items-baseline">
-              <span className="text-3xl font-bold text-blue-600 mr-2">ج.م</span>
+              <span className="text-3xl font-bold text-indigo-500 mr-2">ج.م</span>
               <div className="text-5xl font-bold text-gray-800 tracking-tight">
                 {formatCurrency(value)}
               </div>
@@ -124,7 +124,7 @@ const AddBalance = ({ onClose }) => {
             disabled={!value || isSubmitting}
             className={`w-full py-4 rounded-xl font-bold text-white transition-all flex items-center justify-center gap-2 active:scale-[0.98] ${
               value && !isSubmitting
-                ? 'bg-gradient-to-r from-blue-500 to-indigo-500 hover:from-blue-600 hover:to-indigo-600 shadow-md'
+                ? 'bg-gradient-to-r from-indigo-700 to-indigo-500 hover:from-blue-600 hover:to-indigo-600 shadow-md'
                 : 'bg-gray-300 text-gray-500 cursor-not-allowed'
             }`}
           >

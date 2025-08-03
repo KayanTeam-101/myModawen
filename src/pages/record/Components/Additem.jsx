@@ -34,6 +34,8 @@ const AddItem = ({ onClose }) => {
         photoPreview: URL.createObjectURL(file)
       }));
     }
+    console.log(item);
+    
   };
 
   const triggerFileInput = () => {

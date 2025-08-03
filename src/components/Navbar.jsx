@@ -34,7 +34,7 @@ const Navbar = () => {
             <li className="relative -top-1">
               <button
                 onClick={() => setShowAddItem(true)}
-                className="flex items-center justify-center bg-blue-600  border-blue-200 border-4  text-white rounded-full w-10 h-10 shadow-lg hover:bg-blue-700 transition-colors"
+                className="flex items-center justify-center bg-indigo-600    text-white rounded-full w-10 h-10 shadow-lg hover:bg-blue-700 transition-colors"
                 aria-label="إضافة عنصر"
               >
                 <BsPlus className="text-2xl" />
