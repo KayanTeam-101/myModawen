@@ -7,6 +7,7 @@
 body {
   margin: 0;
   padding: 0;
+  background-color: #fff;
 
 }
 :root {
@@ -19,15 +20,40 @@ a.active {
   box-shadow: 0 0 15px -10px #000000;
 }
 .showSmoothy{
-  animation: showSmoothy .3s ease-in-out;
+  animation: showSmoothy .4s ease-in-out ;
+}
+.fontsansSerif{
+  font-family: sans-serif !important;
+}
+.wide{
+  animation: wide 1s cubic-bezier(0.39, 0.575, 0.565, 1);
 }
 @keyframes showSmoothy {
   0%{
   opacity: 0;
   margin: 0;
+  transform: translateY(-2%);
 
+  }
+  30%{
+    opacity: .1;
   }
   100%{
     opacity: 1;
+  transform: translateX(-0%);
+
+  }
+}
+
+@keyframes wide {
+  0%{
+  opacity: 0;
+width: 0;
+  }
+  30%{
+  }
+  100%{
+    opacity: 1;
+
   }
 }

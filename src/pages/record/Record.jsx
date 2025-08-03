@@ -10,7 +10,7 @@ const Record = () => {
     }
   }, []);
   return (
-    <div className="p-2">
+    <div className="p-2 showSmoothy bg-gray-50 min-h-screen">
       <Moneypanel />
       <TaskBar />
     </div>

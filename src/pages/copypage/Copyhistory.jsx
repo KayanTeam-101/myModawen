@@ -104,7 +104,7 @@ const HistoryCopyPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 p-4 md:p-8">
+    <div className="min-h-screen bg- p-4 md:p-8 showSmoothy">
       <div className="max-w-4xl mx-auto">
         <header className="mb-8 text-center">
           <h1 className="text-3xl font-bold text-gray-800 mb-2">إدارة سجل البيانات</h1>
@@ -172,7 +172,7 @@ const HistoryCopyPage = () => {
           </div>
           
           {sortedDates.length > 0 && (
-            <div className="flex justify-between items-center mt-4">
+            <div className="flex justify-between items-center mt-4 pb-10">
               <button 
                 onClick={() => setPage(p => Math.max(0, p - 1))}
                 disabled={page === 0}

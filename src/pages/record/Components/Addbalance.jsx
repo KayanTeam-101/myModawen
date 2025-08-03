@@ -1,75 +1,144 @@
-import React, { useState,useEffect } from 'react';
-import { IoMdClose } from 'react-icons/io';
-import { BsCheck } from 'react-icons/bs';
+import React, { useState, useEffect, useRef } from 'react';
+import { RiCloseLine, RiCheckLine, RiDeleteBack2Line } from 'react-icons/ri';
 
 const AddBalance = ({ onClose }) => {
   const [value, setValue] = useState('');
-
-  const handlePress = (num) => setValue(prev => prev + num);
-  const handleClear = () => setValue('');
-  const handleBackspace = () => setValue(prev => prev.slice(0, -1));
-
-  const handlebmit = () => {
-    localStorage.setItem('balance',value)
-    window.location.reload()
-  };
-
-    useEffect(() => {
-    const metaTheme = document.querySelector('meta[name="theme-color"]');
-    if (metaTheme) {
-      metaTheme.setAttribute('content', '#555');
-    }
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showModal, setShowModal] = useState(false);
+  const modalRef = useRef(null);
+  
+  useEffect(() => {
+    setShowModal(true);
+    return () => {};
   }, []);
 
+  const handlePress = (num) => {
+    if (num === '.' && value.includes('.')) return;
+    if (value === '0' && num !== '.') {
+      setValue(num);
+    } else {
+      setValue(prev => prev + num);
+    }
+  };
+  
+  const handleClear = () => setValue('');
+  const handleBackspace = () => setValue(prev => prev.slice(0, -1));
+  
+  const handleSubmit = () => {
+    if (!value || parseFloat(value) <= 0) return;
+    
+    setIsSubmitting(true);
+    setTimeout(() => {
+      localStorage.setItem('balance', value);
+      setIsSubmitting(false);
+      closeModal();
+    }, 800);
+  };
+
+  const closeModal = () => {
+    setShowModal(false);
+    setTimeout(() => {
+      onClose();
+      window.location.reload();
+    }, 300);
+  };
+
+  const formatCurrency = (amount) => {
+    if (!amount) return '0.00';
+    return new Intl.NumberFormat('ar-EG', {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
+    }).format(parseFloat(amount));
+  };
+
   return (
-    <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4 showSmoothy">
-      <div className="bg-white rounded-2xl shadow-xl w-full max-w-md overflow-hidden">
+    <div 
+      className={`fixed inset-0 bg-gray-400/70 backdrop-blur-sm flex items-center justify-center z-50 p-4 transition-opacity duration-300 ${
+        showModal ? 'opacity-100' : 'opacity-0 pointer-events-none'
+      }`}
+    >
+      <div 
+        ref={modalRef}
+        className={`bg-white rounded-2xl shadow-xl w-full max-w-md overflow-hidden border border-gray-200 transition-all duration-300 transform ${
+          showModal ? 'scale-100 opacity-100' : 'scale-95 opacity-0'
+        }`}
+      >
         {/* Header */}
-        <div className="flex justify-between items-center p-4 border-b border-gray-200">
-          <h2 className="text-xl font-bold text-gray-900">إضافة ميزانية</h2>
-       
+        <div className="flex justify-between items-center p-5 border-b border-gray-100">
+          <h2 className="text-xl font-bold text-gray-800">إضافة رصيد جديد</h2>
+          <button 
+            onClick={closeModal}
+            className="p-2 rounded-full hover:bg-gray-100 transition-colors"
+          >
+            <RiCloseLine className="text-gray-500 text-xl" />
+          </button>
         </div>
 
         {/* Display */}
-        <div className="py-6 px-4">
-          <div className="relative">
-            <span className="absolute right-0 top-1/2 transform -translate-y-1/2 text-2xl text-gray-500">$</span>
-            <input
-              type="text"
-              value={value || '0'}
-              readOnly
-              className="w-full text-center text-5xl font-bold bg-transparent border-none outline-none pr-8"
-            />
+        <div className="py-7 px-5 relative ">
+          <div className="relative z-10">
+            <div className="flex justify-center items-baseline">
+              <span className="text-3xl font-bold text-blue-600 mr-2">ج.م</span>
+              <div className="text-5xl font-bold text-gray-800 tracking-tight">
+                {formatCurrency(value)}
+              </div>
+            </div>
+            <p className="text-center text-gray-500 mt-3">ادخل المبلغ المطلوب إضافته</p>
           </div>
-          <p className="text-center text-gray-500 mt-2">ادخل المبلغ</p>
+          
+          {/* Decorative elements */}
+          <div className="absolute top-4 right-4 w-8 h-8 rounded-full bg-blue-200/40"></div>
+          <div className="absolute bottom-4 left-4 w-6 h-6 rounded-full bg-indigo-200/40"></div>
         </div>
 
         {/* Number Pad */}
-        <div className="grid grid-cols-3 gap-2 p-4 bg-gray-50">
+        <div className="grid grid-cols-3 gap-3 p-5 bg-gray-50">
           {[1, 2, 3, 4, 5, 6, 7, 8, 9].map(num => (
             <KeyButton key={num} onClick={() => handlePress(num.toString())}>
               {num}
             </KeyButton>
           ))}
-          <KeyButton onClick={handleClear} variant="secondary">مسح</KeyButton>
+          <KeyButton onClick={handleClear} variant="secondary">
+            <RiCloseLine className="text-xl text-gray-600" />
+          </KeyButton>
           <KeyButton onClick={() => handlePress('0')}>0</KeyButton>
-          <KeyButton onClick={handleBackspace} variant="secondary">⌫</KeyButton>
+          <KeyButton onClick={handleBackspace} variant="secondary">
+            <RiDeleteBack2Line className="text-xl text-gray-600" />
+          </KeyButton>
         </div>
 
-        {/* Confirm */}
-        <div className="p-4 border-t border-gray-200">
+        {/* Decimal Button */}
+        <div className="px-5 pb-3">
           <button
-            onClick={handlebmit}
-            disabled={!value}
-            className={`w-full py-3 rounded-xl font-bold text-white transition-all
-              ${value
-                ? 'bg-blue-600 hover:bg-blue-700 active:bg-blue-800'
-                : 'bg-gray-300 cursor-not-allowed'}`}
+            onClick={() => handlePress('.')}
+            className="w-full py-3 rounded-xl bg-gray-100 text-gray-600 font-medium hover:bg-gray-200 transition-colors active:scale-[0.98] border border-gray-200"
           >
-            <div className="flex items-center justify-center gap-2">
-              <BsCheck size={24} />
-              تأكيد
-            </div>
+            إضافة فاصلة عشرية
+          </button>
+        </div>
+
+        {/* Confirm Button */}
+        <div className="p-5 pt-0">
+          <button
+            onClick={handleSubmit}
+            disabled={!value || isSubmitting}
+            className={`w-full py-4 rounded-xl font-bold text-white transition-all flex items-center justify-center gap-2 active:scale-[0.98] ${
+              value && !isSubmitting
+                ? 'bg-gradient-to-r from-blue-500 to-indigo-500 hover:from-blue-600 hover:to-indigo-600 shadow-md'
+                : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+            }`}
+          >
+            {isSubmitting ? (
+              <div className="flex items-center">
+                <div className="w-5 h-5 border-t-2 border-white border-solid rounded-full animate-spin mr-2"></div>
+                جاري الإضافة...
+              </div>
+            ) : (
+              <>
+                <RiCheckLine size={24} />
+                تأكيد إضافة الرصيد
+              </>
+            )}
           </button>
         </div>
       </div>
@@ -82,10 +151,10 @@ const KeyButton = ({ children, onClick, variant = 'primary' }) => (
     onClick={onClick}
     className={`
       h-16 rounded-xl text-xl font-semibold transition-all
-      active:scale-95 focus:outline-none
+      focus:outline-none active:scale-95 border border-gray-200 flex justify-center items-center
       ${variant === 'primary'
-        ? 'bg-white text-gray-800 hover:bg-gray-100 active:bg-gray-200 shadow-sm'
-        : 'bg-gray-200 text-gray-600 hover:bg-gray-300 active:bg-gray-400'}
+        ? 'bg-white text-gray-800 hover:bg-gray-50 shadow-sm'
+        : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}
     `}
   >
     {children}

@@ -22,7 +22,7 @@ const List = () => {
   };
 
   return (
-    <div className="w-full max-w-2xl mx-auto py-4 px-2">
+    <div className="w-full max-w-2xl mx-auto py-4 px-2 showSmoothy">
       {sortedDates.length > 0 ? (
         sortedDates.map(date => (
           <div 
@@ -32,12 +32,12 @@ const List = () => {
             {/* Date header */}
             <button
               onClick={() => toggleDate(date)}
-              className="w-full py-4 px-4 flex justify-between items-center hover:bg-gray-50 transition-colors"
+              className="w-full py-4 px-4 flex justify-between items-center active:bg-gray-50 transition-colors"
             >
               <div className="flex items-center">
                 <div className="text-left">
                   <div className="flex items-center">
-                    <h2 className="font-medium text-gray-900   text-shadow-2xs ">{date}</h2>
+                    <h2 className="font-extrabold     ">{date}</h2>
                   </div>
                   <p className="text-xs text-gray-500 mt-1">
                     {data[date].length} {data[date].length === 1 ? 'عنصر' : 'عناصر'}
@@ -46,7 +46,7 @@ const List = () => {
               </div>
               
               <div className="flex items-center">
-                <span className="text-sm font-medium text-gray-500 mr-2">
+                <span className=" font-medium text-gray-500 mr-2">
                   -{data[date].reduce((sum, item) => sum + parseFloat(item.price), 0).toFixed(2)} ج.م
                 </span>
                 <svg 

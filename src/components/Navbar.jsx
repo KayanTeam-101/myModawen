@@ -51,7 +51,7 @@ const Navbar = () => {
           {/* Settings */}
           <NavItem 
             icon={<BsClockHistory className="text-xl" />}
-            label="الإعدادات"
+            label="البيانات المحفوطة  "
             href="/HistoryCopyPage"
           />
         </ul>
@@ -67,7 +67,7 @@ const NavItem = ({ icon, label, href }) => (
   <li className="flex-1 flex justify-center">
     <a 
       href={href}
-      className="flex flex-col items-center justify-center text-gray-500 hover:text-blue-600 w-full py-1 transition-colors"
+      className="flex flex-col items-center justify-center  hover:text-blue-600 w-full py-1 transition-colors"
     >
       {icon}
       <span className="text-[10px] mt-1">{label}</span>

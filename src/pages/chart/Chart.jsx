@@ -121,11 +121,11 @@ const ChartPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50 p-4 md:p-6">
+    <div className="min-h-screen p-4 md:p-6 showSmoothy">
       <div className="max-w-6xl mx-auto">
         {/* Header */}
         <div className="mb-8 text-center pt-2">
-          <h1 className="text-3xl md:text-4xl font-bold text-gray-800 bg-gradient-to-r from-blue-600 to-indigo-700 bg-clip-text text-transparent">
+          <h1 className="text-3xl md:text-4xl font-bold text-gray-800 ">
             تحليل المصروفات
           </h1>
           <p className="text-gray-600 mt-2 max-w-lg mx-auto">
