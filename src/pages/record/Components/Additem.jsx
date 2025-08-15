@@ -31,7 +31,7 @@ const AddItem = ({ onClose }) => {
   const startLongPress = () => {
     longPressTimer.current = setTimeout(() => {
       Setisclicked(true);
-    }, 50);
+    }, 250);
   };
 
   const endLongPress = () => {
