@@ -10,7 +10,7 @@ export function Utilities(sound, vibrate, storeItem) {
       .then(() => console.log('done'))
       .catch((err) => console.error('Error playing sound:', err));
   };
-this.storeItem = function storeItem(nameofproduct, price) {
+this.storeItem = function storeItem(nameofproduct, price, photo) {
   // Get or initialize data
   let data = JSON.parse(localStorage.getItem('data')) || {};
   
@@ -30,7 +30,8 @@ this.storeItem = function storeItem(nameofproduct, price) {
     name: nameofproduct,
     price: price,
     time: timeString,
-    timestamp: date.getTime() // For sorting
+    timestamp: date.getTime(), // For sorting
+    photo : photo
   };
   
   // If date doesn't exist in data, create empty array

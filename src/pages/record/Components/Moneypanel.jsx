@@ -95,10 +95,10 @@ const Moneypanel = () => {
       ) : (
         <div className="space-y-5">
           {/* Balance Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mt-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 ">
             {/* Total Balance Card */}
             <div
-              className="bg-gradient-to-r from-indigo-600 to-purple-600 rounded-2xl shadow-xl p-5 text-white"
+              className="bg-gradient-to-r  rounded-2xl  p-5 text-gray-900"
               onDoubleClick={handleClick}
             >
               <div className="flex justify-between items-start">
@@ -106,7 +106,7 @@ const Moneypanel = () => {
                   <p className="text-sm opacity-80">الرصيد المضاف </p>
                   <h2 className="text-3xl font-bold mt-1">{formatCurrency(balance)}</h2>
                 </div>
-                <div className="bg-white/20 p-1 rounded-lg flex flex-row gap-1" onClick={e => {
+                <div className="bg-linear-to-r from-indigo-400 via-fuchsia-400 to-blue-300 p-2 rounded-lg flex flex-row gap-1 " onClick={e => {
                   console.log('primary btn cliked');
                   
                   showPremium && (
@@ -117,35 +117,31 @@ hi thre
                   )
                 }}>
                   <img src={premiumImage} width={26} alt="" />
-                  <p>
-                    خد التجربة الكاملة
-
-                  </p>
+                 
                 </div>
               </div>
-              <div className="mt-4 flex justify-between items-center">
-                <span className="text-xs opacity-80">انقر مرتين لتعديل الرصيد</span>
+              <div className="mt-2 flex justify-between items-center">
+                <span className="text-xs opacity-50">انقر مرتين لتعديل الرصيد</span>
 
               </div>
             </div>
 
             {/* Remaining Balance Card */}
-            <div className={`bg-white rounded-2xl  p-5 ${inWallet < 0 ? 'border-b-2 border-red-200' : 'border-b-2 border-green-200'
-              }`}>
+            <div className={`bg-white rounded-2xl  p-1 `}>
               <div className="flex justify-between items-start">
                 <div>
                   <p className="text-gray-500 text-sm">المبلغ المتبقي</p>
-                  <h2 className={`text-2xl font-bold mt-1 ${inWallet < 0 ? 'text-red-600' : 'text-green-600'
+                  <h2 className={`text-2xl font-bold mt-1 ${inWallet < 0 ? 'text-red-600' : 'text-indigo-600'
                     }`}>
                     {formatCurrency(inWallet)}
                   </h2>
                 </div>
           
               </div>
-              <div className="mt-4">
-                <div className="w-full bg-gray-200 rounded-full h-2">
+              <div className="mt-2">
+                <div className="w-full bg-gray-200 rounded-full h-1">
                   <div
-                    className={`h-2 rounded-full wide ${inWallet < 0 ? 'bg-red-500' : 'bg-green-500'
+                    className={`h-1 rounded-full wide ${inWallet < 0 ? 'bg-red-500' : 'bg-indigo-400'
                       }`}
                     style={{ width: `${Math.min(100, Math.max(0, (inWallet / balance) * 100))}%` }}
                   ></div>
@@ -173,10 +169,9 @@ hi thre
             </div>
             <button
               onClick={e => setIsClicked2(true)}
-              className="bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm flex items-center gap-1 active:bg-indigo-400"
+              className="bg-linear-to-r from-purple-500 to-indigo-500 text-white p-2 rounded-full text-sm flex items-center gap-1 active:bg-indigo-400"
             >
-              <BsPlusCircle />
-              <span>إضافة عنصر </span>
+              <BsPlusCircle size={25}/>
             </button>
           </div>
         </div>

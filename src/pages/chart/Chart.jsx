@@ -13,12 +13,8 @@ const ChartPage = () => {
   
   // Process data into chart format
   useEffect(() => {
-    const storedData = JSON.parse(localStorage.getItem('data')) || {};
-    
-    if (Object.keys(storedData).length === 0) {
-      setLoading(false);
-      return;
-    }
+    // Sample data structure
+    const storedData = JSON.parse(localStorage.getItem('data'));
 
     const processData = () => {
       const dates = Object.keys(storedData);
@@ -70,7 +66,7 @@ const ChartPage = () => {
     };
     
     processData();
-  }, []); // Empty dependency array ensures single run
+  }, []);
 
   // Calculate statistics
   const totalSpent = useMemo(() => 
@@ -121,14 +117,14 @@ const ChartPage = () => {
   };
 
   return (
-    <div className="min-h-screen p-4 md:p-6 showSmoothy">
+    <div className="min-h-screen bg-gradient-to-br from-indigo-50 to-white p-4 md:p-6">
       <div className="max-w-6xl mx-auto">
         {/* Header */}
         <div className="mb-8 text-center pt-2">
-          <h1 className="text-3xl md:text-4xl font-bold text-gray-800 ">
+          <h1 className="text-3xl md:text-4xl font-bold text-indigo-900">
             تحليل المصروفات
           </h1>
-          <p className="text-gray-600 mt-2 max-w-lg mx-auto">
+          <p className="text-indigo-700 mt-2 max-w-lg mx-auto">
             رصد وتحليل أنماط صرفك اليومية بسهولة ودقة
           </p>
         </div>
@@ -138,37 +134,41 @@ const ChartPage = () => {
           <SummaryCard 
             title="إجمالي المصروفات" 
             value={`${totalSpent.toFixed(0)} ج.م`} 
-            icon={<FiDollarSign className="text-blue-600 text-xl" />}
+            icon={<FiDollarSign className="text-white text-xl" />}
             trend={null}
+            color="bg-indigo-600"
           />
           
           <SummaryCard 
             title="متوسط الصرف اليومي" 
             value={`${averageDaily} ج.م`} 
-            icon={<FiDollarSign className="text-green-600 text-xl" />}
+            icon={<FiDollarSign className="text-white text-xl" />}
             trend={trendDirection}
+            color="bg-gradient-to-r from-indigo-500 to-purple-500"
           />
           
           <SummaryCard 
             title="أعلى يوم صرف" 
             value={maxSpendingDay ? `${maxSpendingDay.total.toFixed(0)} ج.م` : "0 ج.م"} 
             subValue={maxSpendingDay ? formatDate(maxSpendingDay.date) : ""}
-            icon={<FiArrowUp className="text-red-400 text-xl" />}
+            icon={<FiArrowUp className="text-white text-xl" />}
             trend={null}
+            color="bg-gradient-to-r from-red-500 to-orange-500"
           />
           
           <SummaryCard 
             title="أقل يوم صرف" 
             value={minSpendingDay ? `${minSpendingDay.total.toFixed(0)} ج.م` : "0 ج.م"} 
             subValue={minSpendingDay ? formatDate(minSpendingDay.date) : ""}
-            icon={<FiArrowDown className="text-purple-600 text-xl" />}
+            icon={<FiArrowDown className="text-white text-xl" />}
             trend={null}
+            color="bg-gradient-to-r from-emerald-500 to-teal-500"
           />
         </div>
         
         {/* Time Filters */}
         <div className="flex justify-center mb-6">
-          <div className="flex space-x-2 bg-gray-100 p-1 rounded-xl">
+          <div className="flex space-x-2 bg-indigo-100 p-1 rounded-xl">
             <FilterButton 
               active={timeFilter === 'week'} 
               onClick={() => setTimeFilter('week')}
@@ -191,24 +191,24 @@ const ChartPage = () => {
         </div>
         
         {/* Line Chart */}
-        <div className="bg-white rounded-2xl shadow-sm p-5 mb-8 border border-gray-200">
+        <div className="bg-white rounded-2xl shadow-lg p-5 mb-8 border border-indigo-100">
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
             <div>
-              <h2 className="text-xl font-bold text-gray-800 flex items-center">
-                <BsBarChart className="mr-2 text-blue-500" />
+              <h2 className="text-xl font-bold text-indigo-900 flex items-center">
+                <BsBarChart className="mr-2 text-indigo-600" />
                 تطور المصروفات اليومية
               </h2>
-              <p className="text-gray-500 mt-1">استعرض أنماط صرفك على مدار الوقت</p>
+              <p className="text-indigo-700 mt-1">استعرض أنماط صرفك على مدار الوقت</p>
             </div>
             
             <div className="mt-3 md:mt-0 flex items-center">
               <div className="flex items-center mr-4">
-                <div className="w-3 h-3 rounded-full bg-blue-500 mr-2"></div>
-                <span className="text-sm text-gray-600">المصروفات اليومية</span>
+                <div className="w-3 h-3 rounded-full bg-indigo-600 mr-2"></div>
+                <span className="text-sm text-indigo-800">المصروفات اليومية</span>
               </div>
               <div className="flex items-center">
-                <div className="w-3 h-3 rounded-full bg-gray-300 mr-2"></div>
-                <span className="text-sm text-gray-600">المتوسط ({averageDaily} ج.م)</span>
+                <div className="w-3 h-3 rounded-full bg-gradient-to-r from-indigo-400 to-purple-500 mr-2"></div>
+                <span className="text-sm text-indigo-800">المتوسط ({averageDaily} ج.م)</span>
               </div>
             </div>
           </div>
@@ -216,8 +216,8 @@ const ChartPage = () => {
           <div className="h-80">
             {loading ? (
               <div className="h-full flex flex-col items-center justify-center">
-                <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
-                <p className="mt-4 text-gray-500">جاري تحليل البيانات...</p>
+                <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-indigo-500"></div>
+                <p className="mt-4 text-indigo-700">جاري تحليل البيانات...</p>
               </div>
             ) : (
               <LineChart 
@@ -232,13 +232,14 @@ const ChartPage = () => {
         
         {/* Details Panel */}
         {selectedDate && selectedDate.items.length > 0 && (
-          <div className="bg-white rounded-2xl shadow-sm p-6 border border-gray-200">
+          <>
+          <div className="bg-white rounded-2xl shadow-lg p-6 border border-indigo-100">
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
               <div>
-                <h2 className="text-xl font-bold text-gray-800">
+                <h2 className="text-xl font-bold text-indigo-900">
                   تفاصيل المصروفات - {formatDate(selectedDate.date)}
                 </h2>
-                <p className="text-gray-500 mt-1">
+                <p className="text-indigo-700 mt-1">
                   {selectedDate.items.length} عناصر • {selectedDate.total.toFixed(2)} ج.م
                 </p>
               </div>
@@ -246,10 +247,10 @@ const ChartPage = () => {
               <div className="mt-4 md:mt-0 flex items-center space-x-3">
                 <button 
                   onClick={() => navigateDate('prev')}
-                  className="p-2 rounded-full bg-gray-100 hover:bg-gray-200 transition-colors flex items-center"
+                  className="p-2 rounded-full bg-indigo-100 hover:bg-indigo-200 transition-colors flex items-center"
                 >
-                  <BsChevronLeft className="text-gray-600" />
-                  <span className="text-sm text-gray-600 mr-2">السابق</span>
+                  <BsChevronLeft className="text-indigo-700" />
+                  <span className="text-sm text-indigo-700 mr-2">السابق</span>
                 </button>
                 
                 <div className="text-xl font-bold text-red-600 bg-red-50 px-4 py-2 rounded-lg">
@@ -258,10 +259,10 @@ const ChartPage = () => {
                 
                 <button 
                   onClick={() => navigateDate('next')}
-                  className="p-2 rounded-full bg-gray-100 hover:bg-gray-200 transition-colors flex items-center"
+                  className="p-2 rounded-full bg-indigo-100 hover:bg-indigo-200 transition-colors flex items-center"
                 >
-                  <span className="text-sm text-gray-600 ml-2">التالي</span>
-                  <BsChevronRight className="text-gray-600" />
+                  <span className="text-sm text-indigo-700 ml-2">التالي</span>
+                  <BsChevronRight className="text-indigo-700" />
                 </button>
               </div>
             </div>
@@ -278,15 +279,18 @@ const ChartPage = () => {
               ))}
             </div>
           </div>
+            <div className='h-14'></div>
+
+          </>
         )}
         
         {selectedDate && selectedDate.items.length === 0 && (
-          <div className="bg-white rounded-2xl shadow-sm p-12 text-center border border-gray-200">
-            <div className="text-gray-300 mb-4">
+          <div className="bg-white rounded-2xl shadow-lg p-12 text-center border border-indigo-100">
+            <div className="text-indigo-300 mb-4">
               <BsCashCoin className="text-5xl mx-auto" />
             </div>
-            <h3 className="text-xl font-medium text-gray-700">لا توجد مصروفات مسجلة</h3>
-            <p className="text-gray-500 mt-2">
+            <h3 className="text-xl font-medium text-indigo-800">لا توجد مصروفات مسجلة</h3>
+            <p className="text-indigo-600 mt-2">
               لم يتم تسجيل أي مشتريات في تاريخ {formatDate(selectedDate.date)}
             </p>
           </div>
@@ -296,13 +300,13 @@ const ChartPage = () => {
   );
 };
 
-// Responsive Line Chart Component
+// Enhanced Line Chart Component
 const LineChart = ({ data, selectedDate, onSelectDate, average }) => {
   if (data.length === 0) {
     return (
-      <div className="h-full flex flex-col items-center justify-center text-gray-500 p-4">
-        <div className="bg-gray-200 border-2 border-dashed rounded-xl w-16 h-16 mb-4" />
-        <p className="text-lg font-medium">لا توجد بيانات متاحة</p>
+      <div className="h-full flex flex-col items-center justify-center text-indigo-700 p-4">
+        <div className="bg-indigo-100 border-2 border-dashed border-indigo-300 rounded-xl w-16 h-16 mb-4" />
+        <p className="text-lg font-medium text-indigo-900">لا توجد بيانات متاحة</p>
         <p className="text-sm mt-2 max-w-md text-center">
           أضف مصروفات جديدة لرؤية التحليل البياني
         </p>
@@ -310,14 +314,14 @@ const LineChart = ({ data, selectedDate, onSelectDate, average }) => {
     );
   }
   
-  // Responsive chart dimensions
-  const minPointSpacing = 20; // Minimum space between data points
-  const chartHeight = 300;
-  const margin = { top: 30, right: 40, bottom: 50, left: 60 };
+  // Enhanced dimensions and spacing
+  const minPointSpacing = 40;
+  const chartHeight = 350;
+  const margin = { top: 30, right: 50, bottom: 80, left: 70 };
   
-  // Calculate required width based on data points
+  // Calculate required width
   const requiredWidth = Math.max(
-    700, // Minimum width
+    1200,
     data.length * minPointSpacing + margin.left + margin.right
   );
   
@@ -328,7 +332,7 @@ const LineChart = ({ data, selectedDate, onSelectDate, average }) => {
   const maxSpending = Math.max(...data.map(d => d.total), 10);
   const minSpending = Math.min(...data.map(d => d.total), 0);
   
-  // Scale values to fit chart
+  // Scale functions
   const scaleX = (index) => 
     margin.left + (index / (data.length - 1)) * innerWidth;
   
@@ -350,8 +354,8 @@ const LineChart = ({ data, selectedDate, onSelectDate, average }) => {
   // Average line position
   const averageY = scaleY(average);
   
-  // Only show every nth label to prevent overlap
-  const labelInterval = Math.ceil(data.length / 15);
+  // Label interval calculation
+  const labelInterval = Math.max(1, Math.floor(data.length / 8));
   
   return (
     <div className="w-full overflow-x-auto pb-4">
@@ -361,6 +365,21 @@ const LineChart = ({ data, selectedDate, onSelectDate, average }) => {
         viewBox={`0 0 ${requiredWidth} ${chartHeight}`}
         preserveAspectRatio="xMinYMin meet"
       >
+        {/* Gradient background */}
+        <defs>
+          <linearGradient id="areaGradient" x1="0" x2="0" y1="0" y2="1">
+            <stop offset="0%" stopColor="#818cf8" stopOpacity="0.2" />
+            <stop offset="100%" stopColor="#c7d2fe" stopOpacity="0.05" />
+          </linearGradient>
+        </defs>
+        
+        {/* Background area */}
+        <path 
+          d={`${pathData} L ${scaleX(data.length-1)} ${chartHeight - margin.bottom} L ${margin.left} ${chartHeight - margin.bottom} Z`} 
+          fill="url(#areaGradient)" 
+          stroke="none" 
+        />
+        
         {/* Horizontal grid lines */}
         {[0, 0.25, 0.5, 0.75, 1].map((t, i) => {
           const y = margin.top + t * innerHeight;
@@ -372,15 +391,16 @@ const LineChart = ({ data, selectedDate, onSelectDate, average }) => {
                 y1={y} 
                 x2={requiredWidth - margin.right} 
                 y2={y} 
-                stroke="#e5e7eb" 
+                stroke="#e0e7ff" 
                 strokeDasharray="4 4" 
               />
               <text 
                 x={margin.left - 10} 
                 y={y + 4} 
                 textAnchor="end" 
-                fill="#6b7280" 
+                fill="#4f46e5" 
                 fontSize="12"
+                fontWeight="500"
               >
                 {Math.round(value)} ج.م
               </text>
@@ -394,19 +414,21 @@ const LineChart = ({ data, selectedDate, onSelectDate, average }) => {
           y1={averageY} 
           x2={requiredWidth - margin.right} 
           y2={averageY} 
-          stroke="#9ca3af" 
+          stroke="#a5b4fc" 
           strokeDasharray="6 4" 
+          strokeWidth="2"
         />
         <text 
           x={requiredWidth - margin.right + 5} 
           y={averageY + 4} 
-          fill="#6b7280" 
+          fill="#6366f1" 
           fontSize="12"
+          fontWeight="500"
         >
           المتوسط
         </text>
         
-        {/* Vertical grid lines - only show every nth */}
+        {/* Vertical grid lines */}
         {data.map((day, i) => {
           if (i % labelInterval !== 0 && i !== data.length - 1) return null;
           
@@ -418,15 +440,16 @@ const LineChart = ({ data, selectedDate, onSelectDate, average }) => {
                 y1={margin.top} 
                 x2={x} 
                 y2={chartHeight - margin.bottom} 
-                stroke="#e5e7eb" 
+                stroke="#e0e7ff" 
                 strokeDasharray="4 4" 
               />
               <text 
                 x={x} 
-                y={chartHeight - 15} 
+                y={chartHeight - 20} 
                 textAnchor="middle" 
-                fill="#6b7280" 
+                fill="#4f46e5" 
                 fontSize="10"
+                fontWeight="500"
               >
                 {day.date}
               </text>
@@ -438,12 +461,12 @@ const LineChart = ({ data, selectedDate, onSelectDate, average }) => {
         <path 
           d={pathData} 
           fill="none" 
-          stroke="#3b82f6" 
+          stroke="#4f46e5" 
           strokeWidth="3" 
           strokeLinecap="round"
         />
         
-        {/* Dots - only show value labels for selected points */}
+        {/* Dots */}
         {data.map((day, i) => {
           const x = scaleX(i);
           const y = scaleY(day.total);
@@ -469,27 +492,37 @@ const LineChart = ({ data, selectedDate, onSelectDate, average }) => {
               <circle 
                 cx={x} 
                 cy={y} 
-                r={isSelected ? 6 : 4} 
-                fill={isAboveAverage ? "#ef4444" : "#3b82f6"} 
+                r={isSelected ? 8 : 6} 
+                fill={isAboveAverage ? "#ef4444" : "#4f46e5"} 
                 stroke="white" 
                 strokeWidth="2"
                 onClick={() => onSelectDate(day)}
-                className="cursor-pointer transition-all duration-200"
+                className="cursor-pointer transition-all duration-200 hover:r-8"
               />
               
-              {/* Value label - only show for selected point */}
+              {/* Value label */}
               {isSelected && (
-                <text 
-                  x={x} 
-                  y={y - 12} 
-                  textAnchor="middle" 
-                  fill="#2563eb" 
-                  fontSize="11"
-                  fontWeight="bold"
-                  className="drop-shadow-sm"
-                >
-                  {day.total.toFixed(0)} ج.م
-                </text>
+                <g>
+                  <rect 
+                    x={x - 30} 
+                    y={y - 40} 
+                    width={60} 
+                    height={25} 
+                    rx="4" 
+                    fill="#4f46e5" 
+                    className="drop-shadow-sm"
+                  />
+                  <text 
+                    x={x} 
+                    y={y - 25} 
+                    textAnchor="middle" 
+                    fill="white" 
+                    fontSize="11"
+                    fontWeight="bold"
+                  >
+                    {day.total.toFixed(0)} ج.م
+                  </text>
+                </g>
               )}
             </g>
           );
@@ -501,7 +534,7 @@ const LineChart = ({ data, selectedDate, onSelectDate, average }) => {
           y1={chartHeight - margin.bottom} 
           x2={requiredWidth - margin.right} 
           y2={chartHeight - margin.bottom} 
-          stroke="#9ca3af" 
+          stroke="#a5b4fc" 
           strokeWidth="1" 
         />
         <line 
@@ -509,7 +542,7 @@ const LineChart = ({ data, selectedDate, onSelectDate, average }) => {
           y1={margin.top} 
           x2={margin.left} 
           y2={chartHeight - margin.bottom} 
-          stroke="#9ca3af" 
+          stroke="#a5b4fc" 
           strokeWidth="1" 
         />
       </svg>
@@ -519,36 +552,38 @@ const LineChart = ({ data, selectedDate, onSelectDate, average }) => {
 
 // Sub-components
 const SummaryCard = ({ title, value, subValue, color, icon, trend }) => (
-  <div className={`border-b border-gray-200 p-2 gap-3.5 flex items-start transition-all h-full`}>
-    <div className="bg-white p-3 rounded-xl mr-4 mt-1">
-      {icon}
+  <div className={`${color} rounded-2xl p-5 transition-all h-full text-white shadow-lg`}>
+    <div className="flex justify-between items-center">
+      <div className="flex-1">
+        <h3 className="text-sm font-medium">{title}</h3>
+        <p className="text-2xl font-bold mt-1">{value}</p>
+        {subValue && <p className="text-indigo-100 text-sm mt-1">{subValue}</p>}
+      </div>
+      <div className="bg-white/20 p-3 rounded-full">
+        {icon}
+      </div>
     </div>
-    <div className="flex-1">
-      <h3 className="text-sm text-gray-700">{title}</h3>
-      <p className="text-2xl font-bold mt-1">{value}</p>
-      {subValue && <p className="text-gray-600 text-sm mt-1">{subValue}</p>}
-      
-      {trend && (
-        <div className={`mt-3 inline-flex items-center px-3 py-1 rounded-full text-sm ${
-          trend === 'up' ? 'bg-red-100 text-red-800' : 'bg-green-100 text-green-800'
-        }`}>
-          {trend === 'up' ? 
-            <><FiArrowUp className="mr-1" /> ارتفاع</> : 
-            <><FiArrowDown className="mr-1" /> انخفاض</>
-          }
-        </div>
-      )}
-    </div>
+    
+    {trend && (
+      <div className={`mt-4 inline-flex items-center px-3 py-1 rounded-full text-sm ${
+        trend === 'up' ? 'bg-red-100 text-red-800' : 'bg-green-100 text-green-800'
+      }`}>
+        {trend === 'up' ? 
+          <><FiArrowUp className="mr-1" /> ارتفاع</> : 
+          <><FiArrowDown className="mr-1" /> انخفاض</>
+        }
+      </div>
+    )}
   </div>
 );
 
 const FilterButton = ({ children, active, onClick }) => (
   <button
     onClick={onClick}
-    className={`px-4 py-2 rounded-xl transition-all ${
+    className={`px-4 py-2 rounded-xl transition-all font-medium ${
       active 
-        ? 'bg-gradient-to-r from-blue-600 to-indigo-700 text-white shadow-md' 
-        : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+        ? 'bg-gradient-to-r from-indigo-600 to-indigo-700 text-white shadow-md' 
+        : 'text-indigo-800 hover:bg-indigo-200'
     }`}
   >
     {children}
@@ -556,14 +591,14 @@ const FilterButton = ({ children, active, onClick }) => (
 );
 
 const ExpenseItem = ({ name, price, time, timestamp }) => (
-  <div className="border border-gray-200 rounded-xl p-4 hover:shadow-md transition-shadow bg-white group">
+  <div className="border border-indigo-100 rounded-xl p-4 hover:shadow-md transition-shadow bg-white group">
     <div className="flex justify-between items-start">
       <div className="flex-1 min-w-0">
-        <h3 className="font-bold text-gray-800 text-lg truncate">{name}</h3>
+        <h3 className="font-bold text-indigo-900 text-lg truncate">{name}</h3>
         <div className="flex items-center mt-1">
-          <span className="text-gray-500 text-sm">{time}</span>
-          <span className="mx-2 text-gray-300">•</span>
-          <span className="text-gray-500 text-sm">
+          <span className="text-indigo-600 text-sm">{time}</span>
+          <span className="mx-2 text-indigo-300">•</span>
+          <span className="text-indigo-600 text-sm">
             {new Date(parseInt(timestamp)).toLocaleDateString('ar-EG')}
           </span>
         </div>
@@ -571,8 +606,8 @@ const ExpenseItem = ({ name, price, time, timestamp }) => (
       <div className="text-red-600 font-bold text-xl flex-shrink-0">-{price} ج.م</div>
     </div>
     
-    <div className="mt-4 pt-3 border-t border-gray-100 flex justify-between">
-      <div className="text-sm text-gray-500 flex items-center">
+    <div className="mt-4 pt-3 border-t border-indigo-100 flex justify-between">
+      <div className="text-sm text-indigo-600 flex items-center">
         <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
         </svg>

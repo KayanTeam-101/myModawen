@@ -6,8 +6,6 @@ import {
   BsClockHistory,
   BsListOl,
   BsCamera,
-  BsImage,
-  BsImageAlt
 } from "react-icons/bs";
 import AddItem from "../pages/record/Components/Additem";
 
@@ -18,7 +16,7 @@ const Navbar = () => {
     <>
       {/* Navbar with reduced height */}
       <div className="fixed bottom-0 left-0 right-0 h-14 w-full bg-white border-t border-gray-200 z-20">
-        <ul className="flex justify-around items-center h-full px-1">
+        <ul className="flex justify-between items-center h-full px-1">
           {/* Record */}
           <NavItem 
             icon={<BsFileText className="text-xl" />}
@@ -34,15 +32,17 @@ const Navbar = () => {
           
           {/* Add Item Button */}
           {localStorage.getItem('balance') && (
-            <li className="relative -top-1">
+            <li className="relative">
               <button
                 onClick={() => setShowAddItem(true)}
-                className="flex items-center justify-center bg-indigo-600    text-white rounded-full w-10 h-10 shadow-lg hover:bg-blue-700 transition-colors"
+      className="flex flex-col items-center justify-center  hover:text-blue-600 w-full py-1 transition-colors"
                 aria-label="إضافة عنصر"
               >
                 <BsCamera className="text-xl" />
+      <span className="text-[10px] mt-1"> إلتقاط</span>
               </button>
             </li>
+
           )}
           
           <NavItem 
@@ -57,6 +57,7 @@ const Navbar = () => {
             label="البيانات المحفوطة  "
             href="/HistoryCopyPage"
           />
+          
         </ul>
       </div>
       

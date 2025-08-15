@@ -7,7 +7,7 @@ const AddItem = ({ onClose }) => {
   const [isclicked, Setisclicked] = useState(false);
   const [item, setItem] = useState({
     name: '',
-    price: '',
+    price: 1,
     photo: null,
     photoPreview: null
   });
@@ -84,7 +84,7 @@ const AddItem = ({ onClose }) => {
       return;
     }
 
-    utilities.storeItem(item.name, item.price);
+    utilities.storeItem(item.name, item.price, JSON.stringify(item.photoPreview));
     utilities.sound();
 
     closeModal();
@@ -278,9 +278,7 @@ const AddItem = ({ onClose }) => {
                 </button>
               </div>
               
-              <span className="absolute right-14 top-1/2 transform -translate-y-1/2 text-lg text-gray-500">
-                ج.م
-              </span>
+            
             </div>
           </div>
 

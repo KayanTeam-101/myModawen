@@ -1,32 +1,67 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import Task from './task';
 
 const TaskBar = () => {
-  // Get data from localStorage or use empty object if null
-  const data = JSON.parse(localStorage.getItem('data')) || {};
+  // State for managing data
+  const [data, setData] = useState({});
   
-  // Get today's date key in "D-M-YYYY" format
+  // Load data from localStorage on initial render
+  useEffect(() => {
+    const savedData = JSON.parse(localStorage.getItem('data')) || {};
+    setData(savedData);
+  }, []);
+
+  // Get today's date key
   const today = new Date();
   const dateKey = `${today.getDate()}-${today.getMonth() + 1}-${today.getFullYear()}`;
   
-  // Flatten all items and filter only today's items
-  const todayItems = Object.entries(data)
-    .filter(([date]) => date === dateKey)
-    .flatMap(([, items]) =>
-      items.map((item, idx) => ({ ...item, date: dateKey, count: idx + 1 }))
-    );
+  // Handle price updates
+  const handlePriceChange = (date, id, newPrice) => {
+    setData(prev => {
+      const newData = { ...prev };
+      // Update the specific item
+      newData[date] = newData[date].map(item => 
+        item.timestamp === id ? { ...item, price: newPrice } : item
+      );
+      
+      // Persist to localStorage
+      localStorage.setItem('data', JSON.stringify(newData));
+      return newData;
+    });
+    window.location.reload();
+  };
+const handleDelete = (dateKey, id) => {
+  setData(prev => {
+    const newData = { ...prev };
+    newData[dateKey] = newData[dateKey].filter(item => item.timestamp !== id);
+    localStorage.setItem('data', JSON.stringify(newData));
+    return newData;
+  });
+};
+  // Filter today's items
+  const todayItems = data[dateKey] 
+    ? data[dateKey].map((item, idx) => ({ 
+        ...item, 
+        date: dateKey, 
+        count: idx + 1 
+      }))
+    : [];
 
   return (
     <div className="w-full h-fit space-y-1">
       {todayItems.length > 0 ? (
         todayItems.map((item) => (
           <Task
-            key={`${item.date}-${item.count}`}
+            key={item.timestamp}
+            id={item.timestamp}
+            dateKey={item.date}
             name={item.name}
             price={item.price}
             time={item.time}
-            date={item.date}
             count={item.count}
+            onPriceChange={handlePriceChange}
+                onDelete={handleDelete} // Add this prop
+
           />
         ))
       ) : (
