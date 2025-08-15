@@ -1,13 +1,16 @@
-  @import url('https://fonts.googleapis.com/css2?family=Beiruti:wght@200..900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Ubuntu:ital,wght@0,300;0,400;0,500;0,700;1,300;1,400;1,500;1,700&display=swap');
 @import "tailwindcss";
 
 *{
-    font-family: "Beiruti", sans-serif ;
+  font-family: "Ubuntu", sans-serif !important;
+
 }
 body {
   margin: 0;
   padding: 0;
-  background-color: #fff;
+  background-color: #fff !important;
+  font-family: "Ubuntu", sans-serif !important;
+
 
 }
 :root {
@@ -20,7 +23,7 @@ a.active {
   box-shadow: 0 0 15px -10px #000000;
 }
 .showSmoothy{
-  animation: showSmoothy .4s ease-in-out ;
+  animation: showSmoothy .6s ease-in-out ;
 }
 .fontsansSerif{
   font-family: sans-serif !important;
@@ -32,11 +35,14 @@ a.active {
   0%{
   opacity: 0;
   margin: 0;
-  transform: translateY(-2%);
+  transform: translateY(-1%);
+  scale: .9;
 
   }
-  30%{
+  60%{
     opacity: .1;
+    scale: 1;
+
   }
   100%{
     opacity: 1;
@@ -45,12 +51,10 @@ a.active {
   }
 }
 
-@keyframes wide {
+@keyframes wide { 
   0%{
   opacity: 0;
 width: 0;
-  }
-  30%{
   }
   100%{
     opacity: 1;

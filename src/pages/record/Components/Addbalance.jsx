@@ -53,7 +53,7 @@ const AddBalance = ({ onClose }) => {
 
   return (
     <div 
-      className={`fixed inset-0 bg-gray-400/70 backdrop-blur-sm flex items-center justify-center z-50 p-4 transition-opacity duration-300 ${
+      className={`fixed inset-0 bg-indigo-100/70 backdrop-blur-sm flex items-center justify-center z-50 p-4 transition-opacity duration-300 ${
         showModal ? 'opacity-100' : 'opacity-0 pointer-events-none'
       }`}
     >
@@ -65,7 +65,7 @@ const AddBalance = ({ onClose }) => {
       >
         {/* Header */}
         <div className="flex justify-between items-center p-5 border-b border-gray-100">
-          <h2 className="text-xl font-bold text-gray-800">إضافة رصيد جديد</h2>
+          <h2 className="text-xl font-bold text-gray-800">تعديل الرصيد </h2>
           <button 
             onClick={closeModal}
             className="p-2 rounded-full hover:bg-gray-100 transition-colors"
@@ -124,7 +124,7 @@ const AddBalance = ({ onClose }) => {
             disabled={!value || isSubmitting}
             className={`w-full py-4 rounded-xl font-bold text-white transition-all flex items-center justify-center gap-2 active:scale-[0.98] ${
               value && !isSubmitting
-                ? 'bg-gradient-to-r from-indigo-700 to-indigo-500 hover:from-blue-600 hover:to-indigo-600 shadow-md'
+                ? 'bg-gradient-to-r from-indigo-500 via-sky-600  to-pink-500 hover:from-blue-600 hover:to-indigo-600 shadow-md'
                 : 'bg-gray-300 text-gray-500 cursor-not-allowed'
             }`}
           >
@@ -136,7 +136,7 @@ const AddBalance = ({ onClose }) => {
             ) : (
               <>
                 <RiCheckLine size={24} />
-                تأكيد إضافة الرصيد
+                تأكيد تعديل الرصيد
               </>
             )}
           </button>

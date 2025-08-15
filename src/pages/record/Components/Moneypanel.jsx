@@ -1,9 +1,15 @@
 import React, { useState, useEffect } from "react";
 import { RiWallet3Line, RiAddCircleLine, RiMoneyPoundCircleLine, RiArrowDownCircleLine } from "react-icons/ri";
 import { Utilities } from "../../../utilities/utilities.js";
+import premiumImage from '/premium.jpg';
 import Addbalance from "./Addbalance.jsx";
+import Additem from "./Additem.jsx";
+import Getpremium from "./Getpremium.jsx";
+import { BsPlusCircle, BsPlusCircleDotted } from "react-icons/bs";
 
 const Moneypanel = () => {
+  const [showPremium, setShowPremium] = useState(true);
+
   const tools = new Utilities();
   const today = new Date();
   const dayName = today.toLocaleString("ar", { weekday: "long" });
@@ -15,6 +21,7 @@ const Moneypanel = () => {
   });
 
   const [isClicked, setIsClicked] = useState(false);
+  const [isClicked2, setIsClicked2] = useState(false);
   const [balance, setBalance] = useState(0);
   const [inWallet, setInWallet] = useState(0);
 
@@ -65,6 +72,7 @@ const Moneypanel = () => {
 
   return (
     <div className="max-w-4xl mx-auto px-4">
+    {/* <marquee behavior="smooth" direction="right" >لا تنسوا اخواننا في غزة و الهند و العالم بالدعاء</marquee> */}
       {!balance ? (
         <div className="flex flex-col items-center justify-center py-8">
           <div className="bg-white rounded-2xl shadow-xl p-6 w-full max-w-md">
@@ -74,7 +82,7 @@ const Moneypanel = () => {
               </div>
               <h3 className="text-xl font-bold text-gray-800 mb-2">لا يوجد رصيد</h3>
               <p className="text-gray-500 mb-6">أضف رصيدًا لبدء تتبع مصروفاتك</p>
-              <button 
+              <button
                 onClick={handleClick}
                 className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white py-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center gap-2"
               >
@@ -87,9 +95,9 @@ const Moneypanel = () => {
       ) : (
         <div className="space-y-5">
           {/* Balance Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mt-4">
             {/* Total Balance Card */}
-            <div 
+            <div
               className="bg-gradient-to-r from-indigo-600 to-purple-600 rounded-2xl shadow-xl p-5 text-white"
               onDoubleClick={handleClick}
             >
@@ -98,41 +106,47 @@ const Moneypanel = () => {
                   <p className="text-sm opacity-80">الرصيد المضاف </p>
                   <h2 className="text-3xl font-bold mt-1">{formatCurrency(balance)}</h2>
                 </div>
-                <div className="bg-white/20 p-2 rounded-lg">
-                  <RiWallet3Line className="text-xl" />
+                <div className="bg-white/20 p-1 rounded-lg flex flex-row gap-1" onClick={e => {
+                  console.log('primary btn cliked');
+                  
+                  showPremium && (
+<>
+                    <Getpremium onClose={() => setShowPremium(true)} />
+hi thre
+</>
+                  )
+                }}>
+                  <img src={premiumImage} width={26} alt="" />
+                  <p>
+                    خد التجربة الكاملة
+
+                  </p>
                 </div>
               </div>
               <div className="mt-4 flex justify-between items-center">
                 <span className="text-xs opacity-80">انقر مرتين لتعديل الرصيد</span>
-              
+
               </div>
             </div>
-            
+
             {/* Remaining Balance Card */}
-            <div className={`bg-white rounded-2xl shadow-xl p-5 ${
-              inWallet < 0 ? 'border-l-4 border-red-500' : 'border-l-4 border-green-500'
-            }`}>
+            <div className={`bg-white rounded-2xl  p-5 ${inWallet < 0 ? 'border-b-2 border-red-200' : 'border-b-2 border-green-200'
+              }`}>
               <div className="flex justify-between items-start">
                 <div>
                   <p className="text-gray-500 text-sm">المبلغ المتبقي</p>
-                  <h2 className={`text-2xl font-bold mt-1 ${
-                    inWallet < 0 ? 'text-red-600' : 'text-green-600'
-                  }`}>
+                  <h2 className={`text-2xl font-bold mt-1 ${inWallet < 0 ? 'text-red-600' : 'text-green-600'
+                    }`}>
                     {formatCurrency(inWallet)}
                   </h2>
                 </div>
-                <div className={`p-2 rounded-lg ${
-                  inWallet < 0 ? 'bg-red-100' : 'bg-green-100'
-                }`}>
-             
-                </div>
+          
               </div>
               <div className="mt-4">
                 <div className="w-full bg-gray-200 rounded-full h-2">
-                  <div 
-                    className={`h-2 rounded-full wide ${
-                      inWallet < 0 ? 'bg-red-500' : 'bg-green-500'
-                    }`} 
+                  <div
+                    className={`h-2 rounded-full wide ${inWallet < 0 ? 'bg-red-500' : 'bg-green-500'
+                      }`}
                     style={{ width: `${Math.min(100, Math.max(0, (inWallet / balance) * 100))}%` }}
                   ></div>
                 </div>
@@ -143,9 +157,9 @@ const Moneypanel = () => {
               </div>
             </div>
           </div>
-          
+
           {/* Date Information */}
-          <div className="bg-white rounded-2xl shadow-sm p-4 flex justify-between items-center">
+          <div className="bg-white ro rounded-2xl shadow-sm p-4 flex justify-between items-center active:opacity-70" onDoubleClick={e => setIsClicked2(true)}>
             <div className="flex items-center gap-2">
               <div>
                 <p className="text-sm text-gray-500">اليوم</p>
@@ -157,18 +171,18 @@ const Moneypanel = () => {
               <p className="text-sm text-gray-500">التاريخ</p>
               <p className="font-medium">{arabicDate}</p>
             </div>
-            <button 
-              onClick={handleClick}
-              className="bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm flex items-center gap-1"
+            <button
+              onClick={e => setIsClicked2(true)}
+              className="bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm flex items-center gap-1 active:bg-indigo-400"
             >
-              <RiAddCircleLine />
-              <span>إضافة رصيد</span>
+              <BsPlusCircle />
+              <span>إضافة عنصر </span>
             </button>
           </div>
         </div>
       )}
-
       {isClicked && <Addbalance onClose={handleCloseAddBalance} />}
+      {isClicked2 && <Additem onClose={handleCloseAddBalance} />}
     </div>
   );
 };

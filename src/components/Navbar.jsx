@@ -4,7 +4,10 @@ import {
   BsClipboardData,
   BsPlus,
   BsClockHistory,
-  BsListOl
+  BsListOl,
+  BsCamera,
+  BsImage,
+  BsImageAlt
 } from "react-icons/bs";
 import AddItem from "../pages/record/Components/Additem";
 
@@ -37,7 +40,7 @@ const Navbar = () => {
                 className="flex items-center justify-center bg-indigo-600    text-white rounded-full w-10 h-10 shadow-lg hover:bg-blue-700 transition-colors"
                 aria-label="إضافة عنصر"
               >
-                <BsPlus className="text-2xl" />
+                <BsCamera className="text-xl" />
               </button>
             </li>
           )}
