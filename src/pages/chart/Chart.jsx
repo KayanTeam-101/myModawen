@@ -117,7 +117,7 @@ const ChartPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-indigo-50 to-white p-4 md:p-6">
+    <div className="min-h-screen bg-gradient-to-br from-indigo-50 to-white p-4 md:p-6 showSmoothy">
       <div className="max-w-6xl mx-auto">
         {/* Header */}
         <div className="mb-8 text-center pt-2">
@@ -181,12 +181,7 @@ const ChartPage = () => {
             >
               شهر
             </FilterButton>
-            <FilterButton 
-              active={timeFilter === 'all'} 
-              onClick={() => setTimeFilter('all')}
-            >
-              الكل
-            </FilterButton>
+           
           </div>
         </div>
         
@@ -368,8 +363,8 @@ const LineChart = ({ data, selectedDate, onSelectDate, average }) => {
         {/* Gradient background */}
         <defs>
           <linearGradient id="areaGradient" x1="0" x2="0" y1="0" y2="1">
-            <stop offset="0%" stopColor="#818cf8" stopOpacity="0.2" />
-            <stop offset="100%" stopColor="#c7d2fe" stopOpacity="0.05" />
+            <stop offset="0%" stopColor="aqua" stopOpacity=".4" />
+            <stop offset="100%" stopColor="#5047e011" stopOpacity=".1" />
           </linearGradient>
         </defs>
         

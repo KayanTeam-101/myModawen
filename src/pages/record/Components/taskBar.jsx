@@ -60,7 +60,8 @@ const handleDelete = (dateKey, id) => {
             time={item.time}
             count={item.count}
             onPriceChange={handlePriceChange}
-                onDelete={handleDelete} // Add this prop
+            onDelete={handleDelete} // Add this prop
+            photo={item.photo}
 
           />
         ))

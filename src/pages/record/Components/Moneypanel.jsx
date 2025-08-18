@@ -1,14 +1,18 @@
 import React, { useState, useEffect } from "react";
-import { RiWallet3Line, RiAddCircleLine, RiMoneyPoundCircleLine, RiArrowDownCircleLine } from "react-icons/ri";
+import { RiWallet3Line, RiAddCircleLine, RiMoneyPoundCircleLine } from "react-icons/ri";
 import { Utilities } from "../../../utilities/utilities.js";
 import premiumImage from '/premium.jpg';
 import Addbalance from "./Addbalance.jsx";
 import Additem from "./Additem.jsx";
 import Getpremium from "./Getpremium.jsx";
-import { BsPlusCircle, BsPlusCircleDotted } from "react-icons/bs";
+import { BsPlusCircle } from "react-icons/bs";
 
 const Moneypanel = () => {
-  const [showPremium, setShowPremium] = useState(true);
+  const [showPremiumModal, setShowPremiumModal] = useState(false);
+  const [showAddBalance, setShowAddBalance] = useState(false);
+  const [showAddItem, setShowAddItem] = useState(false);
+  const [balance, setBalance] = useState(0);
+  const [inWallet, setInWallet] = useState(0);
 
   const tools = new Utilities();
   const today = new Date();
@@ -19,11 +23,6 @@ const Moneypanel = () => {
     month: 'long',
     day: 'numeric'
   });
-
-  const [isClicked, setIsClicked] = useState(false);
-  const [isClicked2, setIsClicked2] = useState(false);
-  const [balance, setBalance] = useState(0);
-  const [inWallet, setInWallet] = useState(0);
 
   // Initialize or load balance
   useEffect(() => {
@@ -36,7 +35,7 @@ const Moneypanel = () => {
     }
   }, []);
 
-  // Recalculate remaining balance for today's transactions
+  // Recalculate remaining balance
   useEffect(() => {
     const data = JSON.parse(localStorage.getItem('data')) || {};
     const todayItems = Array.isArray(data[dateKey]) ? data[dateKey] : [];
@@ -49,18 +48,8 @@ const Moneypanel = () => {
     setInWallet(balance - spentToday);
   }, [balance, dateKey]);
 
-  const handleClick = () => {
-    tools.sound();
-    setIsClicked(true);
-  };
+  const handleSound = () => tools.sound();
 
-  const handleCloseAddBalance = () => {
-    setIsClicked(false);
-    const updated = parseFloat(localStorage.getItem('balance')) || 0;
-    setBalance(updated);
-  };
-
-  // Format currency in Arabic style
   const formatCurrency = (amount) => {
     return new Intl.NumberFormat('ar-EG', {
       style: 'currency',
@@ -72,7 +61,6 @@ const Moneypanel = () => {
 
   return (
     <div className="max-w-4xl mx-auto px-4">
-    {/* <marquee behavior="smooth" direction="right" >لا تنسوا اخواننا في غزة و الهند و العالم بالدعاء</marquee> */}
       {!balance ? (
         <div className="flex flex-col items-center justify-center py-8">
           <div className="bg-white rounded-2xl shadow-xl p-6 w-full max-w-md">
@@ -83,7 +71,10 @@ const Moneypanel = () => {
               <h3 className="text-xl font-bold text-gray-800 mb-2">لا يوجد رصيد</h3>
               <p className="text-gray-500 mb-6">أضف رصيدًا لبدء تتبع مصروفاتك</p>
               <button
-                onClick={handleClick}
+                onClick={() => {
+                  handleSound();
+                  setShowAddBalance(true);
+                }}
                 className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white py-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center gap-2"
               >
                 <RiAddCircleLine className="text-xl" />
@@ -94,55 +85,47 @@ const Moneypanel = () => {
         </div>
       ) : (
         <div className="space-y-5">
-          {/* Balance Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-2 ">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {/* Total Balance Card */}
             <div
-              className="bg-gradient-to-r  rounded-2xl  p-5 text-gray-900"
-              onDoubleClick={handleClick}
+              className="rounded-2xl  text-gray-900  "
+              onDoubleClick={() => setShowAddBalance(true)}
             >
               <div className="flex justify-between items-start">
                 <div>
                   <p className="text-sm opacity-80">الرصيد المضاف </p>
                   <h2 className="text-3xl font-bold mt-1">{formatCurrency(balance)}</h2>
                 </div>
-                <div className="bg-linear-to-r from-indigo-400 via-fuchsia-400 to-blue-300 p-2 rounded-lg flex flex-row gap-1 " onClick={e => {
-                  console.log('primary btn cliked');
-                  
-                  showPremium && (
-<>
-                    <Getpremium onClose={() => setShowPremium(true)} />
-hi thre
-</>
-                  )
-                }}>
-                  <img src={premiumImage} width={26} alt="" />
-                 
-                </div>
+                <button
+                  className="bg-gradient-to-r from-indigo-400 via-fuchsia-400 to-blue-300 p-2 rounded-lg"
+                  onClick={() => {
+                    handleSound();
+                    setShowPremiumModal(true);
+                  }}
+                  aria-label="عرض مميزات بريميوم"
+                >
+                  <img src={premiumImage} width={26} alt="Premium" />
+                </button>
               </div>
               <div className="mt-2 flex justify-between items-center">
                 <span className="text-xs opacity-50">انقر مرتين لتعديل الرصيد</span>
-
               </div>
             </div>
 
             {/* Remaining Balance Card */}
-            <div className={`bg-white rounded-2xl  p-1 `}>
+            <div className="bg-white rounded-2xl">
               <div className="flex justify-between items-start">
                 <div>
                   <p className="text-gray-500 text-sm">المبلغ المتبقي</p>
-                  <h2 className={`text-2xl font-bold mt-1 ${inWallet < 0 ? 'text-red-600' : 'text-indigo-600'
-                    }`}>
+                  <h2 className={`text-2xl font-bold mt-1 ${inWallet < 0 ? 'text-red-600' : 'text-indigo-600'}`}>
                     {formatCurrency(inWallet)}
                   </h2>
                 </div>
-          
               </div>
               <div className="mt-2">
-                <div className="w-full bg-gray-200 rounded-full h-1">
+                <div className="w-full bg-gray-200 rounded-full h-1.5">
                   <div
-                    className={`h-1 rounded-full wide ${inWallet < 0 ? 'bg-red-500' : 'bg-indigo-400'
-                      }`}
+                    className={`h-1.5 rounded-full ${inWallet < 0 ? 'bg-red-500' : 'bg-indigo-400'}`}
                     style={{ width: `${Math.min(100, Math.max(0, (inWallet / balance) * 100))}%` }}
                   ></div>
                 </div>
@@ -155,7 +138,10 @@ hi thre
           </div>
 
           {/* Date Information */}
-          <div className="bg-white ro rounded-2xl shadow-sm p-4 flex justify-between items-center active:opacity-70" onDoubleClick={e => setIsClicked2(true)}>
+          <div 
+            className="bg-white rounded-2xl  p-4 flex justify-between items-center border border-gray-100"
+            onDoubleClick={() => setShowAddItem(true)}
+          >
             <div className="flex items-center gap-2">
               <div>
                 <p className="text-sm text-gray-500">اليوم</p>
@@ -165,19 +151,42 @@ hi thre
             <div className="h-6 border-r border-gray-200"></div>
             <div>
               <p className="text-sm text-gray-500">التاريخ</p>
-              <p className="font-medium">{arabicDate}</p>
+                <p className="font-medium">{arabicDate}</p>
+              </div>
+              <button
+                onClick={() => {
+                  handleSound();
+                  setShowAddItem(true);
+                }}
+                className="bg-gradient-to-r from-purple-500 to-indigo-500 text-white p-2 rounded-full"
+                aria-label="إضافة عنصر جديد"
+              >
+                <BsPlusCircle size={25}/>
+              </button>
             </div>
-            <button
-              onClick={e => setIsClicked2(true)}
-              className="bg-linear-to-r from-purple-500 to-indigo-500 text-white p-2 rounded-full text-sm flex items-center gap-1 active:bg-indigo-400"
-            >
-              <BsPlusCircle size={25}/>
-            </button>
           </div>
-        </div>
+        )}
+      
+      {/* Modals */}
+      {showAddBalance && (
+        <Addbalance onClose={() => {
+          const updated = parseFloat(localStorage.getItem('balance')) || 0;
+          setBalance(updated);
+          setShowAddBalance(false);
+        }} />
       )}
-      {isClicked && <Addbalance onClose={handleCloseAddBalance} />}
-      {isClicked2 && <Additem onClose={handleCloseAddBalance} />}
+      
+      {showAddItem && (
+        <Additem onClose={() => {
+          const updated = parseFloat(localStorage.getItem('balance')) || 0;
+          setBalance(updated);
+          setShowAddItem(false);
+        }} />
+      )}
+      
+      {showPremiumModal && (
+        <Getpremium onClose={() => setShowPremiumModal(false)} />
+      )}
     </div>
   );
 };

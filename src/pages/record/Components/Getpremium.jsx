@@ -1,201 +1,177 @@
-import React, { useState, useEffect } from "react";
-import { RiWallet3Line, RiAddCircleLine, RiMoneyPoundCircleLine } from "react-icons/ri";
-import { Utilities } from "../../../utilities/utilities.js";
-import premiumImage from '/premium.jpg';
-import Addbalance from "./Addbalance.jsx";
-import Getpremium from "./Getpremium.jsx";
+import React, { useState } from 'react';
+import { RiCloseLine, RiVipCrownFill } from 'react-icons/ri';
+import { Utilities } from '../../../utilities/utilities.js';
 
-const Moneypanel = () => {
-  const [showPremium, setShowPremium] = useState(false);
-  const [isClicked, setIsClicked] = useState(false);
-  const [balance, setBalance] = useState(0);
-  const [inWallet, setInWallet] = useState(0);
-
+const Getpremium = ({ onClose }) => {
   const tools = new Utilities();
-  const today = new Date();
-  const dayName = today.toLocaleString("ar", { weekday: "long" });
-  const dateKey = `${today.getDate()}-${today.getMonth() + 1}-${today.getFullYear()}`;
-  const arabicDate = today.toLocaleDateString('ar-EG', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric'
-  });
+  const [phone, setPhone] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSuccess, setIsSuccess] = useState(false);
+  const [error, setError] = useState('');
+  
+  const premiumFeatures = [
+    "إحصائيات مفصلة عن مصروفاتك",
+    "نسخ احتياطي تلقائي للسحابة",
+    "إشعارات وتنبيهات للمصروفات",
+    "دعم فني مخصص",
+    "إمكانية إضافة حسابات متعددة",
+    "واجهة بدون إعلانات"
+  ];
 
-  // Initialize or load balance
-  useEffect(() => {
-    const saved = localStorage.getItem('balance');
-    if (saved === null) {
-      localStorage.setItem('balance', '0');
-      setBalance(0);
-    } else {
-      setBalance(parseFloat(saved) || 0);
+  const validatePhone = () => {
+    if (!phone) {
+      setError("يرجى إدخال رقم الهاتف");
+      return false;
     }
-  }, []);
+    
+    const cleanedPhone = phone.replace(/\D/g, '');
+    if (!cleanedPhone.startsWith('01') || cleanedPhone.length !== 11) {
+      setError("رقم فودافون كاش غير صحيح (يجب أن يكون 11 رقم ويبدأ بـ 01)");
+      return false;
+    }
+    
+    setError('');
+    return true;
+  };
 
-  // Recalculate remaining balance for today's transactions
-  useEffect(() => {
-    const data = JSON.parse(localStorage.getItem('data')) || {};
-    const todayItems = Array.isArray(data[dateKey]) ? data[dateKey] : [];
-
-    const spentToday = todayItems.reduce((sum, { price }) => {
-      const val = parseFloat(price);
-      return sum + (isNaN(val) ? 0 : val);
-    }, 0);
-
-    setInWallet(balance - spentToday);
-  }, [balance, dateKey]);
-
-  const handleClick = () => {
+  const handleSubmit = (e) => {
+    e.preventDefault();
     tools.sound();
-    setIsClicked(true);
-  };
-
-  const handleCloseAddBalance = () => {
-    setIsClicked(false);
-    const updated = parseFloat(localStorage.getItem('balance')) || 0;
-    setBalance(updated);
-  };
-
-  // Format currency in Arabic style
-  const formatCurrency = (amount) => {
-    return new Intl.NumberFormat('ar-EG', {
-      style: 'currency',
-      currency: 'EGP',
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2
-    }).format(amount);
+    
+    if (!validatePhone()) return;
+    
+    setIsSubmitting(true);
+    
+    // Simulate payment processing
+    setTimeout(() => {
+      setIsSubmitting(false);
+      setIsSuccess(true);
+      
+      // Close after success
+      setTimeout(() => {
+        onClose();
+      }, 3000);
+    }, 2000);
   };
 
   return (
-    <div className="max-w-4xl mx-auto px-4 py-6">
-      {/* Premium Modal */}
-      {showPremium && <Getpremium onClose={() => setShowPremium(false)} />}
-      
-      {!balance ? (
-        <div className="flex flex-col items-center justify-center py-8">
-          <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-8 w-full max-w-md">
-            <div className="flex flex-col items-center text-center">
-              <div className="bg-gray-100 w-20 h-20 rounded-full flex items-center justify-center mb-4">
-                <RiMoneyPoundCircleLine className="text-indigo-600 text-4xl" />
-              </div>
-              <h3 className="text-xl font-bold text-gray-800 mb-2">لا يوجد رصيد</h3>
-              <p className="text-gray-600 mb-6">أضف رصيدًا لبدء تتبع مصروفاتك</p>
-              <button 
-                onClick={handleClick}
-                className="w-full bg-gradient-to-r from-gray-800 to-slate-700 text-white py-3 rounded-xl shadow transition-all duration-200 flex items-center justify-center gap-2 hover:shadow-md"
-              >
-                <RiAddCircleLine className="text-xl" />
-                <span className="font-medium">إضافة رصيد</span>
-              </button>
-              
-              <div 
-                className="mt-6 flex items-center gap-2 p-3 border border-amber-200 bg-amber-50 rounded-lg cursor-pointer hover:bg-amber-100 transition-colors"
-                onClick={() => setShowPremium(true)}
-              >
-                <img src={premiumImage} width={26} alt="Premium" className="rounded-full" />
-                <span className="text-sm text-amber-700 font-medium">جرب النسخة المميزة</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      ) : (
-        <div className="space-y-6">
-          {/* Balance Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {/* Total Balance Card */}
-            <div 
-              className="bg-gradient-to-r from-slate-800 to-gray-900 rounded-2xl shadow-lg p-6 text-white relative overflow-hidden"
-              onDoubleClick={handleClick}
-            >
-              <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-black/5"></div>
-              <div className="relative z-10">
-                <div className="flex justify-between items-start">
-                  <div>
-                    <p className="text-sm text-gray-300">الرصيد المضاف</p>
-                    <h2 className="text-3xl font-bold mt-2">{formatCurrency(balance)}</h2>
-                  </div>
-                  <div 
-                    className="flex items-center gap-2 bg-white/10 backdrop-blur-sm px-3 py-1.5 rounded-full cursor-pointer hover:bg-white/20 transition-colors"
-                    onClick={() => setShowPremium(true)}
-                  >
-                    <img src={premiumImage} width={20} alt="Premium" className="rounded-full" />
-                    <span className="text-xs font-medium text-amber-300">المزايا الكاملة</span>
-                  </div>
-                </div>
-                <div className="mt-6 flex justify-between items-center">
-                  <span className="text-xs text-gray-400">انقر مرتين لتعديل الرصيد</span>
-                  <RiWallet3Line className="text-gray-300 text-xl" />
-                </div>
-              </div>
-            </div>
-            
-            {/* Remaining Balance Card */}
-            <div className={`bg-white rounded-2xl shadow-lg border-l-4 p-6 ${
-              inWallet < 0 ? 'border-red-500' : 'border-green-500'
-            }`}>
-              <div className="flex justify-between items-start">
-                <div>
-                  <p className="text-gray-600 text-sm">المبلغ المتبقي</p>
-                  <h2 className={`text-2xl font-bold mt-2 ${
-                    inWallet < 0 ? 'text-red-600' : 'text-green-600'
-                  }`}>
-                    {formatCurrency(inWallet)}
-                  </h2>
-                </div>
-                <div className={`p-3 rounded-lg ${
-                  inWallet < 0 ? 'bg-red-50' : 'bg-green-50'
-                }`}>
-                  <div className={`w-3 h-3 rounded-full ${
-                    inWallet < 0 ? 'bg-red-500' : 'bg-green-500'
-                  }`}></div>
-                </div>
-              </div>
-              <div className="mt-6">
-                <div className="w-full bg-gray-200 rounded-full h-2.5 overflow-hidden">
-                  <div 
-                    className={`h-2.5 ${
-                      inWallet < 0 ? 'bg-red-500' : 'bg-green-500'
-                    }`} 
-                    style={{ 
-                      width: `${Math.min(100, Math.max(0, (inWallet / balance) * 100))}%`,
-                      transition: 'width 0.5s ease-in-out'
-                    }}
-                  ></div>
-                </div>
-                <div className="flex justify-between text-xs text-gray-500 mt-2">
-                  <span>0 ج.م</span>
-                  <span>{formatCurrency(balance)}</span>
-                </div>
-              </div>
-            </div>
-          </div>
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-70">
+      <div className="bg-white rounded-2xl w-full max-w-md overflow-hidden shadow-2xl">
+        {/* Header */}
+        <div className="bg-gradient-to-r from-yellow-400 to-yellow-500 p-5 relative">
+          <button 
+            onClick={onClose}
+            className="absolute top-3 left-3 text-white bg-black bg-opacity-20 rounded-full p-1 hover:bg-opacity-30 transition-all"
+            aria-label="إغلاق"
+          >
+            <RiCloseLine size={24} />
+          </button>
           
-          {/* Date Information */}
-          <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-5 flex justify-between items-center">
-            <div className="flex items-center gap-4">
-              <div>
-                <p className="text-sm text-gray-500">اليوم</p>
-                <p className="font-medium text-gray-800">{dayName}</p>
-              </div>
-              <div className="h-6 border-r border-gray-200"></div>
-              <div>
-                <p className="text-sm text-gray-500">التاريخ</p>
-                <p className="font-medium text-gray-800">{arabicDate}</p>
-              </div>
-            </div>
-            <button 
-              onClick={handleClick}
-              className="bg-gray-800 text-white px-4 py-2.5 rounded-lg text-sm flex items-center gap-1.5 hover:bg-gray-900 transition-colors shadow-sm"
-            >
-              <RiAddCircleLine className="text-base" />
-              <span>إضافة رصيد</span>
-            </button>
+          <div className="flex flex-col items-center text-center text-white">
+            <RiVipCrownFill className="text-4xl mb-2" />
+            <h2 className="text-2xl font-bold">ترقية إلى حساب بريميوم</h2>
+            <p className="opacity-90 mt-1">استمتع بمزايا حصرية وتجربة أفضل</p>
           </div>
         </div>
-      )}
-      {isClicked && <Addbalance onClose={handleCloseAddBalance} />}
+        
+        {/* Content */}
+        <div className="p-5">
+          {!isSuccess ? (
+            <>
+              <div className="mb-6">
+                <h3 className="text-lg font-bold text-gray-800 mb-3">المزايا المميزة:</h3>
+                <ul className="space-y-2">
+                  {premiumFeatures.map((feature, index) => (
+                    <li key={index} className="flex items-start">
+                      <span className="text-yellow-500 mr-2">•</span>
+                      <span>{feature}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+              
+              <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-4 mb-5">
+                <div className="flex justify-between items-center">
+                  <span className="font-medium">سعر الاشتراك:</span>
+                  <span className="bg-yellow-500 text-white py-1 px-3 rounded-full font-bold">
+                    10 ج.م / شهر
+                  </span>
+                </div>
+                <p className="text-sm text-gray-600 mt-2">
+                  سيتم تجديد الاشتراك تلقائيًا كل شهر حتى إلغاء الاشتراك
+                </p>
+              </div>
+              
+              <form onSubmit={handleSubmit}>
+                <div className="mb-4">
+                  <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-1">
+                    رقم فودافون كاش
+                  </label>
+                  <div className="relative">
+                    <input
+                      id="phone"
+                      type="tel"
+                      value={phone}
+                      onChange={(e) => setPhone(e.target.value)}
+                      placeholder="01XXXXXXXXX"
+                      className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500"
+                      disabled={isSubmitting}
+                    />
+                    <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                      <span className="text-gray-500">+20</span>
+                    </div>
+                  </div>
+                  {error && <p className="mt-1 text-sm text-red-600">{error}</p>}
+                </div>
+                
+                <button
+                  type="submit"
+                  disabled={isSubmitting}
+                  className="w-full bg-gradient-to-r from-green-600 to-green-700 text-white py-3 rounded-xl font-medium shadow-lg hover:shadow-xl transition-all disabled:opacity-70 flex items-center justify-center"
+                >
+                  {isSubmitting ? (
+                    <>
+                      <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                      </svg>
+                      جارِ المعالجة...
+                    </>
+                  ) : (
+                    "دفع عن طريق فودافون كاش"
+                  )}
+                </button>
+                
+                <div className="mt-3 text-center text-sm text-gray-500">
+                  سيصلك كود تفعيل على هذا الرقم لتأكيد الدفع
+                </div>
+              </form>
+            </>
+          ) : (
+            <div className="text-center py-8">
+              <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-green-100 mb-4">
+                <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
+                </svg>
+              </div>
+              <h3 className="text-xl font-bold text-gray-800 mb-2">تم الترقية بنجاح!</h3>
+              <p className="text-gray-600">
+                تم تفعيل حسابك البريميوم بنجاح. استمتع بالمزايا الحصرية!
+              </p>
+            </div>
+          )}
+        </div>
+        
+        {/* Footer */}
+        <div className="bg-gray-50 p-4 border-t border-gray-200 text-center">
+          <div className="flex items-center justify-center text-sm text-gray-500">
+            <div className="w-12 h-8 bg-contain bg-center bg-no-repeat bg-[url('https://www.vodafone.com.eg/assets/images/icons/payment/vodafone-cash-logo.svg')] mr-2"></div>
+            <span>مدفوعات آمنة عبر فودافون كاش</span>
+          </div>
+        </div>
+      </div>
     </div>
   );
 };
 
-export default Moneypanel;
+export default Getpremium;

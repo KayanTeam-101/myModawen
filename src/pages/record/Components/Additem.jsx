@@ -8,11 +8,12 @@ const AddItem = ({ onClose }) => {
   const [item, setItem] = useState({
     name: '',
     price: 1,
-    photo: null,
-    photoPreview: null
+    photo: null,        // Will store the base64 string
+    photoPreview: null  // For preview only
   });
   const [hoveredShortcut, setHoveredShortcut] = useState(null);
   const [showModal, setShowModal] = useState(false);
+  const [isProcessingPhoto, setIsProcessingPhoto] = useState(false);
   const fileInputRef = useRef(null);
   const priceInput = useRef(null);
   const itemNameInput = useRef(null);
@@ -55,15 +56,43 @@ const AddItem = ({ onClose }) => {
       price: newValue.toString() // Keep as string without formatting
     }));
   };
-
+  
+  // Fixed photo change handler
   const handlePhotoChange = (e) => {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
-      setItem(prev => ({
-        ...prev,
-        photo: file,
-        photoPreview: URL.createObjectURL(file)
-      }));
+      
+      // Check file size (2MB max)
+      const maxSize = 2 * 1024 * 1024;
+      if (file.size > maxSize) {
+        alert("الرجاء اختيار صورة أقل من ٢ ميجابايت");
+        return;
+      }
+
+      setIsProcessingPhoto(true);
+      
+      // Create a FileReader to convert image to base64
+      const reader = new FileReader();
+      
+      reader.onload = (event) => {
+        const base64String = event.target.result;
+        
+        // Update state with base64 string
+        setItem(prev => ({
+          ...prev,
+          photo: base64String,
+          photoPreview: base64String
+        }));
+        setIsProcessingPhoto(false);
+      };
+      
+      reader.onerror = (error) => {
+        console.error("Error reading file:", error);
+        alert("حدث خطأ أثناء قراءة الصورة");
+        setIsProcessingPhoto(false);
+      };
+      
+      reader.readAsDataURL(file);
     }
   };
 
@@ -84,7 +113,8 @@ const AddItem = ({ onClose }) => {
       return;
     }
 
-    utilities.storeItem(item.name, item.price, JSON.stringify(item.photoPreview));
+    // Save the base64 string (item.photo) instead of photoPreview
+    utilities.storeItem(item.name, item.price, item.photo);
     utilities.sound();
 
     closeModal();
@@ -215,7 +245,6 @@ const AddItem = ({ onClose }) => {
                               <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 5l7 7-7 7M5 5l7 7-7 7" />
                               </svg>
-                              <span className="text-xs">سعر</span>
                             </div>
                           )}
                         </div>
@@ -277,8 +306,6 @@ const AddItem = ({ onClose }) => {
                   <RiAddLine className="text-gray-600" />
                 </button>
               </div>
-              
-            
             </div>
           </div>
 
@@ -291,7 +318,12 @@ const AddItem = ({ onClose }) => {
               onClick={triggerFileInput}
               className="border-2 border-dashed border-indigo-300 rounded-xl p-6 text-center hover:border-indigo-400 transition-colors cursor-pointer bg-indigo-50"
             >
-              {item.photoPreview ? (
+              {isProcessingPhoto ? (
+                <div className="flex flex-col items-center justify-center">
+                  <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-indigo-500"></div>
+                  <p className="text-gray-600 mt-3">جارٍ تحميل الصورة...</p>
+                </div>
+              ) : item.photoPreview ? (
                 <div className="relative">
                   <img
                     src={item.photoPreview}
@@ -324,16 +356,29 @@ const AddItem = ({ onClose }) => {
 
           {/* Submit Button */}
           <button
+            onClick={utilities.sound}
             type="submit"
-            disabled={!item.name.trim() || !item.price || parseFloat(item.price) <= 0}
-            className={`w-full py-4 rounded-xl font-bold text-white  flex items-center justify-center gap-2 transition-colors ${
-              item.name.trim() && item.price && parseFloat(item.price) > 0
+            disabled={!item.name.trim() || !item.price || parseFloat(item.price) <= 0 || isProcessingPhoto}
+            className={`w-full py-4 rounded-xl font-bold text-white flex items-center justify-center gap-2 transition-colors ${
+              !isProcessingPhoto && item.name.trim() && item.price && parseFloat(item.price) > 0
                 ? 'bg-gradient-to-r from-indigo-500 to-indigo-500 hover:from-indigo-600 hover:to-indigo-600 shadow-md'
                 : 'bg-indigo-300 text-gray-500 cursor-not-allowed'
             }`}
           >
-            <RiCheckLine size={24} />
-            إضافة العنصر
+            {isProcessingPhoto ? (
+              <>
+                <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                جارٍ معالجة الصورة
+              </>
+            ) : (
+              <>
+                <RiCheckLine size={24} />
+                إضافة العنصر
+              </>
+            )}
           </button>
         </form>
       </div>

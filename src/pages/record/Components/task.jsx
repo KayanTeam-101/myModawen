@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { RiDeleteBinLine, RiCloseLine } from 'react-icons/ri';
-import { FaDeleteLeft } from "react-icons/fa6";
+import { RiDeleteBinLine, RiCloseLine, RiZoomInLine } from 'react-icons/ri';
+import { FaDeleteLeft, FaImage } from "react-icons/fa6";
+import { BsImage } from 'react-icons/bs';
 
 const Task = ({ 
   name, 
@@ -10,11 +11,13 @@ const Task = ({
   dateKey, 
   id, 
   onPriceChange,
-  onDelete // New prop for deletion
+  onDelete,
+  photo
 }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [editValue, setEditValue] = useState(price);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [showImageModal, setShowImageModal] = useState(false);
   const [isLongPressing, setIsLongPressing] = useState(false);
   const inputRef = useRef(null);
   const pressTimer = useRef(null);
@@ -31,8 +34,7 @@ const Task = ({
     pressTimer.current = setTimeout(() => {
       setIsLongPressing(true);
       setShowDeleteModal(true);
-    window.navigator.vibrate(200)
-
+      window.navigator.vibrate(200);
     }, 500);
   };
 
@@ -42,10 +44,6 @@ const Task = ({
       pressTimer.current = null;
     }
     setIsLongPressing(false);
-  };
-
-  const handleLongPress = () => {
-    setShowDeleteModal(true);
   };
 
   const handleDelete = () => {
@@ -84,9 +82,15 @@ const Task = ({
     setEditValue(price);
   };
 
+  // Handle image modal
+  const openImageModal = (e) => {
+    e.stopPropagation();
+    setShowImageModal(true);
+  };
+
   return (
     <div 
-      className='w-full p-3 border-b border-gray-100 hover:bg-gray-50 transition-colors duration-200 flex items-start relative group'
+      className='w-full h-fit p-3 border-b border-gray-100 hover:bg-gray-50 transition-colors duration-200 flex items-start relative group'
       onMouseDown={startPressTimer}
       onMouseUp={cancelPressTimer}
       onMouseLeave={cancelPressTimer}
@@ -104,14 +108,7 @@ const Task = ({
       
       {/* Delete Confirmation Modal */}
       {showDeleteModal && (
-        <div className="absolute inset-0 bg-white bg-opacity-95 rounded-lg z-20 flex flex-col items-center justify-center p-4 shadow-lg select-none border border-red-200">
-          <div className="text-center mb-3">
-            <div className=" w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-2">
-            </div>
-            <h3 className="font-medium text-gray-800">هل أنت متأكد من الحذف؟</h3>
-            <p className="text-sm text-gray-600 mt-1">لا يمكن استرجاع العنصر بعد الحذف</p>
-          </div>
-          
+        <div className="absolute rounded-none inset-0 z-20 flex flex-col items-center justify-center p-4 select-none showSmoothy bg-red-50/45 backdrop-blur-[1px]">
           <div className="flex gap-2">
             <button
               onClick={() => setShowDeleteModal(false)}
@@ -127,6 +124,32 @@ const Task = ({
               <FaDeleteLeft />
               حذف
             </button>
+          </div>
+        </div>
+      )}
+
+      {/* Image Preview Modal */}
+      {showImageModal && (
+        <div 
+          className="fixed h-screen w-screen inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-4"
+          onClick={() => setShowImageModal(false)}
+        >
+          <div className="relative max-w-3xl max-h-[90vh]">
+            <img 
+              src={photo} 
+              alt={name}
+              className="max-w-full max-h-[80vh] object-contain rounded-lg"
+            />
+            <div className="absolute top-4 right-4 bg-white/20 backdrop-blur-sm rounded-full p-2">
+              <RiCloseLine 
+                className="text-white text-xl cursor-pointer" 
+                onClick={() => setShowImageModal(false)}
+              />
+            </div>
+            <div className="text-white text-center mt-4">
+              <div className="font-medium">{name}</div>
+              <div className="text-sm opacity-80">-{price} ج.م</div>
+            </div>
           </div>
         </div>
       )}
@@ -172,7 +195,19 @@ const Task = ({
         </div>
       </div>
       
-      <div className='absolute inset-y-0 left-0 w-1 bg-transparent transition-colors duration-300'></div>
+      {photo && (
+        <div 
+          className='h-full p-2 mr-2 flex justify-center items-center cursor-pointer'
+          onClick={openImageModal}
+        >
+          <div className="relative">
+            <FaImage size={24} className='text-gray-700'/>
+            <div className="absolute -top-1 -right-1 bg-indigo-500 rounded-full w-4 h-4 flex items-center justify-center">
+              <RiZoomInLine className="text-white text-xs" />
+            </div>
+          </div>
+        </div>
+      )} 
     </div>
   );
 };
