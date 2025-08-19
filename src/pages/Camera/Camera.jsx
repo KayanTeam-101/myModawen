@@ -107,7 +107,7 @@ const CameraPage = ({ onClose, onAddItem }) => {
       context.drawImage(video, 0, 0, canvas.width, canvas.height);
       
       // Convert to base64 for storage
-      const imageData = canvas.toDataURL('image/jpeg', 0.8);
+      const imageData = canvas.toDataURL('image/jpeg', 1);
       setCapturedImage(imageData);
       
       // Stop camera after capture

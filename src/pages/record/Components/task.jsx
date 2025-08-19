@@ -207,9 +207,7 @@ const Task = ({
         >
           <div className="relative">
             <FaImage size={24} className='text-gray-700'/>
-            <div className="absolute -top-1 -right-1 bg-indigo-500 rounded-full w-4 h-4 flex items-center justify-center">
-              <RiZoomInLine className="text-white text-xs" />
-            </div>
+           
           </div>
         </div>
       )} 
