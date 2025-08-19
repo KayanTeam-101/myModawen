@@ -7,7 +7,12 @@ import { RiSettingsFill } from "react-icons/ri";
 
 const Navbar = () => {
   const [showAddItem, setShowAddItem] = useState(false);
+
   const [path, setPath] = useState(typeof window !== "undefined" ? window.location.pathname : "/");
+  const data =localStorage.getItem('data');
+console.log(
+  Boolean(data)
+);
 
   useEffect(() => {
     // update on browser navigation (back/forward)
@@ -24,9 +29,10 @@ const Navbar = () => {
   
   return (
     <>
-      <nav
+   {Boolean(data) ? (
+       <nav
         dir="rtl"
-        className="fixed bottom-0 w-screen h-12 left-0 right-0 z-40 bg-white border-t border-gray-100 safe-area-inset-bottom flex justify-around items-center shadow-sm"
+        className="fixed bottom-0 w-screen h-12 left-0 right-0 z-40 bg-white  border-gray-100 safe-area-inset-bottom flex justify-around items-center border-t"
         aria-label="Bottom navigation"
       >
         <div className="max-w-xl mx-auto">
@@ -55,8 +61,8 @@ const Navbar = () => {
                     <NavItem
               icon={<FaCamera className="text-2xl" />}
               label="إلتقاط"
-              href="/"
-              active={path === "/none"}
+              href="/camera"
+              active={path === "/camera"}
               onClick={() => handleNavClick("/")}
 
             />
@@ -84,6 +90,8 @@ const Navbar = () => {
           </ul>
         </div>
       </nav>
+   ):
+   null}
 
       {/* Add item modal */}
       {showAddItem && <AddItem onClose={() => setShowAddItem(false)} />}

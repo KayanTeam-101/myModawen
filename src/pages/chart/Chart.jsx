@@ -15,7 +15,10 @@ const ChartPage = () => {
   useEffect(() => {
     // Sample data structure
     const storedData = JSON.parse(localStorage.getItem('data'));
-
+    const data =localStorage.getItem('data');
+    if (!data) {
+      window.location.href='/'
+    }
     const processData = () => {
       const dates = Object.keys(storedData);
       

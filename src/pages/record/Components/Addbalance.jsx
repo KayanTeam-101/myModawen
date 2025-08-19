@@ -45,10 +45,7 @@ const AddBalance = ({ onClose }) => {
 
   const formatCurrency = (amount) => {
     if (!amount) return '0.00';
-    return new Intl.NumberFormat('ar-EG', {
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2
-    }).format(parseFloat(amount));
+    return  parseFloat(amount);
   };
 
   return (

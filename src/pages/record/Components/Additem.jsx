@@ -7,7 +7,7 @@ const AddItem = ({ onClose }) => {
   const [isclicked, Setisclicked] = useState(false);
   const [item, setItem] = useState({
     name: '',
-    price: 1,
+    price: '',
     photo: null,        // Will store the base64 string
     photoPreview: null  // For preview only
   });
@@ -48,7 +48,6 @@ const AddItem = ({ onClose }) => {
 
   // Handle price increment/decrement without formatting
   const adjustPrice = (amount) => {
-    utilities.sound();
     const currentValue = parseFloat(item.price) || 0;
     const newValue = Math.max(0, currentValue + amount);
     setItem(prev => ({
@@ -101,6 +100,8 @@ const AddItem = ({ onClose }) => {
   };
 
   const handleSubmit = (e) => {
+    utilities.sound();
+
     e.preventDefault();
 
     if (!item.name.trim()) {
@@ -121,6 +122,8 @@ const AddItem = ({ onClose }) => {
   };
 
   const closeModal = () => {
+    utilities.sound();
+
     setShowModal(false);
     setTimeout(() => {
       onClose?.();
@@ -155,6 +158,7 @@ const AddItem = ({ onClose }) => {
 
   return (
     <div 
+    onDoubleClick={e => Setisclicked(false)}
       className={`fixed inset-0 bg-indigo-100/70 backdrop-blur-sm flex items-center justify-center z-50 p-4 transition-opacity duration-300 ${
         showModal ? 'opacity-100' : 'opacity-0 pointer-events-none'
       }`}
@@ -169,7 +173,7 @@ const AddItem = ({ onClose }) => {
           <h2 className="text-xl font-bold text-gray-800">إضافة عنصر جديد</h2>
           <button 
             onClick={closeModal}
-            className="p-2 rounded-full hover:bg-gray-100 transition-colors"
+            className="p-2 rounded-full bg-gray-50 transition-colors"
           >
             <RiCloseLine className="text-gray-500 text-xl" />
           </button>
@@ -202,7 +206,7 @@ const AddItem = ({ onClose }) => {
               <button
                 type="button"
                 className="absolute left-3 top-1/2 transform -translate-y-1/2 h-10 w-10 focus bg-gray-100 flex items-center justify-center text-gray-600 rounded-xl hover:bg-gray-200 transition-colors"
-                onClick={() => Setisclicked(!isclicked)}
+                onClick={() => {utilities.sound();Setisclicked(!isclicked)}}
               >
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 12h.01M12 12h.01M19 12h.01M6 12a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0z" />

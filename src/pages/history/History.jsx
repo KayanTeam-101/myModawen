@@ -1,6 +1,9 @@
 import React from 'react'
 import List from './components/list'
 const History = () => {
+    if (!localStorage.getItem('data')) {
+      window.location.href='/'
+    }
   return (
     <div className=' min-h-screen'>
         <div className="mb-8 text-center pt-2">

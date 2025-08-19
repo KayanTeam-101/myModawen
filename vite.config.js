@@ -15,9 +15,9 @@ export default defineConfig({
       registerType: 'autoUpdate',
       includeAssets: ['favicon.svg', 'robots.txt', 'apple-touch-icon.png'],
       manifest: {
-        name: 'My App',
-        short_name: 'App',
-        description: 'My awesome PWA built with Vite + React',
+        name: 'مُدوّن',
+        short_name: 'مُدوّن',
+        description: 'صل علي محمد',
         theme_color: '#ffffff',
         icons: [
           { src: 'pwa-192x192.png', sizes: '192x192', type: 'image/png' },

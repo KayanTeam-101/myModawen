@@ -48,7 +48,7 @@ const handleDelete = (dateKey, id) => {
     : [];
 
   return (
-    <div className="w-full h-fit space-y-1">
+    <div className="w-full h-fit">
       {todayItems.length > 0 ? (
         todayItems.map((item) => (
           <Task

@@ -51,12 +51,7 @@ const Moneypanel = () => {
   const handleSound = () => tools.sound();
 
   const formatCurrency = (amount) => {
-    return new Intl.NumberFormat('ar-EG', {
-      style: 'currency',
-      currency: 'EGP',
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2
-    }).format(amount);
+    return amount  + ' EGP';
   };
 
   return (
@@ -139,7 +134,7 @@ const Moneypanel = () => {
 
           {/* Date Information */}
           <div 
-            className="bg-white rounded-2xl  p-4 flex justify-between items-center border border-gray-100"
+            className="bg-white rounded-2xl select-none active:opacity-20  p-4 flex justify-between items-center border border-gray-100"
             onDoubleClick={() => setShowAddItem(true)}
           >
             <div className="flex items-center gap-2">
