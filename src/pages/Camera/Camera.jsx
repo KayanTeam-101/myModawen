@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { RiCloseLine, RiCameraLine, RiCameraOffLine, RiCheckLine } from 'react-icons/ri';
+import { RiCloseLine, RiCameraLine, RiCameraOffLine, RiCheckLine, RiRefreshLine } from 'react-icons/ri';
 
 const CameraPage = ({ onClose, onAddItem }) => {
   const [showModal, setShowModal] = useState(false);
@@ -9,13 +9,14 @@ const CameraPage = ({ onClose, onAddItem }) => {
   const [itemPrice, setItemPrice] = useState('');
   const [facingMode, setFacingMode] = useState('environment');
   const [cameraError, setCameraError] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
   const videoRef = useRef(null);
   const streamRef = useRef(null);
   const canvasRef = useRef(null);
 
   useEffect(() => {
     setShowModal(true);
-    startCamera();
+    initializeCamera();
     
     return () => {
       stopCamera();
@@ -26,12 +27,13 @@ const CameraPage = ({ onClose, onAddItem }) => {
     // Restart camera when facing mode changes
     if (showModal) {
       stopCamera();
-      setTimeout(startCamera, 100);
+      setTimeout(initializeCamera, 300);
     }
   }, [facingMode]);
 
-  const startCamera = async () => {
+  const initializeCamera = async () => {
     try {
+      setIsLoading(true);
       setCameraError(null);
       
       // Check if browser supports mediaDevices
@@ -52,20 +54,37 @@ const CameraPage = ({ onClose, onAddItem }) => {
       
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
+        
+        // Wait for video to load
         videoRef.current.onloadedmetadata = () => {
-          setIsCameraActive(true);
+          videoRef.current.play().then(() => {
+            setIsCameraActive(true);
+            setIsLoading(false);
+          }).catch(err => {
+            console.error('Error playing video:', err);
+            setCameraError('Failed to start camera');
+            setIsLoading(false);
+          });
+        };
+        
+        videoRef.current.onerror = () => {
+          setCameraError('Failed to load camera');
+          setIsLoading(false);
         };
       }
     } catch (error) {
       console.error('Error accessing camera:', error);
       setCameraError(`Camera error: ${error.message}`);
+      setIsLoading(false);
       setIsCameraActive(false);
     }
   };
 
   const stopCamera = () => {
     if (streamRef.current) {
-      streamRef.current.getTracks().forEach(track => track.stop());
+      streamRef.current.getTracks().forEach(track => {
+        track.stop();
+      });
       setIsCameraActive(false);
     }
   };
@@ -75,7 +94,7 @@ const CameraPage = ({ onClose, onAddItem }) => {
   };
 
   const capturePhoto = () => {
-    if (videoRef.current && canvasRef.current) {
+    if (videoRef.current && canvasRef.current && isCameraActive) {
       const video = videoRef.current;
       const canvas = canvasRef.current;
       const context = canvas.getContext('2d');
@@ -98,7 +117,7 @@ const CameraPage = ({ onClose, onAddItem }) => {
 
   const retakePhoto = () => {
     setCapturedImage(null);
-    startCamera();
+    initializeCamera();
   };
 
   const handleSubmit = (e) => {
@@ -162,9 +181,10 @@ const CameraPage = ({ onClose, onAddItem }) => {
                 <RiCameraOffLine className="text-2xl mx-auto mb-2" />
                 <p>{cameraError}</p>
                 <button 
-                  onClick={startCamera}
-                  className="mt-3 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+                  onClick={initializeCamera}
+                  className="mt-3 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors flex items-center justify-center mx-auto"
                 >
+                  <RiRefreshLine className="ml-1" />
                   حاول مرة أخرى
                 </button>
               </div>
@@ -175,46 +195,53 @@ const CameraPage = ({ onClose, onAddItem }) => {
                     isCameraActive ? '' : 'border-2 border-dashed border-gray-400'
                   }`}
                 >
-                  {isCameraActive ? (
-                    <video
-                      ref={videoRef}
-                      autoPlay
-                      playsInline
-                      muted
-                      className="w-full h-full object-cover"
-                    />
-                  ) : (
-                    <div className="text-center text-gray-500 p-6">
-                      <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-white mx-auto mb-3"></div>
-                      <p>جارٍ تشغيل الكاميرا...</p>
+                  <video
+                    ref={videoRef}
+                    autoPlay
+                    playsInline
+                    muted
+                    className="w-full h-full object-cover"
+                    style={{ display: isCameraActive ? 'block' : 'none' }}
+                  />
+                  
+                  {isLoading && (
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <div className="text-center text-white p-6">
+                        <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-white mx-auto mb-3"></div>
+                        <p>جارٍ تشغيل الكاميرا...</p>
+                      </div>
+                    </div>
+                  )}
+                  
+                  {!isLoading && !isCameraActive && (
+                    <div className="text-center text-white p-6">
+                      <RiCameraOffLine className="text-2xl mx-auto mb-2" />
+                      <p>تعذر تشغيل الكاميرا</p>
                     </div>
                   )}
                 </div>
                 
                 {/* Camera controls */}
-                <div className="flex justify-center mt-4 space-x-4">
-                  <button
-                    onClick={toggleCamera}
-                    className="p-3 bg-indigo-100 rounded-full text-indigo-700 hover:bg-indigo-200 transition-colors"
-                    title="تبديل الكاميرا"
-                  >
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7h4m-4 4h4m-4 4h4m4-8v8m0 0v8m0-8h4m-4 4h4m-4 4h4" />
-                    </svg>
-                  </button>
-                  
-                  <button
-                    onClick={capturePhoto}
-                    disabled={!isCameraActive}
-                    className={`p-5 rounded-full ${
-                      isCameraActive 
-                        ? 'bg-indigo-600 hover:bg-indigo-700 text-white' 
-                        : 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                    } transition-colors`}
-                  >
-                    <RiCameraLine className="text-2xl" />
-                  </button>
-                </div>
+                {isCameraActive && (
+                  <div className="flex justify-center mt-4 space-x-4">
+                    <button
+                      onClick={toggleCamera}
+                      className="p-3 bg-indigo-100 rounded-full text-indigo-700 hover:bg-indigo-200 transition-colors"
+                      title="تبديل الكاميرا"
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7h4m-4 4h4m-4 4h4m4-8v8m0 0v8m0-8h4m-4 4h4m-4 4h4" />
+                      </svg>
+                    </button>
+                    
+                    <button
+                      onClick={capturePhoto}
+                      className="p-5 rounded-full bg-indigo-600 hover:bg-indigo-700 text-white transition-colors"
+                    >
+                      <RiCameraLine className="text-2xl" />
+                    </button>
+                  </div>
+                )}
               </div>
             ) : (
               <div className="text-center">
