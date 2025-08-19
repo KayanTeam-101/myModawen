@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { RiCloseLine, RiCameraLine, RiCameraOffLine, RiCheckLine, RiRefreshLine } from 'react-icons/ri';
-
+import { Utilities } from '../../utilities/utilities';
 const CameraPage = ({ onClose, onAddItem }) => {
   const [showModal, setShowModal] = useState(false);
   const [isCameraActive, setIsCameraActive] = useState(false);
@@ -13,7 +13,7 @@ const CameraPage = ({ onClose, onAddItem }) => {
   const videoRef = useRef(null);
   const streamRef = useRef(null);
   const canvasRef = useRef(null);
-
+  const utilities = new Utilities();
   useEffect(() => {
     setShowModal(true);
     initializeCamera();
@@ -121,6 +121,7 @@ const CameraPage = ({ onClose, onAddItem }) => {
   };
 
   const handleSubmit = (e) => {
+    utilities.sound();
     e.preventDefault();
     
     if (!itemPrice || parseFloat(itemPrice) <= 0) {
@@ -134,12 +135,8 @@ const CameraPage = ({ onClose, onAddItem }) => {
     }
 
     // Pass the captured item data to the parent component
-    onAddItem({
-      name: itemName || 'عنصر بدون اسم',
-      price: itemPrice,
-      photo: capturedImage
-    });
-
+utilities.storeItem(itemName,itemPrice,capturedImage);
+window.location.href ='/'
     closeModal();
   };
 

@@ -134,7 +134,12 @@ const Task = ({
           className="fixed h-screen w-screen inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-4"
           onClick={() => setShowImageModal(false)}
         >
-          <div className="relative max-w-3xl max-h-[90vh]">
+             <img 
+              src={photo} 
+              alt={name}
+              className="w-screen h-screen absolute"
+            />
+          <div className="fixed flex items-center justify-center flex-col bg-indigo-500/15 w-screen h-screen backdrop-blur-2xl">
             <img 
               src={photo} 
               alt={name}
