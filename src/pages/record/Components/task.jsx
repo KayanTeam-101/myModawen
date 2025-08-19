@@ -131,7 +131,7 @@ const Task = ({
       {/* Image Preview Modal */}
       {showImageModal && (
         <div 
-          className="fixed h-screen w-screen inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-4"
+          className="fixed h-screen w-screen inset-0 bg-black/80  z-50 flex items-center justify-center p-4"
           onClick={() => setShowImageModal(false)}
         >
              <img 
@@ -139,7 +139,7 @@ const Task = ({
               alt={name}
               className="w-screen h-screen absolute"
             />
-          <div className="fixed flex items-center justify-center flex-col bg-indigo-500/15 w-screen h-screen backdrop-blur-2xl">
+          <div className="fixed flex items-center justify-center flex-col bg-indigo-500/15 w-screen h-screen backdrop-blur-md">
             <img 
               src={photo} 
               alt={name}
