@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { RiDeleteBinLine, RiCloseLine, RiZoomInLine } from 'react-icons/ri';
 import { FaDeleteLeft, FaImage } from "react-icons/fa6";
 import { BsImage } from 'react-icons/bs';
+import '../../../index.css';
 
 const Task = ({ 
   name, 
@@ -131,7 +132,7 @@ const Task = ({
       {/* Image Preview Modal */}
       {showImageModal && (
         <div 
-          className="fixed h-screen w-screen inset-0 bg-black/80  z-50 flex items-center justify-center p-4"
+          className=" showSmoothy fixed h-screen w-screen inset-0 bg-black/80  z-50 flex items-center justify-center p-4 "
           onClick={() => setShowImageModal(false)}
         >
              <img 
@@ -139,11 +140,11 @@ const Task = ({
               alt={name}
               className="w-screen h-screen absolute"
             />
-          <div className="fixed flex items-center justify-center flex-col bg-indigo-500/15 w-screen h-screen backdrop-blur-md">
+          <div className="showSmoothy fixed flex items-center justify-center flex-col bg-indigo-500/15 w-screen h-screen backdrop-blur-md">
             <img 
               src={photo} 
               alt={name}
-              className="max-w-full max-h-[80vh] object-contain rounded-lg"
+              className="showSmoothy max-w-full max-h-[80vh] object-contain rounded-lg"
             />
             <div className="absolute top-4 right-4 bg-white/20 backdrop-blur-sm rounded-full p-2">
               <RiCloseLine 
