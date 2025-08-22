@@ -120,7 +120,7 @@ const Moneypanel = () => {
               <div className="mt-2">
                 <div className="w-full bg-gray-200 rounded-full h-1.5">
                   <div
-                    className={`h-1.5 rounded-full ${inWallet < 0 ? 'bg-red-500' : 'bg-indigo-400'}`}
+                    className={`h-1.5 rounded-full ${inWallet < 0 ? 'bg-red-500' : 'bg-linear-90 from-indigo-400 to-indigo-700'}`}
                     style={{ width: `${Math.min(100, Math.max(0, (inWallet / balance) * 100))}%` }}
                   ></div>
                 </div>
