@@ -319,7 +319,7 @@ const LineChart = ({ data, selectedDate, onSelectDate, average }) => {
   
   // Calculate required width
   const requiredWidth = Math.max(
-    1200,
+    data.length <= 10 ? 500 : data.length ,
     data.length * minPointSpacing + margin.left + margin.right
   );
   

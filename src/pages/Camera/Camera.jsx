@@ -145,6 +145,8 @@ window.location.href ='/'
     setShowModal(false);
     setTimeout(() => {
       onClose?.();
+window.location.href ='/'
+
     }, 300);
   };
 

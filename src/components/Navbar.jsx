@@ -32,7 +32,7 @@ console.log(
    {Boolean(data) ? (
        <nav
         dir="rtl"
-        className="fixed bottom-0 w-screen h-12 left-0 right-0 z-40 bg-white  border-gray-100 safe-area-inset-bottom flex justify-around items-center border-t"
+        className="fixed bottom-0 w-screen h-12 left-0 right-0 z-40 bg-white  border-gray-50 safe-area-inset-bottom flex justify-around items-center border-t"
         aria-label="Bottom navigation"
       >
         <div className="max-w-xl mx-auto">

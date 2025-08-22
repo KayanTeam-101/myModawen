@@ -422,7 +422,7 @@ const handleFile = (e) => {
   );
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-indigo-50 to-white p-4 md:p-6 showSmoothy" dir="rtl">
+    <div className=" bg-gradient-to-br from-indigo-50 to-white p-4 md:p-6 showSmoothy" dir="rtl">
       <div className="max-w-4xl mx-auto">
         {/* Header */}
         <div className="mb-8 text-center pt-2">
