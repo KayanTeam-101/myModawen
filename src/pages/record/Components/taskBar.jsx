@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import Task from './task';
+import { BsClipboard2MinusFill } from "react-icons/bs";
 
 const TaskBar = () => {
   // State for managing data
@@ -66,8 +67,17 @@ const handleDelete = (dateKey, id) => {
           />
         ))
       ) : (
-        <div className="text-center py-8 text-gray-500">
+        <div className="text-center py-44  flex justify-center items-center flex-col gap-10 text-gray-500 "    onClick={() => {
+    const button = document.querySelector('div.bg-white button.bg-gradient-to-r');
+    console.log(button);
+    
+    if (button) {
+      button.click();
+    }
+  }}
+>
           لا توجد عناصر مضافة اليوم
+<BsClipboard2MinusFill size={150} className=' text-gray-200'/>
         </div>
       )}
     </div>

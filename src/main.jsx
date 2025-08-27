@@ -9,6 +9,10 @@ import { Analytics } from '@vercel/analytics/react';
 //   onNeedRefresh() {},
 //   onOfflineReady() {},
 // });
+  if (!localStorage.getItem('theme')) {
+localStorage.setItem('theme','dark')
+    
+  }
 
 createRoot(document.getElementById("root")).render(
   <BrowserRouter>

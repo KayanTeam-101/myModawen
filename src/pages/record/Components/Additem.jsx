@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { RiCloseLine, RiCameraLine, RiAddLine, RiCheckLine, RiSubtractLine } from 'react-icons/ri';
+import { RiCloseLine, RiImageCircleLine, RiAddLine, RiCheckLine, RiSubtractLine } from 'react-icons/ri';
 import { Utilities } from '../../../utilities/utilities';
 
 const AddItem = ({ onClose }) => {
@@ -12,12 +12,25 @@ const AddItem = ({ onClose }) => {
     photoPreview: null  // For preview only
   });
   const [hoveredShortcut, setHoveredShortcut] = useState(null);
+  const [Storeshortcuts, setStoreShortcuts] = useState(() => {
+    try {
+      const item = typeof window !== 'undefined' ? localStorage.getItem('shortcuts') : null;
+      return item ? JSON.parse(item) : [];
+    } catch (error) {
+      console.error('Error parsing localStorage item "shortcuts":', error);
+      return [];
+    }
+  });
   const [showModal, setShowModal] = useState(false);
   const [isProcessingPhoto, setIsProcessingPhoto] = useState(false);
   const fileInputRef = useRef(null);
   const priceInput = useRef(null);
   const itemNameInput = useRef(null);
   const longPressTimer = useRef(null);
+
+  // theme
+  const THEME = typeof window !== 'undefined' ? (localStorage.getItem('theme') || 'light') : 'light';
+  const isDark = THEME === 'dark';
 
   useEffect(() => {
     setShowModal(true);
@@ -134,7 +147,7 @@ const AddItem = ({ onClose }) => {
   // Shortcuts management
   const getShortcuts = () => {
     try {
-      const data = localStorage.getItem('shortcuts');
+      const data = typeof window !== 'undefined' ? localStorage.getItem('shortcuts') : null;
       return data ? JSON.parse(data) : [];
     } catch (err) {
       console.error('فشل في قراءة الاختصارات من localStorage:', err);
@@ -149,40 +162,50 @@ const AddItem = ({ onClose }) => {
     const shortcuts = getShortcuts();
     if (!shortcuts.includes(newShortcut.trim())) {
       const updatedShortcuts = [...shortcuts, newShortcut.trim()];
-      localStorage.setItem('shortcuts', JSON.stringify(updatedShortcuts));
+      setStoreShortcuts(updatedShortcuts)
+      if (typeof window !== 'undefined') localStorage.setItem('shortcuts', JSON.stringify(updatedShortcuts));
       Setisclicked(true);
     }
   };
 
   const shortcuts = getShortcuts();
 
+  // themed classes
+  const overlayBg = isDark ? 'bg-gray-900/70' : 'bg-indigo-100/70';
+  const cardBg = isDark ? 'bg-gray-800 border-gray-700 text-gray-100' : 'bg-white border-gray-200 text-gray-900';
+  const inputBg = isDark ? 'bg-gray-700 border-gray-600 placeholder-gray-400' : 'bg-gray-50 border-gray-200 placeholder-gray-400';
+  const subtleBg = isDark ? 'bg-gray-800/30' : 'bg-indigo-50';
+  const shortcutHoverBg = isDark ? 'bg-indigo-900/20' : 'bg-indigo-50';
+  const accent = 'text-indigo-600';
+  const buttonGradient = 'bg-gradient-to-r from-indigo-700 to-indigo-500';
+
   return (
     <div 
-    onDoubleClick={e => Setisclicked(false)}
-      className={`fixed inset-0 bg-indigo-100/70 backdrop-blur-sm flex items-center justify-center z-50 p-4 transition-opacity duration-300 ${
+      onDoubleClick={e => Setisclicked(false)}
+      className={`fixed inset-0 ${overlayBg} backdrop-blur-sm flex items-center justify-center z-50 p-4 transition-opacity duration-300 ${
         showModal ? 'opacity-100' : 'opacity-0 pointer-events-none'
       }`}
     >
       <div 
-        className={`bg-white rounded-2xl shadow-xl w-full max-w-md overflow-hidden border border-gray-200 transition-all duration-300 transform ${
+        className={`${cardBg} rounded-2xl shadow-xl w-full max-w-md overflow-hidden transition-all duration-300 transform ${
         showModal ? 'scale-100 opacity-100' : 'scale-95 opacity-0'
       }`}
       >
         {/* Header */}
-        <div className="flex justify-between items-center p-5 border-b border-gray-100">
-          <h2 className="text-xl font-bold text-gray-800">إضافة عنصر جديد</h2>
+        <div className={`flex justify-between items-center p-5 border-b ${isDark ? 'border-gray-700' : 'border-gray-100'}`}>
+          <h2 className="text-xl font-bold">إضافة عنصر جديد</h2>
           <button 
             onClick={closeModal}
-            className="p-2 rounded-full bg-gray-50 transition-colors"
+            className={`p-2 rounded-full transition-colors ${isDark ? 'bg-gray-700/40' : 'bg-gray-50'}`}
           >
-            <RiCloseLine className="text-gray-500 text-xl" />
+            <RiCloseLine className={`${isDark ? 'text-gray-200' : 'text-gray-500'} text-xl`} />
           </button>
         </div>
 
         <form onSubmit={handleSubmit} className="p-5">
           {/* Item Name */}
           <div className="mb-6 relative">
-            <label htmlFor="itemName" className="block text-sm font-medium text-gray-700 mb-2">
+            <label htmlFor="itemName" className={`block text-sm font-medium mb-2 ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>
               اسم العنصر
             </label>
             
@@ -194,7 +217,7 @@ const AddItem = ({ onClose }) => {
                 type="text"
                 value={item.name}
                 onChange={handleChange}
-                className="w-full px-4 py-3 text-lg bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-100 focus:border-indigo-500 outline-none transition-colors"
+                className={`w-full px-4 py-3 text-lg rounded-xl focus:ring-2 focus:border-indigo-500 outline-none transition-colors ${inputBg}`}
                 placeholder="أدخل اسم العنصر"
                 onMouseDown={startLongPress}
                 onMouseUp={endLongPress}
@@ -205,7 +228,7 @@ const AddItem = ({ onClose }) => {
               
               <button
                 type="button"
-                className="absolute left-3 top-1/2 transform -translate-y-1/2 h-10 w-10 focus bg-gray-100 flex items-center justify-center text-gray-600 rounded-xl hover:bg-gray-200 transition-colors"
+                className={`absolute left-3 top-1/2 transform -translate-y-1/2 h-10 w-10 focus bg-gray-100 flex items-center justify-center rounded-xl hover:bg-gray-200 transition-colors ${isDark ? 'bg-gray-700/40 hover:bg-gray-600/40' : ''}`}
                 onClick={() => {utilities.sound();Setisclicked(!isclicked)}}
               >
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -215,17 +238,17 @@ const AddItem = ({ onClose }) => {
               
               {isclicked && (
                 <div 
-                  className="absolute top-full left-0 mt-2 w-full bg-white border border-gray-200 rounded-xl shadow-lg z-30 overflow-hidden transition-all duration-300 showSmoothy"
+                  className={`absolute top-full left-0 mt-2 w-full ${cardBg.replace('text-gray-100','')} border ${isDark ? 'border-gray-700' : 'border-gray-200'} rounded-xl shadow-lg z-30 overflow-hidden transition-all duration-300 showSmoothy`}
                 >
                   <div className="max-h-60 overflow-y-auto">
-                    {shortcuts.length > 0 ? (
-                      shortcuts.map((shortcut, i) => (
+                    {Storeshortcuts.length > 0 ? (
+                      Storeshortcuts.map((shortcut, i) => (
                         <div
                           key={i}
                           className={`px-4 py-3 transition-all duration-200 cursor-pointer flex items-center ${
                             hoveredShortcut === shortcut 
-                              ? 'bg-indigo-50 border-l-4 border-indigo-500 pl-3' 
-                              : 'text-gray-700'
+                              ? `${shortcutHoverBg} border-l-4 border-indigo-500 pl-3` 
+                              : `${isDark ? 'text-gray-200' : 'text-gray-700'}`
                           }`}
                           onMouseEnter={() => {
                             setHoveredShortcut(shortcut);
@@ -261,7 +284,7 @@ const AddItem = ({ onClose }) => {
                   </div>
                   
                   <div 
-                    className="px-4 py-3 flex items-center justify-between text-indigo-600 hover:bg-indigo-50 cursor-pointer transition-colors border-t border-gray-100"
+                    className={`px-4 py-3 flex items-center justify-between ${accent} hover:${isDark ? 'bg-indigo-900/20' : 'bg-indigo-50'} cursor-pointer transition-colors border-t ${isDark ? 'border-gray-700' : 'border-gray-100'}`}
                     onClick={addNewShortcut}
                   >
                     <span>إضافة جديد</span>
@@ -274,7 +297,7 @@ const AddItem = ({ onClose }) => {
 
           {/* Price with adjustment buttons */}
           <div className="mb-6">
-            <label htmlFor="itemPrice" className="block text-sm font-medium text-gray-700 mb-2">
+            <label htmlFor="itemPrice" className={`block text-sm font-medium mb-2 ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>
               السعر
             </label>
             <div className="relative">
@@ -282,9 +305,9 @@ const AddItem = ({ onClose }) => {
                 <button
                   type="button"
                   onClick={() => adjustPrice(-1)}
-                  className="flex items-center justify-center w-12 bg-gray-100 rounded-r-lg border border-gray-200 border-l-0 hover:bg-gray-200 transition-colors"
+                  className={`${isDark ? 'bg-gray-700 border-gray-600' : 'bg-gray-100'} flex items-center justify-center w-12 rounded-r-lg border ${isDark ? 'border-gray-600' : 'border-gray-200'} hover:brightness-105 transition-colors`}
                 >
-                  <RiSubtractLine className="text-gray-600" />
+                  <RiSubtractLine className={`${isDark ? 'text-gray-200' : 'text-gray-600'}`} />
                 </button>
                 
                 <div className="relative flex-1">
@@ -297,7 +320,7 @@ const AddItem = ({ onClose }) => {
                     onChange={handleChange}
                     min="0"
                     step="1"
-                    className="w-full px-4 py-3 text-lg bg-gray-50 border border-gray-200 focus:ring-2 focus:ring-indigo-100 focus:border-indigo-500 outline-none transition-colors"
+                    className={`w-full px-4 py-3 text-lg rounded-none focus:ring-2 focus:border-indigo-500 outline-none transition-colors ${inputBg}`}
                     placeholder="0"
                   />
                 </div>
@@ -305,9 +328,9 @@ const AddItem = ({ onClose }) => {
                 <button
                   type="button"
                   onClick={() => adjustPrice(1)}
-                  className="flex items-center justify-center w-12 bg-gray-100 rounded-l-lg border border-gray-200 border-r-0 hover:bg-gray-200 transition-colors"
+                  className={`${isDark ? 'bg-gray-700 border-gray-600' : 'bg-gray-100'} flex items-center justify-center w-12 rounded-l-lg border ${isDark ? 'border-gray-600' : 'border-gray-200'} hover:brightness-105 transition-colors`}
                 >
-                  <RiAddLine className="text-gray-600" />
+                  <RiAddLine className={`${isDark ? 'text-gray-200' : 'text-gray-600'}`} />
                 </button>
               </div>
             </div>
@@ -315,17 +338,17 @@ const AddItem = ({ onClose }) => {
 
           {/* Photo Upload */}
           <div className="mb-6">
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className={`block text-sm font-medium mb-2 ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>
               صورة العنصر (اختياري)
             </label>
             <div
               onClick={triggerFileInput}
-              className="border-2 border-dashed border-indigo-300 rounded-xl p-6 text-center hover:border-indigo-400 transition-colors cursor-pointer bg-indigo-50"
+              className={`border-2 border-dashed rounded-xl p-6 text-center hover:border-indigo-400 transition-colors cursor-pointer ${isDark ? 'border-gray-600 ' + 'bg-gray-800/30' : 'border-indigo-300 bg-indigo-50'}`}
             >
               {isProcessingPhoto ? (
                 <div className="flex flex-col items-center justify-center">
                   <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-indigo-500"></div>
-                  <p className="text-gray-600 mt-3">جارٍ تحميل الصورة...</p>
+                  <p className={`${isDark ? 'text-gray-200' : 'text-gray-600'} mt-3`}>جارٍ تحميل الصورة...</p>
                 </div>
               ) : item.photoPreview ? (
                 <div className="relative">
@@ -334,18 +357,18 @@ const AddItem = ({ onClose }) => {
                     alt="معاينة الصورة"
                     className="mx-auto max-h-40 object-contain rounded-lg"
                   />
-                  <div className="mt-4 text-indigo-600 font-medium flex items-center justify-center">
-                    <RiCameraLine className="mr-1" />
+                  <div className={`mt-4 ${accent} font-medium flex items-center justify-center`}>
+                    <RiImageCircleLine className="mr-1" />
                     تغيير الصورة
                   </div>
                 </div>
               ) : (
                 <div className="flex flex-col items-center justify-center">
-                  <div className="bg-indigo-100 rounded-full p-3 mb-3 inline-block">
-                    <RiCameraLine className="text-indigo-400 text-2xl" />
+                  <div className={`${isDark ? 'bg-indigo-900/30' : 'bg-indigo-100'} rounded-full p-3 mb-3 inline-block`}>
+                    <RiImageCircleLine className={`${isDark ? 'text-indigo-300' : 'text-indigo-400'} text-2xl`} />
                   </div>
-                  <p className="text-gray-600">اضغط لاختيار صورة</p>
-                  <p className="text-gray-400 text-sm mt-1">أو اسحب الصورة هنا</p>
+                  <p className={`${isDark ? 'text-gray-200' : 'text-gray-600'}`}>اضغط لاختيار صورة</p>
+                  <p className={`${isDark ? 'text-gray-400' : 'text-gray-400'} text-sm mt-1`}>أو اسحب الصورة هنا</p>
                 </div>
               )}
             </div>
@@ -360,12 +383,12 @@ const AddItem = ({ onClose }) => {
 
           {/* Submit Button */}
           <button
-            onClick={utilities.sound}
+            onClick={() => utilities.sound()}
             type="submit"
             disabled={!item.name.trim() || !item.price || parseFloat(item.price) <= 0 || isProcessingPhoto}
-            className={`w-full py-4 rounded-xl font-bold text-white flex items-center justify-center gap-2 transition-colors ${
+            className={`w-full py-4 rounded-xl font-bold text-white flex items-center justify-center gap-2 transition-colors active:opacity-40 ${
               !isProcessingPhoto && item.name.trim() && item.price && parseFloat(item.price) > 0
-                ? 'bg-gradient-to-r from-indigo-500 to-indigo-500 hover:from-indigo-600 hover:to-indigo-600 shadow-md'
+                ? `${buttonGradient} shadow-md`
                 : 'bg-indigo-300 text-gray-500 cursor-not-allowed'
             }`}
           >

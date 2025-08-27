@@ -5,7 +5,8 @@ export function Utilities(sound, vibrate, storeItem) {
     const audio = new Audio();
     const src = 'src/assets/bubbles.mp3';
     audio.src = src;
-    audio.playbackRate=1.25;
+    audio.playbackRate=1;
+    audio.volume=.2;
     audio.play()
       .then(() => console.log('done'))
       .catch((err) => console.error('Error playing sound:', err));

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState,useEffect } from "react";
 import "./App.css";
 import Navbar from "./components/Navbar";
 import { Route, Routes } from "react-router-dom";
@@ -9,8 +9,20 @@ import HistoryCopyPage from "./pages/copypage/Copyhistory";
 import CameraPage from "./pages/Camera/Camera";
 
 function App() {
-  const [count, setCount] = useState(0);
+     useEffect(() => {
+    const metaTheme = document.querySelector('meta[name="theme-color"]');
+    const THEME =localStorage.getItem('theme');
+    if (metaTheme) {
+    }
+    if (THEME == "dark") {
+     metaTheme.setAttribute('content', '#000');
+    document.body.style.backgroundColor="#000";
+   }else{
+    document.body.style.backgroundColor="#fff";
+     metaTheme.setAttribute('content', '#000');
 
+   }
+  }, []);
   return (
     <>
       <Routes>

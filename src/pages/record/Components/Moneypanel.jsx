@@ -5,7 +5,11 @@ import premiumImage from '/premium.jpg';
 import Addbalance from "./Addbalance.jsx";
 import Additem from "./Additem.jsx";
 import Getpremium from "./Getpremium.jsx";
-import { BsPlusCircle } from "react-icons/bs";
+import { BsInfo, BsPlusCircle } from "react-icons/bs";
+
+// Moneypanel with conditional Tailwind classes for light / dark theme
+// Usage: the component reads localStorage.getItem('theme') and applies classes
+// based on THEME === 'dark'. If no theme is stored, it falls back to 'light'.
 
 const Moneypanel = () => {
   const [showPremiumModal, setShowPremiumModal] = useState(false);
@@ -13,6 +17,10 @@ const Moneypanel = () => {
   const [showAddItem, setShowAddItem] = useState(false);
   const [balance, setBalance] = useState(0);
   const [inWallet, setInWallet] = useState(0);
+
+  // read theme from localStorage (client-side). default to 'light' if missing
+  const THEME = (typeof window !== 'undefined' && localStorage.getItem('theme')) || 'light';
+  const isDark = THEME === 'dark';
 
   const tools = new Utilities();
   const today = new Date();
@@ -51,26 +59,39 @@ const Moneypanel = () => {
   const handleSound = () => tools.sound();
 
   const formatCurrency = (amount) => {
-    return amount  + ' EGP';
+    return amount + ' EGP';
   };
 
+  // helper classes
+  const containerBase = `max-w-4xl mx-auto px-4`;
+  const textMain = isDark ? 'text-gray-100' : 'text-gray-900';
+  const cardBg = '';
+  const cardShadow = isDark ? 'shadow-md' : 'shadow-xl';
+  const subtleBg = isDark ? 'bg-indigo-900/15' : 'bg-indigo-50';
+  const infoText = isDark ? 'text-gray-300' : 'text-gray-500';
+  const smallText = isDark ? 'text-gray-400' : 'text-gray-500';
+  // main accent now consistently indigo
+  const accentText = 'text-indigo-600';
+  const buttonGradient = 'bg-gradient-to-r from-indigo-600 via-sky-400 to-purple-300';
+
   return (
-    <div className="max-w-4xl mx-auto px-4">
+    <div className={`${containerBase} ${textMain}`}>
       {!balance ? (
         <div className="flex flex-col items-center justify-center py-8">
-          <div className="bg-white rounded-2xl shadow-xl p-6 w-full max-w-md">
+          <div className={`${cardBg} ${cardShadow} rounded-2xl p-6 w-full max-w-md`}
+               style={{ backdropFilter: isDark ? 'blur(6px)' : 'none' }}>
             <div className="flex flex-col items-center text-center">
-              <div className="bg-indigo-100 w-20 h-20 rounded-full flex items-center justify-center mb-4">
-                <RiMoneyPoundCircleLine className="text-indigo-600 text-4xl" />
+              <div className={`${isDark ? 'bg-indigo-500/20' : 'bg-indigo-100'} w-20 h-20 rounded-full flex items-center justify-center mb-4`}>
+                <RiMoneyPoundCircleLine className={`${accentText} text-4xl`} />
               </div>
-              <h3 className="text-xl font-bold text-gray-800 mb-2">لا يوجد رصيد</h3>
-              <p className="text-gray-500 mb-6">أضف رصيدًا لبدء تتبع مصروفاتك</p>
+              <h3 className={`text-xl font-bold ${isDark ? 'text-white' : 'text-gray-800'} mb-2`}>لا يوجد رصيد</h3>
+              <p className={`${infoText} mb-6`}>أضف رصيدًا لبدء تتبع مصروفاتك</p>
               <button
                 onClick={() => {
                   handleSound();
                   setShowAddBalance(true);
                 }}
-                className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white py-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center gap-2"
+                className={`w-full ${buttonGradient} text-white py-3 rounded-xl ${isDark ? 'shadow-lg' : 'shadow-lg'} hover:scale-[1.01] transition-all duration-300 flex items-center justify-center gap-2`}
               >
                 <RiAddCircleLine className="text-xl" />
                 <span className="font-medium">إضافة رصيد</span>
@@ -83,85 +104,66 @@ const Moneypanel = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {/* Total Balance Card */}
             <div
-              className="rounded-2xl  text-gray-900  "
+              className={`${cardBg} ${cardShadow} rounded-2xl p-4`}
               onDoubleClick={() => setShowAddBalance(true)}
             >
               <div className="flex justify-between items-start">
                 <div>
-                  <p className="text-sm opacity-80">الرصيد المضاف </p>
-                  <h2 className="text-3xl font-bold mt-1">{formatCurrency(balance)}</h2>
+                  <p className={`text-sm opacity-80 ${smallText}`}>الرصيد</p>
+                  <h2 className={`text-3xl font-black mt-2 ${isDark ? 'text-white' : 'text-gray-900'}`}>
+                    <span className={`${inWallet > 0 ? (isDark ? 'text-white' : 'text-black') : 'text-red-600'}`}>{inWallet}</span>
+                    <span className="p-1 text-gray-600">EGP</span>
+                    <span className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-300'} pl-2`}>متبقي من {balance} <span className="pl-1 text-gray-600">EGP</span></span>
+                  </h2>
                 </div>
                 <button
-                  className="bg-gradient-to-r from-indigo-400 via-fuchsia-400 to-blue-300 p-2 rounded-lg"
+                  className={`p-1 rounded-full ${isDark ? 'bg-gray-700/40' : 'bg-black'} flex items-center justify-center`}
                   onClick={() => {
                     handleSound();
                     setShowPremiumModal(true);
                   }}
                   aria-label="عرض مميزات بريميوم"
                 >
-                  <img src={premiumImage} width={26} alt="Premium" />
+                  <BsInfo size={22} className={`${isDark ? 'text-white' : 'text-white'}`} />
                 </button>
               </div>
               <div className="mt-2 flex justify-between items-center">
-                <span className="text-xs opacity-50">انقر مرتين لتعديل الرصيد</span>
+                <span className={`text-xs opacity-50 ${smallText}`}>انقر مرتين لتعديل الرصيد</span>
               </div>
             </div>
 
-            {/* Remaining Balance Card */}
-            <div className="bg-white rounded-2xl">
-              <div className="flex justify-between items-start">
-                <div>
-                  <p className="text-gray-500 text-sm">المبلغ المتبقي</p>
-                  <h2 className={`text-2xl font-bold mt-1 ${inWallet < 0 ? 'text-red-600' : 'text-indigo-600'}`}>
-                    {formatCurrency(inWallet)}
-                  </h2>
-                </div>
-              </div>
-              <div className="mt-2">
-                <div className="w-full bg-gray-200 rounded-full h-1.5">
-                  <div
-                    className={`h-1.5 rounded-full ${inWallet < 0 ? 'bg-red-500' : 'bg-linear-90 from-indigo-400 to-indigo-700'}`}
-                    style={{ width: `${Math.min(100, Math.max(0, (inWallet / balance) * 100))}%` }}
-                  ></div>
-                </div>
-                <div className="flex justify-between text-xs text-gray-500 mt-1">
-                  <span>0 ج.م</span>
-                  <span>{formatCurrency(balance)}</span>
-                </div>
-              </div>
-            </div>
           </div>
 
           {/* Date Information */}
-          <div 
-            className="bg-white rounded-2xl select-none active:opacity-20  p-4 flex justify-between items-center border border-gray-100"
+          <div
+            className={`rounded-4xl h-40 select-none active:opacity-80 transition-all p-4 flex justify-between items-center ${subtleBg}`}
             onDoubleClick={() => setShowAddItem(true)}
           >
             <div className="flex items-center gap-2">
               <div>
-                <p className="text-sm text-gray-500">اليوم</p>
-                <p className="font-medium">{dayName}</p>
+                <p className={`text-sm ${smallText}`}>اليوم</p>
+                <p className={`${isDark ? 'text-white' : 'text-gray-900'} font-medium`}>{dayName}</p>
               </div>
             </div>
-            <div className="h-6 border-r border-gray-200"></div>
+            <div className={`h-6 border-r ${isDark ? 'border-gray-600' : 'border-gray-200'}`}></div>
             <div>
-              <p className="text-sm text-gray-500">التاريخ</p>
-                <p className="font-medium">{arabicDate}</p>
-              </div>
-              <button
-                onClick={() => {
-                  handleSound();
-                  setShowAddItem(true);
-                }}
-                className="bg-gradient-to-r from-purple-500 to-indigo-500 text-white p-2 rounded-full"
-                aria-label="إضافة عنصر جديد"
-              >
-                <BsPlusCircle size={25}/>
-              </button>
+              <p className={`text-sm ${smallText}`}>التاريخ</p>
+              <p className={`${isDark ? 'text-white' : 'text-gray-900'} font-medium`}>{arabicDate}</p>
             </div>
+            <button
+              onClick={() => {
+                handleSound();
+                setShowAddItem(true);
+              }}
+              className={`py-2 px-3 rounded-2xl ${isDark ? 'bg-indigo-600/90 text-white' : 'bg-indigo-500 text-white'}`}
+              aria-label="إضافة عنصر جديد"
+            >
+              <BsPlusCircle size={25} />
+            </button>
           </div>
-        )}
-      
+        </div>
+      )}
+
       {/* Modals */}
       {showAddBalance && (
         <Addbalance onClose={() => {
@@ -170,7 +172,7 @@ const Moneypanel = () => {
           setShowAddBalance(false);
         }} />
       )}
-      
+
       {showAddItem && (
         <Additem onClose={() => {
           const updated = parseFloat(localStorage.getItem('balance')) || 0;
@@ -178,7 +180,7 @@ const Moneypanel = () => {
           setShowAddItem(false);
         }} />
       )}
-      
+
       {showPremiumModal && (
         <Getpremium onClose={() => setShowPremiumModal(false)} />
       )}
