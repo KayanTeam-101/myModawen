@@ -32,7 +32,7 @@ const Navbar = () => {
   // themed classes
   const navBg = isDark ? 'bg-black ' : 'bg-white border-gray-50';
   const navTextInactive = isDark ? 'text-gray-500' : 'text-gray-300';
-  const navTextActive = 'text-white'; // main color is indigo
+  const navTextActive = isDark ?'text-white' : 'text-black'; // main color is indigo
   const iconBase = 'transition-transform';
 
   return (

@@ -74,12 +74,12 @@ const COLORS = {
     dark: '#6366F1'
   },
   background: {
-    light: 'bg-gradient-to-br from-indigo-50 to-white',
-    dark: 'bg-gray-900'
+    light: 'bg-white',
+    dark: 'bg-black'
   },
   card: {
     light: 'bg-white',
-    dark: 'bg-gray-800'
+    dark: 'bg-gray-950'
   },
   text: {
     light: 'text-gray-900',
@@ -172,8 +172,8 @@ const ChartPage = () => {
           <StatCard title="أدنى يوم" value={`${minSpendingDay ? minSpendingDay.total.toFixed(0) : 0} ج.م`} sub={minSpendingDay ? formatArabicDate(minSpendingDay.date) : ''} icon={<FiArrowDown />} color="green" isDark={isDark} />
         </section>
 
-        <div className="flex items-center justify-between mb-4">
-          <div className={`p-1 rounded-xl ${isDark ? 'bg-gray-700' : 'bg-indigo-100'}`}>
+        <div className="flex items-center justify-center mb-4 m-auto">
+          <div className={`p-1 rounded-xl ${isDark ? 'bg-gray-900' : 'bg-indigo-100'}`}>
             <div className="flex items-center gap-2 px-3 py-2 rounded-lg">
               <FilterButton active={timeFilter === 'week'} onClick={() => setTimeFilter('week')} isDark={isDark}>أسبوع</FilterButton>
               <FilterButton active={timeFilter === 'month'} onClick={() => setTimeFilter('month')} isDark={isDark}>شهر</FilterButton>
@@ -225,13 +225,13 @@ const ChartPage = () => {
                 <p className={`${isDark ? 'text-indigo-200' : 'text-indigo-700'} mt-1`}>{selectedDate.items.length} عناصر • {selectedDate.total.toFixed(2)} ج.م</p>
               </div>
               <div className="mt-4 md:mt-0 flex items-center gap-3">
-                <div className={`text-xl font-bold ${isDark ? 'text-red-400 bg-red-900' : 'text-red-600 bg-red-50'} px-4 py-2 rounded-lg`}>-{selectedDate.total.toFixed(2)} ج.م</div>
+                <div className={`text-xl font-bold ${isDark ? 'text-red-400 bg-gray-800' : 'text-black bg-red-50'} px-4 py-2 rounded-lg`}>-{selectedDate.total.toFixed(2)} ج.م</div>
               </div>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {selectedDate.items.map((it, idx) => (
-                <div key={idx} className={`border ${isDark ? 'border-gray-700' : 'border-indigo-100'} rounded-xl p-4 ${isDark ? 'bg-gray-700' : 'bg-white'} hover:shadow-md transition`}>
+                <div key={idx} className={`border ${isDark ? 'border-gray-700/50' : 'border-indigo-100'} rounded-xl p-4 ${isDark ? 'bg-gray-900' : 'bg-white'} hover:shadow-md transition`}>
                   <div className="flex justify-between items-start">
                     <div className="flex-1 min-w-0">
                       <h3 className={`font-bold ${isDark ? 'text-indigo-200' : 'text-indigo-900'} truncate`}>{it.name}</h3>
@@ -337,7 +337,7 @@ const ResponsiveLineChart = ({ data, selectedDate, onSelectDate, isDark }) => {
           const isHovered = hoverIdx === i;
           return (
             <g key={i} className="cursor-pointer" onClick={() => onSelectDate(d)}>
-              <circle cx={x} cy={y} r={isHovered || isSelected ? 5 : 3} fill={isHovered || isSelected ? (isDark ? '#818cf8' : '#4F46E5') : (isDark ? '#1f2937' : '#fff')} stroke={isDark ? '#818cf8' : '#4F46E5'} strokeWidth={isHovered || isSelected ? 2 : 1} />
+              <circle cx={x} cy={y} r={i == data.length -1 ? 2 : 0} fill='#818cf8'  stroke={isDark ? '#818cf8' : '#4F46E5'} strokeWidth={isHovered || isSelected ? 2 : 1} />
             </g>
           );
         })}

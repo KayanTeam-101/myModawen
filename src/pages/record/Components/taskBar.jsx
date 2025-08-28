@@ -67,7 +67,7 @@ const handleDelete = (dateKey, id) => {
           />
         ))
       ) : (
-        <div className="text-center py-44  flex justify-center items-center flex-col gap-10 text-gray-500 "    onClick={() => {
+        <div className="text-center py-28  flex justify-center items-center flex-col gap-10 text-gray-500 "    onClick={() => {
     const button = document.querySelector('div.bg-white button.bg-gradient-to-r');
     console.log(button);
     

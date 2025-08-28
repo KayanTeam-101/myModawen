@@ -66,14 +66,6 @@ const formatDateLocalized = (dateStr) => {
 const applyThemeSync = (theme) => {
   const root = document.documentElement;
   root.classList.toggle("dark", theme === THEMES.DARK);
-  // Optional: keep CSS vars for non-Tailwind surfaces
-  if (theme === THEMES.DARK) {
-    root.style.setProperty("--bg-color", "#0b1220");
-    root.style.setProperty("--text-color", "#f7fafc");
-  } else {
-    root.style.setProperty("--bg-color", "#f9fafb");
-    root.style.setProperty("--text-color", "#0b1220");
-  }
   // Mobile address bar color (nice touch)
   const meta = document.querySelector('meta[name="theme-color"]');
   if (meta) meta.setAttribute("content", theme === "dark" ? "#0b1220" : "#f9fafb");
@@ -102,7 +94,7 @@ const getInitialTheme = () => {
    Component
    ========================= */
 const SettingsPage = () => {
-  const [theme, setTheme] = useState(getInitialTheme);
+  const [theme, setTheme] = useState(localStorage.getItem('theme'));
   const [dataObj, setDataObj] = useState(safeReadData);
   const [dates, setDates] = useState(() => sortedDates(safeReadData()));
   const [selected, setSelected] = useState([]);
@@ -177,6 +169,9 @@ const SettingsPage = () => {
     const newTheme = theme === THEMES.DARK ? THEMES.LIGHT : THEMES.DARK;
     setTheme(newTheme);
     localStorage.setItem('theme',newTheme)
+    setTimeout(() => {
+      window.location.reload()
+    }, 500);
   };
 
   /* Selection helpers */
@@ -365,19 +360,12 @@ const SettingsPage = () => {
      ========================= */
   return (
     <div
-      className="min-h-screen bg-gradient-to-br from-indigo-50 to-white dark:from-slate-950 dark:to-slate-900 p-4 md:p-6 showSmoothy"
+      className={`min-h-screen ${theme != "dark" ? 'bg-gradient-to-br from-indigo-50 to-white' : 'bg-black' } transition  p-4 md:p-6 showSmoothy `}
       dir="rtl"
     >
       <div className="max-w-4xl mx-auto">
         {/* Header */}
-        <div className="mb-8 text-center pt-2">
-          <h1 className="text-3xl md:text-4xl font-bold text-indigo-900 dark:text-slate-100">
-            إعدادات التطبيق
-          </h1>
-          <p className="text-indigo-700 dark:text-slate-300 mt-2 max-w-lg mx-auto">
-            تحكم في المظهر، شارك بياناتك، أو استورد/صدر السجل بسرعة
-          </p>
-        </div>
+   
 
         {/* Summary Cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-5 mb-6">
@@ -402,10 +390,8 @@ const SettingsPage = () => {
                 )}
               </div>
               <div>
-                <div className="text-lg font-semibold text-indigo-900 dark:text-slate-100">المظهر</div>
-                <div className="text-sm text-indigo-700 dark:text-slate-300">
-                  اختر الوضع الفاتح أو الداكن — محفوظ في localStorage.theme
-                </div>
+                <div className="text-lg font-black text-indigo-900 dark:text-slate-100">المظهر</div>
+              
               </div>
             </div>
 
@@ -653,7 +639,6 @@ const SettingsPage = () => {
 
 const ThemeToggle = ({ theme, onToggle }) => {
   const isDark = theme === THEMES.DARK;
-
   return (
     <button
       onClick={onToggle}
@@ -665,7 +650,7 @@ const ThemeToggle = ({ theme, onToggle }) => {
       <span className="sr-only">تبديل وضع المظهر</span>
       <span
         className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-          isDark ? "translate-x-6" : "translate-x-1"
+          isDark ? "-translate-x-6" : "-translate-x-1"
         }`}
       />
     </button>

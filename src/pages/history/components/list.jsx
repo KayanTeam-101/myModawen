@@ -25,12 +25,12 @@ const List = () => {
 
   // theme helpers
   const containerText = isDark ? 'text-gray-100' : 'text-gray-900';
-  const cardBg = isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-100';
+  const cardBg = isDark ? 'bg-gray-900 border-2 border-gray-800/50' : 'bg-white border-gray-100';
   const inputBg = isDark ? 'bg-gray-600/40 border-gray-600 placeholder-gray-400 text-gray-200' : 'bg-white border-indigo-100 text-gray-900';
   const subtleBg = isDark ? 'bg-gray-700/30' : 'bg-indigo-50';
   const accent = isDark ? 'text-indigo-300' : 'text-indigo-700';
   const accentLight = isDark ? 'text-indigo-400' : 'text-indigo-400';
-  const borderAccent = isDark ? 'border-none' : 'border-indigo-100';
+  const borderAccent = isDark ? 'border border-gray-800/50' : 'border-indigo-100';
 
   const toggleDate = (date) => {
     setExpandedDates((prev) => ({
@@ -122,7 +122,7 @@ const List = () => {
             <div
               key={date}
               onClick={() => toggleDate(date)}
-              className={`${cardBg} mb-4 rounded-xl shadow-sm overflow-hidden transition hover:shadow-md border ${borderAccent}`}
+              className={`${cardBg} mb-4 rounded-xl shadow-sm overflow-hidden transition hover:shadow-md  ${borderAccent} active:bg-gray-800`}
             >
               {/* Date header */}
               <button

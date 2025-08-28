@@ -66,7 +66,7 @@ const Moneypanel = () => {
   const containerBase = `max-w-4xl mx-auto px-4`;
   const textMain = isDark ? 'text-gray-100' : 'text-gray-900';
   const cardBg = '';
-  const cardShadow = isDark ? 'shadow-md' : 'shadow-xl';
+  const cardShadow = isDark ? 'shadow-md' : 'shadow-';
   const subtleBg = isDark ? 'bg-indigo-900/15' : 'bg-indigo-50';
   const infoText = isDark ? 'text-gray-300' : 'text-gray-500';
   const smallText = isDark ? 'text-gray-400' : 'text-gray-500';
@@ -101,7 +101,7 @@ const Moneypanel = () => {
         </div>
       ) : (
         <div className="space-y-5">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1  gap-4">
             {/* Total Balance Card */}
             <div
               className={`${cardBg} ${cardShadow} rounded-2xl p-4`}
