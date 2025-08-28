@@ -18,7 +18,7 @@ export default defineConfig({
         name: 'مُدوّن',
         short_name: 'مُدوّن',
         description: 'صل علي محمد',
-        theme_color: '#6600ff',
+        theme_color: '#ffffff',
         icons: [
           { src: 'pwa-192x192.png', sizes: '192x192', type: 'image/png' },
           { src: 'pwa-512x512.png', sizes: '512x512', type: 'image/png' }
