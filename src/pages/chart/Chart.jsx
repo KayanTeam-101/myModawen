@@ -53,15 +53,15 @@ const useTheme = () => {
 };
 
 const useResizeWidth = (ref) => {
-  const [width, setWidth] = useState(800);
+  const [width, setWidth] = useState(window.innerWidth);
   useEffect(() => {
     if (!ref.current) return;
     const ro = new ResizeObserver(() => {
-      const w = ref.current?.clientWidth || 800;
+      const w = ref.current?.clientWidth || width;
       setWidth(w);
     });
     ro.observe(ref.current);
-    setWidth(ref.current.clientWidth || 800);
+    setWidth(ref.current.clientWidth || width);
     return () => ro.disconnect();
   }, [ref]);
   return width;

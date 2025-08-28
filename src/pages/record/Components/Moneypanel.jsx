@@ -155,7 +155,7 @@ const Moneypanel = () => {
                 handleSound();
                 setShowAddItem(true);
               }}
-              className={`py-2 px-3 rounded-2xl ${isDark ? 'bg-indigo-600/90 text-white' : 'bg-indigo-500 text-white'}`}
+              className={`py-2 px-3 rounded-2xl ${isDark ? 'bg-black text-white' : 'bg-indigo-500 text-white'}`}
               aria-label="إضافة عنصر جديد"
             >
               <BsPlusCircle size={25} />
