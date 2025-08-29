@@ -42,12 +42,7 @@ function App() {
       });
     }
 
-    // عند إغلاق الصفحة نمسح الإشعار
-    const handleUnload = () => {
-      if (notificationRef.current) {
-        notificationRef.current.close();
-      }
-    };
+
 
     window.addEventListener("beforeunload", handleUnload);
 
