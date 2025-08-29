@@ -27,25 +27,6 @@ const Getpremium = ({ onClose }) => {
     return true;
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    tools.sound();
-    
-    if (!validatePhone()) return;
-    
-    setIsSubmitting(true);
-    
-    // Simulate payment processing
-    setTimeout(() => {
-      setIsSubmitting(false);
-      setIsSuccess(true);
-      
-      // Close after success
-      setTimeout(() => {
-        onClose();
-      }, 3000);
-    }, 2000);
-  };
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 backdrop-blur-xs">

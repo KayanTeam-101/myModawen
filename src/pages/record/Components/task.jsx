@@ -132,7 +132,7 @@ const Task = ({
               إلغاء
             </button>
             <button
-              onClick={handleDelete}
+              onDoubleClick={handleDelete}
               className="px-4 py-2 bg-gradient-to-r from-red-500 to-red-600 text-white rounded-lg flex items-center gap-1 shadow-md"
             >
               <FaDeleteLeft />

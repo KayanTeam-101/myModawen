@@ -1,4 +1,4 @@
-import { useState,useEffect } from "react";
+import { useRef,useEffect } from "react";
 import "./App.css";
 import Navbar from "./components/Navbar";
 import { Route, Routes } from "react-router-dom";
@@ -9,6 +9,11 @@ import HistoryCopyPage from "./pages/copypage/Copyhistory";
 import CameraPage from "./pages/Camera/Camera";
 
 function App() {
+
+  const notificationRef = useRef(null);
+  
+
+
      useEffect(() => {
     const metaTheme = document.querySelector('meta[name="theme-color"]');
     const THEME =localStorage.getItem('theme');
@@ -22,7 +27,43 @@ function App() {
      metaTheme.setAttribute('content', '#000');
 
    }
+
+
+      if ("Notification" in window) {
+      Notification.requestPermission().then(permission => {
+        if (permission === "granted") {
+          // إنشاء الإشعار
+          notificationRef.current = new Notification("📌 التطبيق مفتوح", {
+            body: "الإشعار سيظل موجود حتى تغلق الصفحة",
+            requireInteraction: true, // يبقى ظاهر
+            icon: "/logo192.png"
+          });
+        }
+      });
+    }
+
+    // عند إغلاق الصفحة نمسح الإشعار
+    const handleUnload = () => {
+      if (notificationRef.current) {
+        notificationRef.current.close();
+      }
+    };
+
+    window.addEventListener("beforeunload", handleUnload);
+
+    return () => {
+      handleUnload();
+      window.removeEventListener("beforeunload", handleUnload);
+    };
   }, []);
+
+
+  useEffect(() => {
+    // طلب إذن المستخدم
+ 
+  }, []);
+
+
   return (
     <>
       <Routes>
