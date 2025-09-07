@@ -25,10 +25,10 @@ const List = () => {
 
   // theme helpers
   const containerText = isDark ? 'text-gray-100' : 'text-gray-900';
-  const cardBg = isDark ? 'bg-gray-900 border-2 border-gray-800/50' : 'bg-white border-gray-100';
+  const cardBg = isDark ? 'bg-gray-950 border border-white/5' : 'bg-white border-gray-100';
   const inputBg = isDark ? 'bg-gray-600/40 border-gray-600 placeholder-gray-400 text-gray-200' : 'bg-white border-indigo-100 text-gray-900';
   const subtleBg = isDark ? 'bg-gray-700/30' : 'bg-indigo-50';
-  const accent = isDark ? 'text-indigo-300' : 'text-indigo-700';
+  const accent = isDark ? 'text-indigo-50' : 'text-indigo-700';
   const accentLight = isDark ? 'text-indigo-400' : 'text-indigo-400';
   const borderAccent = isDark ? 'border border-gray-800/50' : 'border-indigo-100';
 
@@ -55,7 +55,7 @@ const List = () => {
       {/* Image Preview Modal */}
       {viewingImage && (
         <div
-          className={`fixed inset-0 ${isDark ? 'bg-black/80' : 'bg-indigo-950/90'} backdrop-blur-md z-50 flex items-center justify-center p-4`}
+          className={`fixed inset-0 ${isDark ? 'bg-gray-900/30' : 'bg-indigo-950/90'} backdrop-blur-md z-50 flex items-center justify-center p-4`}
           onClick={() => setViewingImage(null)}
         >
           <div className="relative max-w-3xl max-h-[90vh]">
@@ -90,7 +90,7 @@ const List = () => {
           onChange={(e) => setSearchTerm(e.target.value)}
           className={`w-full py-3 px-4 pr-10 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-400 transition ${inputBg}`}
         />
-        <div className="absolute right-3 top-3.5 text-black">
+        <div className="absolute right-3 top-3.5 text-indigo-600">
           <svg
             className="w-5 h-5"
             fill="none"
@@ -122,7 +122,7 @@ const List = () => {
             <div
               key={date}
               onClick={() => toggleDate(date)}
-              className={`${cardBg} mb-4 rounded-xl shadow-sm overflow-hidden transition hover:shadow-md  ${borderAccent} active:bg-gray-800`}
+              className={`${cardBg} mb-2.5 rounded-xl shadow-sm overflow-hidden transition hover:shadow-md  ${borderAccent} ${isDark ? 'active:bg-indigo-500/15' : 'active:bg-gray-200'}`}
             >
               {/* Date header */}
               <button
@@ -135,10 +135,10 @@ const List = () => {
                   </p>
                 </div>
 
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-2">
                   <span className="font-semibold text-red-500">-{totalForDate.toFixed(2)} ج.م</span>
                   <svg
-                    className={`w-5 h-5 ${isDark ? 'text-indigo-300' : 'text-indigo-500'} transform transition-transform ${
+                    className={`w-5 h-5 ${isDark ? 'text-indigo-50' : 'text-indigo-950'} transform transition-transform ${
                       expandedDates[date] ? 'rotate-90' : ''
                     }`}
                     fill="none"
@@ -170,7 +170,7 @@ const List = () => {
                     >
                       <div className="flex-1 min-w-0">
                         <p className={`${isDark ? 'text-gray-100' : 'text-gray-800'} font-semibold`}>{item.name}</p>
-                        <div className={`flex items-center mt-1 text-sm ${isDark ? 'text-gray-300' : 'text-indigo-400'}`}>
+                        <div className={`flex items-center mt-1 text-sm ${isDark ? 'text-gray-300' : 'text-indigo-50'}`}>
                           <svg
                             className="w-3 h-3 mr-1"
                             fill="none"
@@ -188,7 +188,7 @@ const List = () => {
                         </div>
                       </div>
 
-                      <div className="flex items-center gap-3">
+                      <div className="flex items-center">
                         <span className={`font-medium whitespace-nowrap ${accent}`}>-{item.price} ج.م</span>
 
                         {item.photo && (

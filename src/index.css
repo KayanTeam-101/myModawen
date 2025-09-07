@@ -23,7 +23,7 @@ a.active {
   box-shadow: 0 0 15px -10px #000000;
 }
 .showSmoothy{
-  animation: showSmoothy .3s ease-in-out ;
+  animation: showSmoothy .2s ease-in-out ;
 }
 .fontsansSerif{
   font-family: sans-serif !important;

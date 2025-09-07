@@ -172,12 +172,12 @@ const AddItem = ({ onClose }) => {
 
   // themed classes
   const overlayBg = isDark ? 'bg-gray-900/70' : 'bg-indigo-100/70';
-  const cardBg = isDark ? 'bg-gray-800 border-gray-700 text-gray-100' : 'bg-white border-gray-200 text-gray-900';
-  const inputBg = isDark ? 'bg-gray-700 border-gray-600 placeholder-gray-400' : 'bg-gray-50 border-gray-200 placeholder-gray-400';
+  const cardBg = isDark ? 'bg-gray-950 border-gray-700 text-gray-100' : 'bg-white border-gray-200 text-gray-900';
+  const inputBg = isDark ? 'bg-gray-900 border-gray-600 placeholder-gray-400' : 'bg-gray-50 border-gray-200 placeholder-gray-400';
   const subtleBg = isDark ? 'bg-gray-800/30' : 'bg-indigo-50';
-  const shortcutHoverBg = isDark ? 'bg-indigo-900/20' : 'bg-indigo-50';
+  const shortcutHoverBg = isDark ? 'bg-indigo-900/5' : 'bg-indigo-50';
   const accent = 'text-indigo-600';
-  const buttonGradient = 'bg-gradient-to-r from-indigo-700 to-indigo-500';
+  const buttonGradient = 'bg-gradient-to-r from-indigo-600 via-sky-400 to-purple-300';
 
   return (
     <div 
@@ -200,6 +200,9 @@ const AddItem = ({ onClose }) => {
           >
             <RiCloseLine className={`${isDark ? 'text-gray-200' : 'text-gray-500'} text-xl`} />
           </button>
+
+
+          
         </div>
 
         <form onSubmit={handleSubmit} className="p-5">
@@ -305,7 +308,7 @@ const AddItem = ({ onClose }) => {
                 <button
                   type="button"
                   onClick={() => adjustPrice(-1)}
-                  className={`${isDark ? 'bg-gray-700 border-gray-600' : 'bg-gray-100'} flex items-center justify-center w-12 rounded-r-lg border ${isDark ? 'border-gray-600' : 'border-gray-200'} hover:brightness-105 transition-colors`}
+                  className={`${isDark ? 'bg-gray-900 border-gray-600/15' : 'bg-gray-100'} flex items-center justify-center w-12 rounded-r-lg border ${isDark ? 'border-gray-600' : 'border-gray-200'} hover:brightness-105 transition-colors`}
                 >
                   <RiSubtractLine className={`${isDark ? 'text-gray-200' : 'text-gray-600'}`} />
                 </button>
@@ -328,7 +331,7 @@ const AddItem = ({ onClose }) => {
                 <button
                   type="button"
                   onClick={() => adjustPrice(1)}
-                  className={`${isDark ? 'bg-gray-700 border-gray-600' : 'bg-gray-100'} flex items-center justify-center w-12 rounded-l-lg border ${isDark ? 'border-gray-600' : 'border-gray-200'} hover:brightness-105 transition-colors`}
+                  className={`${isDark ? 'bg-gray-900 border-gray-600/15' : 'bg-gray-100'} flex items-center justify-center w-12 rounded-l-lg border ${isDark ? 'border-gray-600' : 'border-gray-200'} hover:brightness-105 transition-colors`}
                 >
                   <RiAddLine className={`${isDark ? 'text-gray-200' : 'text-gray-600'}`} />
                 </button>

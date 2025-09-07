@@ -24,25 +24,6 @@ function App() {
       metaTheme?.setAttribute("content", "#fff");
     }
 
-    // === Notification via Service Worker ===
-    if ("serviceWorker" in navigator) {
-      navigator.serviceWorker.register("/sw.js").then((reg) => {
-        console.log("✅ Service Worker Registered:", reg);
-
-        Notification.requestPermission().then((permission) => {
-          if (permission === "granted") {
-            // Ask SW to show notification
-            if (reg.active) {
-              reg.active.postMessage({ type: "SHOW_NOTIFICATION" });
-            } else {
-              navigator.serviceWorker.ready.then((readyReg) => {
-                readyReg.active?.postMessage({ type: "SHOW_NOTIFICATION" });
-              });
-            }
-          }
-        });
-      });
-    }
 
     // === Cleanup notifications when unloading (optional) ===
     const handleUnload = () => {

@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from "react";
-import { RiWallet3Line, RiAddCircleLine, RiMoneyPoundCircleLine } from "react-icons/ri";
+import { RiWallet3Line, RiAddCircleLine, RiMoneyPoundCircleLine, RiInfoI } from "react-icons/ri";
 import { Utilities } from "../../../utilities/utilities.js";
 import premiumImage from '/premium.jpg';
 import Addbalance from "./Addbalance.jsx";
 import Additem from "./Additem.jsx";
 import Getpremium from "./Getpremium.jsx";
-import { BsInfo, BsPlusCircle } from "react-icons/bs";
+import { BsInfo, BsPlus  } from "react-icons/bs";
 
 // Moneypanel with conditional Tailwind classes for light / dark theme
 // Usage: the component reads localStorage.getItem('theme') and applies classes
@@ -124,7 +124,7 @@ const Moneypanel = () => {
                   }}
                   aria-label="عرض مميزات بريميوم"
                 >
-                  <BsInfo size={22} className={`${isDark ? 'text-white' : 'text-white'}`} />
+                  <RiInfoI size={22} className={`${isDark ? 'text-white' : 'text-white'}`} />
                 </button>
               </div>
               <div className="mt-2 flex justify-between items-center">
@@ -155,11 +155,13 @@ const Moneypanel = () => {
                 handleSound();
                 setShowAddItem(true);
               }}
-              className={`py-2 px-3 rounded-2xl ${isDark ? 'bg-black text-white' : 'bg-indigo-500 text-white'}`}
+              className={`min-w-12  p-2 min-h-12 flex justify-center items-center rounded-full ${isDark ? 'bg-indigo-950 text-white' : 'bg-indigo-500/15 text-indigo-500'}`}
               aria-label="إضافة عنصر جديد"
             >
-              <BsPlusCircle size={25} />
+              <BsPlus  size={30} />
+              <p>إضافة عنصر جديد</p>
             </button>
+            
           </div>
         </div>
       )}

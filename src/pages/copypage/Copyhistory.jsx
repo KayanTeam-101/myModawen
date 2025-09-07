@@ -65,10 +65,11 @@ const formatDateLocalized = (dateStr) => {
 
 const applyThemeSync = (theme) => {
   const root = document.documentElement;
-  root.classList.toggle("dark", theme === THEMES.DARK);
+  const isDark = theme === THEMES.DARK;
+  root.classList.toggle("dark", isDark);
   // Mobile address bar color (nice touch)
   const meta = document.querySelector('meta[name="theme-color"]');
-  if (meta) meta.setAttribute("content", theme === "dark" ? "#0b1220" : "#f9fafb");
+  if (meta) meta.setAttribute("content", isDark ? "#0b1220" : "#f9fafb");
 };
 
 const getInitialTheme = () => {
@@ -94,7 +95,7 @@ const getInitialTheme = () => {
    Component
    ========================= */
 const SettingsPage = () => {
-  const [theme, setTheme] = useState(localStorage.getItem('theme'));
+  const [theme, setTheme] = useState(getInitialTheme);
   const [dataObj, setDataObj] = useState(safeReadData);
   const [dates, setDates] = useState(() => sortedDates(safeReadData()));
   const [selected, setSelected] = useState([]);
@@ -102,6 +103,7 @@ const SettingsPage = () => {
   const [message, setMessage] = useState(null);
   const [showShareOptions, setShowShareOptions] = useState(false);
 
+  const isDark = theme === THEMES.DARK;
   const shareRef = useRef(null);
   const fileRef = useRef(null);
   const messageTimeoutRef = useRef(null);
@@ -166,12 +168,10 @@ const SettingsPage = () => {
 
   /* Theme toggle */
   const onThemeToggle = () => {
-    const newTheme = theme === THEMES.DARK ? THEMES.LIGHT : THEMES.DARK;
+    const newTheme = isDark ? THEMES.LIGHT : THEMES.DARK;
     setTheme(newTheme);
-    localStorage.setItem('theme',newTheme)
-    setTimeout(() => {
-      window.location.reload()
-    }, 500);
+    localStorage.setItem(STORAGE_KEYS.THEME, newTheme);
+    window.location.reload()
   };
 
   /* Selection helpers */
@@ -360,13 +360,29 @@ const SettingsPage = () => {
      ========================= */
   return (
     <div
-      className={`min-h-screen ${theme != "dark" ? 'bg-gradient-to-br from-indigo-50 to-white' : 'bg-black' } transition  p-4 md:p-6 showSmoothy `}
+      className={`min-h-screen ${isDark ? 'bg-black' : 'bg-gradient-to-br from-indigo-50 to-white'} transition p-4 md:p-6 showSmoothy`}
       dir="rtl"
     >
-      <div className="max-w-4xl mx-auto">
-        {/* Header */}
-   
+      <div className="  rounded-2xl  p-5 mb-6">
+        <div className="flex items-center justify-between flex-wrap gap-4">
+          <div className="flex items-center gap-4">
+            <div className="p-3 rounded-lg bg-indigo-50 dark:bg-slate-100">
+              {isDark ? (
+                <BsMoon className="text-indigo-600" size={20} />
+              ) : (
+                <BsSun className="text-indigo-600" size={20} />
+              )}
+            </div>
+            <div>
+              <div className="text-lg font-black text-indigo-900 dark:text-slate-900">المظهر</div>
+            </div>
+          </div>
 
+          {/* Theme switch */}
+          <ThemeToggle isDark={isDark} onToggle={onThemeToggle} />
+        </div>
+      </div>
+      <div className="max-w-4xl mx-auto">
         {/* Summary Cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-5 mb-6">
           <SmallCard title="تواريخ محفوظة" value={`${dates.length}`} color="from-indigo-500 to-indigo-600" />
@@ -378,50 +394,28 @@ const SettingsPage = () => {
           />
         </div>
 
-        {/* Theme card */}
-        <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-lg p-5 mb-6 border border-indigo-100 dark:border-slate-800">
-          <div className="flex items-center justify-between flex-wrap gap-4">
-            <div className="flex items-center gap-4">
-              <div className="p-3 rounded-lg bg-indigo-50 dark:bg-slate-800">
-                {theme === THEMES.DARK ? (
-                  <BsMoon className="text-indigo-600" size={20} />
-                ) : (
-                  <BsSun className="text-indigo-600" size={20} />
-                )}
-              </div>
-              <div>
-                <div className="text-lg font-black text-indigo-900 dark:text-slate-100">المظهر</div>
-              
-              </div>
-            </div>
-
-            {/* Theme switch */}
-<ThemeToggle theme={theme} onToggle={onThemeToggle} />
-          </div>
-        </div>
-
         {/* Share by days */}
-        <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-lg p-5 mb-6 border border-indigo-100 dark:border-slate-800">
+        <div className="rounded-2xl shadow-lg p-5 mb-6 ">
           <div className="flex items-start justify-between mb-4 flex-wrap gap-4">
             <div>
-              <h2 className="text-lg font-bold text-indigo-900 dark:text-slate-100">شارك بيانات حسب الأيام</h2>
+              <h2 className="text-lg font-bold text-indigo-900 dark:text-slate-900">شارك بيانات حسب الأيام</h2>
             </div>
 
             <div className="flex flex-col items-end">
-              <div className="text-sm text-indigo-600 dark:text-slate-300">
+              <div className="text-sm text-indigo-600 dark:text-slate-900">
                 {selected.length} / {dates.length}
               </div>
 
               <div className="mt-3 flex items-center gap-3 flex-wrap">
                 <button
                   onClick={selectAll}
-                  className="px-3 py-2 rounded-lg bg-indigo-50 dark:bg-slate-800 text-indigo-700 dark:text-slate-200 hover:bg-indigo-100 dark:hover:bg-slate-700 transition"
+                  className="px-3 py-2 rounded-lg bg-indigo-50  text-indigo-700 da hover:bg-indigo-100 dark:h transition"
                 >
                   {selected.length === dates.length ? "إلغاء الكل" : "تحديد الكل"}
                 </button>
                 <button
                   onClick={pickLast7}
-                  className="px-3 py-2 rounded-lg bg-indigo-50 dark:bg-slate-800 text-indigo-700 dark:text-slate-200 hover:bg-indigo-100 dark:hover:bg-slate-700 transition"
+                  className="px-3 py-2 rounded-lg bg-indigo-50  text-indigo-700 da hover:bg-indigo-100 dark:h transition"
                 >
                   آخر 7
                 </button>
@@ -432,7 +426,7 @@ const SettingsPage = () => {
                     disabled={selected.length === 0}
                     className={`px-3 py-2 rounded-lg ${
                       selected.length === 0
-                        ? "bg-gray-100 dark:bg-slate-800 text-gray-400 cursor-not-allowed"
+                        ? "bg-gray-100  text-gray-400 cursor-not-allowed"
                         : "bg-gradient-to-r from-indigo-600 to-indigo-700 text-white shadow"
                     } transition`}
                   >
@@ -481,7 +475,7 @@ const SettingsPage = () => {
                   key={d}
                   className={`flex items-center justify-between p-3 rounded-lg border cursor-pointer transition ${
                     selected.includes(d)
-                      ? "bg-indigo-50 dark:bg-slate-800 border-indigo-200 dark:border-slate-700"
+                      ? "bg-indigo-50 dark:bg-slate-100 text-indigo-500 border-indigo-200 dark:border-slate-700"
                       : "bg-white dark:bg-slate-900 border-gray-100 dark:border-slate-800"
                   }`}
                 >
@@ -493,10 +487,10 @@ const SettingsPage = () => {
                       className="rounded text-indigo-600 focus:ring-indigo-500"
                     />
                     <div>
-                      <div className="text-sm font-medium text-indigo-900 dark:text-slate-100">
+                      <div className="text-sm font-medium text-indigo-100 dark:text-slate-900">
                         {formatDateLocalized(d)}
                       </div>
-                      <div className="text-xs text-indigo-600 dark:text-slate-300">{d}</div>
+                      <div className="text-xs text-indigo-600 dark:text-slate-900">{d}</div>
                     </div>
                   </div>
                   <div className="text-xs text-indigo-600 dark:text-slate-300">
@@ -637,8 +631,7 @@ const SettingsPage = () => {
   );
 };
 
-const ThemeToggle = ({ theme, onToggle }) => {
-  const isDark = theme === THEMES.DARK;
+const ThemeToggle = ({ isDark, onToggle }) => {
   return (
     <button
       onClick={onToggle}
@@ -656,6 +649,5 @@ const ThemeToggle = ({ theme, onToggle }) => {
     </button>
   );
 };
-
 
 export default SettingsPage;
