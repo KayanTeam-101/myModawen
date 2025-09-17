@@ -58,9 +58,7 @@ const Moneypanel = () => {
 
   const handleSound = () => tools.sound();
 
-  const formatCurrency = (amount) => {
-    return amount + ' EGP';
-  };
+
 
   // helper classes
   const containerBase = `max-w-4xl mx-auto px-4`;
@@ -77,7 +75,7 @@ const Moneypanel = () => {
   return (
     <div className={`${containerBase} ${textMain}`}>
       {!balance ? (
-        <div className="flex flex-col items-center justify-center py-8">
+        <div className="flex flex-col items-center justify-center py-4 ">
           <div className={`${cardBg} ${cardShadow} rounded-2xl p-6 w-full max-w-md`}
                style={{ backdropFilter: isDark ? 'blur(6px)' : 'none' }}>
             <div className="flex flex-col items-center text-center">
@@ -117,14 +115,14 @@ const Moneypanel = () => {
                   </h2>
                 </div>
                 <button
-                  className={`p-1 rounded-full ${isDark ? 'bg-gray-700/40' : 'bg-black'} flex items-center justify-center`}
+                  className={`p- rounded-full text-white ${isDark ? 'bg-gray-700/40' : 'bg-black'} flex items-center justify-center`}
                   onClick={() => {
                     handleSound();
                     setShowPremiumModal(true);
                   }}
                   aria-label="عرض مميزات بريميوم"
                 >
-                  <RiInfoI size={22} className={`${isDark ? 'text-white' : 'text-white'}`} />
+                تعلم المزيد 
                 </button>
               </div>
               <div className="mt-2 flex justify-between items-center">
@@ -155,7 +153,7 @@ const Moneypanel = () => {
                 handleSound();
                 setShowAddItem(true);
               }}
-              className={`min-w-12  p-2 min-h-12 flex justify-center items-center rounded-full ${isDark ? 'bg-indigo-950 text-white' : 'bg-indigo-500/15 text-indigo-500'}`}
+              className={`min-w-12  p-2 min-h-12 flex justify-center items-center rounded-full ${isDark ? 'bg-indigo-950 text-white' : 'bg-indigo-500/15 text-indigo-700'}`}
               aria-label="إضافة عنصر جديد"
             >
               <BsPlus  size={30} />

@@ -26,7 +26,7 @@ const List = () => {
   // theme helpers
   const containerText = isDark ? 'text-gray-100' : 'text-gray-900';
   const cardBg = isDark ? 'bg-gray-950 border border-white/5' : 'bg-white border-gray-100';
-  const inputBg = isDark ? 'bg-gray-600/40 border-gray-600 placeholder-gray-400 text-gray-200' : 'bg-white border-indigo-100 text-gray-900';
+  const inputBg = isDark ? 'bg-gray-900/40`` border-gray-600 placeholder-gray-400 text-gray-200' : 'bg-white border-indigo-100 text-gray-900';
   const subtleBg = isDark ? 'bg-gray-700/30' : 'bg-indigo-50';
   const accent = isDark ? 'text-indigo-50' : 'text-indigo-700';
   const accentLight = isDark ? 'text-indigo-400' : 'text-indigo-400';
@@ -88,7 +88,7 @@ const List = () => {
           placeholder="ابحث عن عنصر..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
-          className={`w-full py-3 px-4 pr-10 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-400 transition ${inputBg}`}
+          className={`w-full py-3 px-4 pr-10 rounded-full shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-400 transition ${inputBg}`}
         />
         <div className="absolute right-3 top-3.5 text-indigo-600">
           <svg

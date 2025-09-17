@@ -1,5 +1,14 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { RiCloseLine, RiImageCircleLine, RiAddLine, RiCheckLine, RiSubtractLine } from 'react-icons/ri';
+import { 
+  RiCloseLine, 
+  RiAddLine, 
+  RiCheckLine, 
+  RiSubtractLine, 
+  RiMicLine, 
+  RiMicOffLine,
+  RiPlayCircleLine,
+  RiStopCircleLine
+} from 'react-icons/ri';
 import { Utilities } from '../../../utilities/utilities';
 
 const AddItem = ({ onClose }) => {
@@ -8,8 +17,8 @@ const AddItem = ({ onClose }) => {
   const [item, setItem] = useState({
     name: '',
     price: '',
-    photo: null,        // Will store the base64 string
-    photoPreview: null  // For preview only
+    audio: null,        // Will store the base64 string
+    audioBlob: null     // For playback
   });
   const [hoveredShortcut, setHoveredShortcut] = useState(null);
   const [Storeshortcuts, setStoreShortcuts] = useState(() => {
@@ -22,8 +31,21 @@ const AddItem = ({ onClose }) => {
     }
   });
   const [showModal, setShowModal] = useState(false);
-  const [isProcessingPhoto, setIsProcessingPhoto] = useState(false);
-  const fileInputRef = useRef(null);
+  const [isRecording, setIsRecording] = useState(false);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [recordingTime, setRecordingTime] = useState(0);
+  const [recordingTimer, setRecordingTimer] = useState(null);
+  
+  // Audio recording refs
+  const mediaRecorderRef = useRef(null);
+  const audioChunksRef = useRef([]);
+  const audioContextRef = useRef(null);
+  const analyserRef = useRef(null);
+  const dataArrayRef = useRef(null);
+  const canvasRef = useRef(null);
+  const animationRef = useRef(null);
+  const audioElementRef = useRef(null);
+  
   const priceInput = useRef(null);
   const itemNameInput = useRef(null);
   const longPressTimer = useRef(null);
@@ -34,9 +56,27 @@ const AddItem = ({ onClose }) => {
 
   useEffect(() => {
     setShowModal(true);
+    
+    // Initialize audio context
+    if (typeof window !== 'undefined') {
+      audioContextRef.current = new (window.AudioContext || window.webkitAudioContext)();
+      analyserRef.current = audioContextRef.current.createAnalyser();
+      analyserRef.current.fftSize = 256;
+      dataArrayRef.current = new Uint8Array(analyserRef.current.frequencyBinCount);
+    }
+    
     return () => {
       if (longPressTimer.current) {
         clearTimeout(longPressTimer.current);
+      }
+      if (recordingTimer) {
+        clearInterval(recordingTimer);
+      }
+      if (animationRef.current) {
+        cancelAnimationFrame(animationRef.current);
+      }
+      if (audioContextRef.current && audioContextRef.current.state !== 'closed') {
+        audioContextRef.current.close();
       }
     };
   }, []);
@@ -69,47 +109,142 @@ const AddItem = ({ onClose }) => {
     }));
   };
   
-  // Fixed photo change handler
-  const handlePhotoChange = (e) => {
-    if (e.target.files && e.target.files[0]) {
-      const file = e.target.files[0];
+  // Start audio recording
+  const startRecording = async () => {
+    try {
+      audioChunksRef.current = [];
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       
-      // Check file size (2MB max)
-      const maxSize = 2 * 1024 * 1024;
-      if (file.size > maxSize) {
-        alert("الرجاء اختيار صورة أقل من ٢ ميجابايت");
-        return;
-      }
-
-      setIsProcessingPhoto(true);
+      // Setup audio visualization
+      const source = audioContextRef.current.createMediaStreamSource(stream);
+      source.connect(analyserRef.current);
       
-      // Create a FileReader to convert image to base64
-      const reader = new FileReader();
+      // Create media recorder
+      mediaRecorderRef.current = new MediaRecorder(stream);
+      mediaRecorderRef.current.ondataavailable = (event) => {
+        if (event.data.size > 0) {
+          audioChunksRef.current.push(event.data);
+        }
+      };
       
-      reader.onload = (event) => {
-        const base64String = event.target.result;
+      mediaRecorderRef.current.onstop = () => {
+        const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
+        const reader = new FileReader();
+        reader.onload = () => {
+          const base64String = reader.result;
+          setItem(prev => ({
+            ...prev,
+            audio: base64String,
+            audioBlob: audioBlob
+          }));
+        };
+        reader.readAsDataURL(audioBlob);
         
-        // Update state with base64 string
-        setItem(prev => ({
-          ...prev,
-          photo: base64String,
-          photoPreview: base64String
-        }));
-        setIsProcessingPhoto(false);
+        // Disconnect and stop tracks
+        stream.getTracks().forEach(track => track.stop());
       };
       
-      reader.onerror = (error) => {
-        console.error("Error reading file:", error);
-        alert("حدث خطأ أثناء قراءة الصورة");
-        setIsProcessingPhoto(false);
-      };
+      mediaRecorderRef.current.start();
+      setIsRecording(true);
       
-      reader.readAsDataURL(file);
+      // Start recording timer
+      let seconds = 0;
+      setRecordingTime(0);
+      const timer = setInterval(() => {
+        seconds++;
+        setRecordingTime(seconds);
+      }, 1000);
+      setRecordingTimer(timer);
+      
+      // Start visualization
+      drawAudioVisualization();
+      
+    } catch (error) {
+      console.error('Error accessing microphone:', error);
+      alert('تعذر الوصول إلى الميكروفون. يرجى التحقق من الإذن.');
     }
   };
-
-  const triggerFileInput = () => {
-    fileInputRef.current.click();
+  
+  // Stop audio recording
+  const stopRecording = () => {
+    if (mediaRecorderRef.current && isRecording) {
+      mediaRecorderRef.current.stop();
+      setIsRecording(false);
+      clearInterval(recordingTimer);
+      setRecordingTimer(null);
+      
+      // Stop visualization
+      if (animationRef.current) {
+        cancelAnimationFrame(animationRef.current);
+      }
+    }
+  };
+  
+  // Play recorded audio
+  const playAudio = () => {
+    if (item.audioBlob && !isPlaying) {
+      const audioUrl = URL.createObjectURL(item.audioBlob);
+      audioElementRef.current = new Audio(audioUrl);
+      audioElementRef.current.onended = () => {
+        setIsPlaying(false);
+        URL.revokeObjectURL(audioUrl);
+      };
+      audioElementRef.current.play();
+      setIsPlaying(true);
+    }
+  };
+  
+  // Stop playing audio
+  const stopAudio = () => {
+    if (audioElementRef.current && isPlaying) {
+      audioElementRef.current.pause();
+      audioElementRef.current.currentTime = 0;
+      setIsPlaying(false);
+    }
+  };
+  
+  // Draw audio frequency visualization
+  const drawAudioVisualization = () => {
+    if (!canvasRef.current) return;
+    
+    const canvas = canvasRef.current;
+    const ctx = canvas.getContext('2d');
+    const width = canvas.width;
+    const height = canvas.height;
+    
+    const draw = () => {
+      animationRef.current = requestAnimationFrame(draw);
+      
+      analyserRef.current.getByteFrequencyData(dataArrayRef.current);
+      
+      ctx.fillStyle = isDark ? '#1f2937' : '#f9fafb';
+      ctx.fillRect(0, 0, width, height);
+      
+      const barWidth = (width / dataArrayRef.current.length) * 2.5;
+      let x = 0;
+      
+      for (let i = 0; i < dataArrayRef.current.length; i++) {
+        const barHeight = (dataArrayRef.current[i] / 255) * height;
+        
+        const gradient = ctx.createLinearGradient(0, height - barHeight, 0, height);
+        gradient.addColorStop(0, '#6366f1');
+        gradient.addColorStop(1, '#8b5cf6');
+        
+        ctx.fillStyle = gradient;
+        ctx.fillRect(x, height - barHeight, barWidth, barHeight);
+        
+        x += barWidth + 1;
+      }
+    };
+    
+    draw();
+  };
+  
+  // Format time in MM:SS format
+  const formatTime = (seconds) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
   };
 
   const handleSubmit = (e) => {
@@ -127,8 +262,8 @@ const AddItem = ({ onClose }) => {
       return;
     }
 
-    // Save the base64 string (item.photo) instead of photoPreview
-    utilities.storeItem(item.name, item.price, item.photo);
+    // Save the base64 audio string (item.audio) instead of image
+    utilities.storeItem(item.name, item.price, item.audio);
     utilities.sound();
 
     closeModal();
@@ -200,9 +335,6 @@ const AddItem = ({ onClose }) => {
           >
             <RiCloseLine className={`${isDark ? 'text-gray-200' : 'text-gray-500'} text-xl`} />
           </button>
-
-
-          
         </div>
 
         <form onSubmit={handleSubmit} className="p-5">
@@ -339,69 +471,102 @@ const AddItem = ({ onClose }) => {
             </div>
           </div>
 
-          {/* Photo Upload */}
+          {/* Audio Recording */}
           <div className="mb-6">
             <label className={`block text-sm font-medium mb-2 ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>
-              صورة العنصر (اختياري)
+              تسجيل صوتي (اختياري)
             </label>
-            <div
-              onClick={triggerFileInput}
-              className={`border-2 border-dashed rounded-xl p-6 text-center hover:border-indigo-400 transition-colors cursor-pointer ${isDark ? 'border-gray-600 ' + 'bg-gray-800/30' : 'border-indigo-300 bg-indigo-50'}`}
-            >
-              {isProcessingPhoto ? (
-                <div className="flex flex-col items-center justify-center">
-                  <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-indigo-500"></div>
-                  <p className={`${isDark ? 'text-gray-200' : 'text-gray-600'} mt-3`}>جارٍ تحميل الصورة...</p>
-                </div>
-              ) : item.photoPreview ? (
-                <div className="relative">
-                  <img
-                    src={item.photoPreview}
-                    alt="معاينة الصورة"
-                    className="mx-auto max-h-40 object-contain rounded-lg"
-                  />
-                  <div className={`mt-4 ${accent} font-medium flex items-center justify-center`}>
-                    <RiImageCircleLine className="mr-1" />
-                    تغيير الصورة
+            
+            <div className={`border-2 ${isRecording ? 'border-indigo-400' : 'border-dashed'} rounded-xl p-4 transition-colors ${isDark ? 'border-gray-600 bg-gray-800/30' : 'border-indigo-300 bg-indigo-50'}`}>
+              {/* Audio visualization canvas */}
+              <div className="mb-4 relative">
+                <canvas 
+                  ref={canvasRef} 
+                  width="300" 
+                  height="80"
+                  className={`w-full h-20 rounded-lg ${isDark ? 'bg-gray-900' : 'bg-gray-100'}`}
+                />
+                
+                {isRecording && (
+                  <div className="absolute top-2 right-2 flex items-center">
+                    <div className="h-3 w-3 rounded-full bg-red-500 animate-pulse mr-2"></div>
+                    <span className="text-sm font-medium text-red-500">
+                      {formatTime(recordingTime)}
+                    </span>
                   </div>
-                </div>
-              ) : (
-                <div className="flex flex-col items-center justify-center">
-                  <div className={`${isDark ? 'bg-indigo-900/30' : 'bg-indigo-100'} rounded-full p-3 mb-3 inline-block`}>
-                    <RiImageCircleLine className={`${isDark ? 'text-indigo-300' : 'text-indigo-400'} text-2xl`} />
-                  </div>
-                  <p className={`${isDark ? 'text-gray-200' : 'text-gray-600'}`}>اضغط لاختيار صورة</p>
-                  <p className={`${isDark ? 'text-gray-400' : 'text-gray-400'} text-sm mt-1`}>أو اسحب الصورة هنا</p>
-                </div>
+                )}
+              </div>
+              
+              {/* Recording controls */}
+              <div className="flex justify-center space-x-4">
+                {!isRecording ? (
+                  <button
+                    type="button"
+                    onClick={startRecording}
+                    className={`flex items-center justify-center px-4 py-2 rounded-lg ${isDark ? 'bg-red-600 hover:bg-red-700' : 'bg-red-500 hover:bg-red-600'} text-white transition-colors`}
+                  >
+                    <RiMicLine className="mr-2" />
+                    بدء التسجيل
+                  </button>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={stopRecording}
+                    className={`flex items-center justify-center px-4 py-2 rounded-lg ${isDark ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gray-600 hover:bg-gray-700'} text-white transition-colors`}
+                  >
+                    <RiMicOffLine className="mr-2" />
+                    إيقاف التسجيل
+                  </button>
+                )}
+                
+                {item.audioBlob && !isRecording && (
+                  <>
+                    {!isPlaying ? (
+                      <button
+                        type="button"
+                        onClick={playAudio}
+                        className={`flex items-center justify-center px-4 py-2 rounded-lg ${isDark ? 'bg-green-600 hover:bg-green-700' : 'bg-green-500 hover:bg-green-600'} text-white transition-colors`}
+                      >
+                        <RiPlayCircleLine className="mr-2" />
+                        تشغيل
+                      </button>
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={stopAudio}
+                        className={`flex items-center justify-center px-4 py-2 rounded-lg ${isDark ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gray-600 hover:bg-gray-700'} text-white transition-colors`}
+                      >
+                        <RiStopCircleLine className="mr-2" />
+                        إيقاف
+                      </button>
+                    )}
+                  </>
+                )}
+              </div>
+              
+              {item.audioBlob && !isRecording && (
+                <p className={`text-center mt-3 text-sm ${isDark ? 'text-green-400' : 'text-green-600'}`}>
+                  ✓ تم حفظ التسجيل الصوتي
+                </p>
               )}
             </div>
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept="image/*"
-              onChange={handlePhotoChange}
-              className="hidden"
-            />
           </div>
 
           {/* Submit Button */}
           <button
             onClick={() => utilities.sound()}
             type="submit"
-            disabled={!item.name.trim() || !item.price || parseFloat(item.price) <= 0 || isProcessingPhoto}
+            disabled={!item.name.trim() || !item.price || parseFloat(item.price) <= 0 || isRecording}
             className={`w-full py-4 rounded-xl font-bold text-white flex items-center justify-center gap-2 transition-colors active:opacity-40 ${
-              !isProcessingPhoto && item.name.trim() && item.price && parseFloat(item.price) > 0
+              !isRecording && item.name.trim() && item.price && parseFloat(item.price) > 0
                 ? `${buttonGradient} shadow-md`
                 : 'bg-indigo-300 text-gray-500 cursor-not-allowed'
             }`}
           >
-            {isProcessingPhoto ? (
+            {isRecording ? (
               <>
-                <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                </svg>
-                جارٍ معالجة الصورة
+                <div className="animate-pulse h-5 w-5 rounded-full bg-white mr-2"></div>
+                جاري التسجيل... ({formatTime(recordingTime)})
               </>
             ) : (
               <>

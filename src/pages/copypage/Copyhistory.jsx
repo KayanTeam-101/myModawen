@@ -363,18 +363,18 @@ const SettingsPage = () => {
       className={`min-h-screen ${isDark ? 'bg-black' : 'bg-gradient-to-br from-indigo-50 to-white'} transition p-4 md:p-6 showSmoothy`}
       dir="rtl"
     >
-      <div className="  rounded-2xl  p-5 mb-6">
+      <div className={`${isDark ? 'bg-slate-800' : 'bg-white'} rounded-2xl shadow-lg p-5 mb-6`}>
         <div className="flex items-center justify-between flex-wrap gap-4">
           <div className="flex items-center gap-4">
-            <div className="p-3 rounded-lg bg-indigo-50 dark:bg-slate-100">
+            <div className={`p-3 rounded-lg ${isDark ? 'bg-slate-700' : 'bg-indigo-50'}`}>
               {isDark ? (
-                <BsMoon className="text-indigo-600" size={20} />
+                <BsMoon className="text-indigo-400" size={20} />
               ) : (
                 <BsSun className="text-indigo-600" size={20} />
               )}
             </div>
             <div>
-              <div className="text-lg font-black text-indigo-900 dark:text-slate-900">المظهر</div>
+              <div className={`text-lg font-black ${isDark ? 'text-slate-100' : 'text-indigo-900'}`}>المظهر</div>
             </div>
           </div>
 
@@ -395,27 +395,27 @@ const SettingsPage = () => {
         </div>
 
         {/* Share by days */}
-        <div className="rounded-2xl shadow-lg p-5 mb-6 ">
+        <div className={`rounded-2xl shadow-lg p-5 mb-6 ${isDark ? 'bg-slate-800' : 'bg-white'}`}>
           <div className="flex items-start justify-between mb-4 flex-wrap gap-4">
             <div>
-              <h2 className="text-lg font-bold text-indigo-900 dark:text-slate-900">شارك بيانات حسب الأيام</h2>
+              <h2 className={`text-lg font-bold ${isDark ? 'text-slate-100' : 'text-indigo-900'}`}>شارك بيانات حسب الأيام</h2>
             </div>
 
             <div className="flex flex-col items-end">
-              <div className="text-sm text-indigo-600 dark:text-slate-900">
+              <div className={`text-sm ${isDark ? 'text-slate-300' : 'text-indigo-600'}`}>
                 {selected.length} / {dates.length}
               </div>
 
               <div className="mt-3 flex items-center gap-3 flex-wrap">
                 <button
                   onClick={selectAll}
-                  className="px-3 py-2 rounded-lg bg-indigo-50  text-indigo-700 da hover:bg-indigo-100 dark:h transition"
+                  className={`px-3 py-2 rounded-lg ${isDark ? 'bg-slate-700 text-slate-200 hover:bg-slate-600' : 'bg-indigo-50 text-indigo-700 hover:bg-indigo-100'} transition`}
                 >
                   {selected.length === dates.length ? "إلغاء الكل" : "تحديد الكل"}
                 </button>
                 <button
                   onClick={pickLast7}
-                  className="px-3 py-2 rounded-lg bg-indigo-50  text-indigo-700 da hover:bg-indigo-100 dark:h transition"
+                  className={`px-3 py-2 rounded-lg ${isDark ? 'bg-slate-700 text-slate-200 hover:bg-slate-600' : 'bg-indigo-50 text-indigo-700 hover:bg-indigo-100'} transition`}
                 >
                   آخر 7
                 </button>
@@ -426,7 +426,9 @@ const SettingsPage = () => {
                     disabled={selected.length === 0}
                     className={`px-3 py-2 rounded-lg ${
                       selected.length === 0
-                        ? "bg-gray-100  text-gray-400 cursor-not-allowed"
+                        ? isDark 
+                          ? "bg-slate-700 text-slate-400 cursor-not-allowed" 
+                          : "bg-gray-100 text-gray-400 cursor-not-allowed"
                         : "bg-gradient-to-r from-indigo-600 to-indigo-700 text-white shadow"
                     } transition`}
                   >
@@ -435,7 +437,7 @@ const SettingsPage = () => {
 
                   {/* Share dropdown */}
                   {showShareOptions && (
-                    <div className="absolute right-0 mt-2 w-44 rounded-lg shadow-md bg-white dark:bg-slate-900 ring-1 ring-indigo-100 dark:ring-slate-800 z-40">
+                    <div className={`absolute right-0 mt-2 w-44 rounded-lg shadow-md ${isDark ? 'bg-slate-900 ring-slate-800' : 'bg-white ring-indigo-100'} ring-1 z-40`}>
                       <ShareItem onClick={() => shareVia(SOCIAL_PLATFORMS.CLIPBOARD)} icon={<BsClipboard />} text="نسخ" />
                       <ShareItem
                         onClick={() => shareVia(SOCIAL_PLATFORMS.WHATSAPP)}
@@ -465,7 +467,7 @@ const SettingsPage = () => {
           </div>
 
           {dates.length === 0 ? (
-            <div className="text-center text-indigo-600 dark:text-slate-300 py-8">
+            <div className={`text-center ${isDark ? 'text-slate-300' : 'text-indigo-600'} py-8`}>
               لا توجد بيانات مخزنة حالياً.
             </div>
           ) : (
@@ -475,8 +477,12 @@ const SettingsPage = () => {
                   key={d}
                   className={`flex items-center justify-between p-3 rounded-lg border cursor-pointer transition ${
                     selected.includes(d)
-                      ? "bg-indigo-50 dark:bg-slate-100 text-indigo-500 border-indigo-200 dark:border-slate-700"
-                      : "bg-white dark:bg-slate-900 border-gray-100 dark:border-slate-800"
+                      ? isDark 
+                        ? "bg-slate-700 text-indigo-300 border-slate-600" 
+                        : "bg-indigo-50 text-indigo-500 border-indigo-200"
+                      : isDark 
+                        ? "bg-slate-900 border-slate-700" 
+                        : "bg-white border-gray-100"
                   }`}
                 >
                   <div className="flex items-center gap-3">
@@ -487,13 +493,13 @@ const SettingsPage = () => {
                       className="rounded text-indigo-600 focus:ring-indigo-500"
                     />
                     <div>
-                      <div className="text-sm font-medium text-indigo-100 dark:text-slate-900">
+                      <div className={`text-sm font-medium ${isDark ? 'text-slate-100' : 'text-indigo-800'}`}>
                         {formatDateLocalized(d)}
                       </div>
-                      <div className="text-xs text-indigo-600 dark:text-slate-900">{d}</div>
+                      <div className={`text-xs ${isDark ? 'text-slate-300' : 'text-indigo-600'}`}>{d}</div>
                     </div>
                   </div>
-                  <div className="text-xs text-indigo-600 dark:text-slate-300">
+                  <div className={`text-xs ${isDark ? 'text-slate-400' : 'text-indigo-500'}`}>
                     {(dataObj[d] || []).length} عنصر
                   </div>
                 </label>
@@ -508,8 +514,12 @@ const SettingsPage = () => {
               disabled={selected.length === 0}
               className={`px-4 py-2 rounded-lg border ${
                 selected.length === 0
-                  ? "bg-gray-100 dark:bg-slate-800 text-gray-400 border-gray-200 dark:border-slate-700 cursor-not-allowed"
-                  : "bg-white dark:bg-slate-900 text-indigo-700 dark:text-slate-100 border-indigo-100 dark:border-slate-700 hover:shadow"
+                  ? isDark 
+                    ? "bg-slate-700 text-slate-400 border-slate-600 cursor-not-allowed" 
+                    : "bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed"
+                  : isDark 
+                    ? "bg-slate-900 text-slate-100 border-slate-700 hover:shadow" 
+                    : "bg-white text-indigo-700 border-indigo-100 hover:shadow"
               }`}
             >
               نسخ المحدد
@@ -519,8 +529,12 @@ const SettingsPage = () => {
               disabled={selected.length === 0}
               className={`px-4 py-2 rounded-lg border ${
                 selected.length === 0
-                  ? "bg-gray-100 dark:bg-slate-800 text-gray-400 border-gray-200 dark:border-slate-700 cursor-not-allowed"
-                  : "bg-white dark:bg-slate-900 text-green-700 dark:text-emerald-300 border-green-100 dark:border-emerald-900/40 hover:shadow"
+                  ? isDark 
+                    ? "bg-slate-700 text-slate-400 border-slate-600 cursor-not-allowed" 
+                    : "bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed"
+                  : isDark 
+                    ? "bg-slate-900 text-emerald-300 border-emerald-900/40 hover:shadow" 
+                    : "bg-white text-green-700 border-green-100 hover:shadow"
               }`}
             >
               تحميل المحدد
@@ -530,8 +544,12 @@ const SettingsPage = () => {
               disabled={dates.length === 0}
               className={`px-4 py-2 rounded-lg border ${
                 dates.length === 0
-                  ? "bg-gray-100 dark:bg-slate-800 text-gray-400 border-gray-200 dark:border-slate-700 cursor-not-allowed"
-                  : "bg-white dark:bg-slate-900 text-gray-700 dark:text-slate-100 border-gray-100 dark:border-slate-700 hover:shadow"
+                  ? isDark 
+                    ? "bg-slate-700 text-slate-400 border-slate-600 cursor-not-allowed" 
+                    : "bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed"
+                  : isDark 
+                    ? "bg-slate-900 text-slate-100 border-slate-700 hover:shadow" 
+                    : "bg-white text-gray-700 border-gray-100 hover:shadow"
               }`}
             >
               تنزيل الكل
@@ -540,10 +558,10 @@ const SettingsPage = () => {
         </div>
 
         {/* Import / Set data */}
-        <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-lg p-5 mb-8 border border-indigo-100 dark:border-slate-800">
+        <div className={`rounded-2xl shadow-lg p-5 mb-8 border ${isDark ? 'bg-slate-800 border-slate-700' : 'bg-white border-indigo-100'}`}>
           <div className="flex items-center justify-between mb-3 flex-wrap gap-3">
             <div>
-              <h3 className="text-lg font-bold text-indigo-900 dark:text-slate-100">استيراد / لصق بيانات</h3>
+              <h3 className={`text-lg font-bold ${isDark ? 'text-slate-100' : 'text-indigo-900'}`}>استيراد / لصق بيانات</h3>
             </div>
           </div>
 
@@ -552,7 +570,11 @@ const SettingsPage = () => {
             value={importText}
             onChange={(e) => setImportText(e.target.value)}
             placeholder='مثال: {"01-01-2024":[{"name":"منتج","price":"10","time":"12:30"}]}'
-            className="w-full p-3 border border-gray-100 dark:border-slate-800 rounded-lg bg-indigo-50 dark:bg-slate-800 text-sm font-mono text-indigo-900 dark:text-slate-100"
+            className={`w-full p-3 border rounded-lg text-sm font-mono ${
+              isDark 
+                ? 'bg-slate-700 border-slate-600 text-slate-100' 
+                : 'bg-indigo-50 border-gray-100 text-indigo-900'
+            }`}
             aria-label="مساحة لإدخال بيانات JSON"
           />
 
@@ -562,14 +584,20 @@ const SettingsPage = () => {
               disabled={!importText.trim()}
               className={`px-4 py-2 rounded-lg flex items-center ${
                 !importText.trim()
-                  ? "bg-gray-100 dark:bg-slate-800 text-gray-400"
+                  ? isDark 
+                    ? "bg-slate-700 text-slate-400" 
+                    : "bg-gray-100 text-gray-400"
                   : "bg-gradient-to-r from-teal-400 to-cyan-500 text-white shadow"
               }`}
             >
               <BsUpload className="ml-2" /> حفظ
             </button>
 
-            <label className="px-4 py-2 rounded-lg bg-white dark:bg-slate-900 border border-gray-100 dark:border-slate-800 cursor-pointer inline-flex items-center gap-2 hover:shadow">
+            <label className={`px-4 py-2 rounded-lg border inline-flex items-center gap-2 hover:shadow ${
+              isDark 
+                ? 'bg-slate-900 border-slate-700 text-slate-200' 
+                : 'bg-white border-gray-100 text-gray-700'
+            } cursor-pointer`}>
               <BsUpload /> رفع ملف
               <input ref={fileRef} onChange={handleFile} type="file" accept=".json,application/json" className="hidden" />
             </label>
@@ -579,14 +607,18 @@ const SettingsPage = () => {
                 setImportText(JSON.stringify(dataObj, null, 2));
                 show("تم لصق البيانات الحالية");
               }}
-              className="px-4 py-2 rounded-lg bg-white dark:bg-slate-900 border border-gray-100 dark:border-slate-800 hover:shadow"
+              className={`px-4 py-2 rounded-lg border hover:shadow ${
+                isDark 
+                  ? 'bg-slate-900 border-slate-700 text-slate-200' 
+                  : 'bg-white border-gray-100 text-gray-700'
+              }`}
             >
               لصق الحالية
             </button>
           </div>
         </div>
 
-        <footer className="text-center text-sm text-indigo-600 dark:text-slate-300">
+        <footer className={`text-center text-sm ${isDark ? 'text-slate-400' : 'text-indigo-600'}`}>
           localStorage.data — احفظ بياناتك محلياً · localStorage.theme = "{theme}"
         </footer>
 
