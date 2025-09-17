@@ -228,7 +228,8 @@ const AddItem = ({ onClose }) => {
         
         const gradient = ctx.createLinearGradient(0, height - barHeight, 0, height);
         gradient.addColorStop(0, '#6366f1');
-        gradient.addColorStop(1, '#8b5cf6');
+        gradient.addColorStop(1, '#63fff1');
+        gradient.addColorStop(2, '#8b5cf6');
         
         ctx.fillStyle = gradient;
         ctx.fillRect(x, height - barHeight, barWidth, barHeight);
@@ -477,7 +478,7 @@ const AddItem = ({ onClose }) => {
               تسجيل صوتي (اختياري)
             </label>
             
-            <div className={`border-2 ${isRecording ? 'border-indigo-400' : 'border-dashed'} rounded-xl p-4 transition-colors ${isDark ? 'border-gray-600 bg-gray-800/30' : 'border-indigo-300 bg-indigo-50'}`}>
+            <div className={`border-2 ${isRecording ? 'border-indigo-400' : ''} rounded-xl p-4 transition-colors ${isDark ? 'border-gray-600 bg-gray-800/30' : 'border-indigo-300 bg-indigo-50'}`}>
               {/* Audio visualization canvas */}
               <div className="mb-4 relative">
                 <canvas 
@@ -546,7 +547,7 @@ const AddItem = ({ onClose }) => {
               
               {item.audioBlob && !isRecording && (
                 <p className={`text-center mt-3 text-sm ${isDark ? 'text-green-400' : 'text-green-600'}`}>
-                  ✓ تم حفظ التسجيل الصوتي
+                 تم حفظ التسجيل الصوتي
                 </p>
               )}
             </div>
