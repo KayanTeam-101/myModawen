@@ -227,9 +227,8 @@ const AddItem = ({ onClose }) => {
         const barHeight = (dataArrayRef.current[i] / 255) * height;
         
         const gradient = ctx.createLinearGradient(0, height - barHeight, 0, height);
-        gradient.addColorStop(0, '#6366f1');
-        gradient.addColorStop(1, '#63fff1');
-        gradient.addColorStop(2, '#8b5cf6');
+        gradient.addColorStop(0, '#6006f1');
+        gradient.addColorStop(1, '#8c3cf6');
         
         ctx.fillStyle = gradient;
         ctx.fillRect(x, height - barHeight, barWidth, barHeight);
