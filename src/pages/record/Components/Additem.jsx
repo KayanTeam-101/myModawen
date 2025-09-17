@@ -525,7 +525,7 @@ const AddItem = ({ onClose }) => {
                       <button
                         type="button"
                         onClick={playAudio}
-                        className={`flex items-center justify-center px-4 py-2 rounded-lg ${isDark ? 'bg-green-600 hover:bg-green-700' : 'bg-green-500 hover:bg-green-600'} text-white transition-colors`}
+                        className={`flex items-center justify-center px-4 py-2 rounded-lg ${isDark ? 'bg-teal-600 hover:bg-teal-700' : 'bg-teal-500 hover:bg-teal-600'} text-white transition-colors`}
                       >
                         <RiPlayCircleLine className="mr-2" />
                         تشغيل
