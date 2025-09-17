@@ -63,6 +63,7 @@ const handleDelete = (dateKey, id) => {
             onPriceChange={handlePriceChange}
             onDelete={handleDelete} // Add this prop
             photo={item.photo}
+            record={item.record}
 
           />
         ))
