@@ -22,7 +22,7 @@ const Task = ({
   onPriceChange,
   onDelete,
   photo,
-  record // <-- new prop: record (data URL or url or blob url)
+  record 
 }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [editValue, setEditValue] = useState(price);
