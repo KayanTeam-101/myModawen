@@ -263,7 +263,7 @@ const AddItem = ({ onClose }) => {
     }
 
     // Save the base64 audio string (item.audio) instead of image
-    utilities.storeItem(item.name, item.price, item.audio);
+    utilities.storeItem(item.name, item.price, null ,item.audio);
     utilities.sound();
 
     closeModal();

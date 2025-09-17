@@ -11,44 +11,37 @@ export function Utilities(sound, vibrate, storeItem) {
       .then(() => console.log('done'))
       .catch((err) => console.error('Error playing sound:', err));
   };
-this.storeItem = function storeItem(nameofproduct, price, photo) {
-  // Get or initialize data
+this.storeItem = function storeItem(nameofproduct, price, photo, voice) {
   let data = JSON.parse(localStorage.getItem('data')) || {};
-  
-  // Get current date in "d-M-yyyy" format (e.g., "3-12-2023")
+
+  // If caller passed only 3 args and the 3rd is an audio data URL,
+  // treat it as voice.
+  if (!voice && typeof photo === 'string' && photo.startsWith('data:audio')) {
+    voice = photo;
+    photo = null;
+  }
+
   const date = new Date();
-  const dateKey = `${date.getDate()}-${date.getMonth() + 1}-${date.getFullYear()}`
-  
-  
-  // Get formatted time (HH:MM:SS AM/PM)
+  const dateKey = `${date.getDate()}-${date.getMonth() + 1}-${date.getFullYear()}`;
+
   let hours = date.getHours();
   const ampm = hours >= 12 ? 'PM' : 'AM';
-  hours = hours % 12;
-  hours = hours || 12;
-  const timeString = `${hours}:${(date.getMinutes())}:${(date.getSeconds())} ${ampm}`;
-  // Create the new item object
+  hours = hours % 12 || 12;
+  const timeString = `${hours}:${date.getMinutes()}:${date.getSeconds()} ${ampm}`;
+
   const newItem = {
     name: nameofproduct,
     price: price,
     time: timeString,
-    timestamp: date.getTime(), // For sorting
-    photo : photo
+    timestamp: date.getTime(),
+    photo: photo || null,
+    record: voice || null
   };
-  
-  // If date doesn't exist in data, create empty array
-  if (!data[dateKey]) {
-    data[dateKey] = [];
-  }
-  
-  // Add new item to the date's array
+
+  if (!data[dateKey]) data[dateKey] = [];
   data[dateKey].push(newItem);
-  
-  // Save to localStorage
   localStorage.setItem('data', JSON.stringify(data));
-  
-  return {
-    date: dateKey,
-    item: newItem
-  };
+
+  return { date: dateKey, item: newItem };
 };}
 

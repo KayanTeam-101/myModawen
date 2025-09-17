@@ -1,5 +1,13 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { RiDeleteBinLine, RiCloseLine, RiZoomInLine, RiDownloadLine } from 'react-icons/ri';
+import { 
+  RiDeleteBinLine, 
+  RiCloseLine, 
+  RiZoomInLine, 
+  RiDownloadLine,
+  RiPlayCircleLine,
+  RiStopCircleLine,
+  RiMusicLine
+} from 'react-icons/ri';
 import { FaDeleteLeft, FaImage } from "react-icons/fa6";
 import { BsImage, BsArrowLeft, BsArrowRight } from 'react-icons/bs';
 import '../../../index.css';
@@ -13,16 +21,22 @@ const Task = ({
   id, 
   onPriceChange,
   onDelete,
-  photo
+  photo,
+  record // <-- new prop: record (data URL or url or blob url)
 }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [editValue, setEditValue] = useState(price);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [showImageModal, setShowImageModal] = useState(false);
+  const [showAudioModal, setShowAudioModal] = useState(false); // audio modal state
   const [isLongPressing, setIsLongPressing] = useState(false);
   const [imageLoaded, setImageLoaded] = useState(false);
+  const [audioLoaded, setAudioLoaded] = useState(false);
+  const [isPlaying, setIsPlaying] = useState(false);
+
   const inputRef = useRef(null);
   const pressTimer = useRef(null);
+  const audioRef = useRef(null); // for audio element in modal
 
   // theme
   const THEME = typeof window !== 'undefined' ? (localStorage.getItem('theme') || 'light') : 'light';
@@ -34,6 +48,17 @@ const Task = ({
       inputRef.current.focus();
     }
   }, [isEditing]);
+
+  // cleanup audio when component unmounts
+  useEffect(() => {
+    return () => {
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current.src = '';
+        audioRef.current = null;
+      }
+    };
+  }, []);
 
   // Long press handlers
   const startPressTimer = () => {
@@ -114,6 +139,80 @@ const Task = ({
     }
   };
 
+  // -----------------------
+  // Audio handlers & modal
+  // -----------------------
+  const openAudioModal = (e) => {
+    e.stopPropagation();
+    setShowAudioModal(true);
+    setAudioLoaded(false);
+    setIsPlaying(false);
+  };
+
+  const closeAudioModal = (e) => {
+    if (e) e.stopPropagation();
+    setShowAudioModal(false);
+    // stop playback
+    if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current.currentTime = 0;
+      setIsPlaying(false);
+    }
+  };
+
+  // Called when audio element is ready
+  const handleAudioCanPlay = () => {
+    setAudioLoaded(true);
+  };
+
+  const togglePlayPause = async (e) => {
+    if (e) e.stopPropagation();
+    if (!audioRef.current) return;
+
+    if (isPlaying) {
+      audioRef.current.pause();
+      setIsPlaying(false);
+    } else {
+      try {
+        await audioRef.current.play();
+        setIsPlaying(true);
+      } catch (err) {
+        console.error('Audio play failed:', err);
+      }
+    }
+  };
+
+  // Download audio: if data: URL, just use it; otherwise fetch blob
+  const downloadAudio = async (e) => {
+    e.stopPropagation();
+    if (!record) return;
+    try {
+      if (record.startsWith('data:')) {
+        // data URL -> direct download
+        const a = document.createElement('a');
+        a.href = record;
+        a.download = `${name || 'record'}.webm`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+      } else {
+        // remote url -> fetch and download
+        const response = await fetch(record);
+        const blob = await response.blob();
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `${name || 'record'}.webm`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+      }
+    } catch (err) {
+      console.error('Error downloading audio:', err);
+    }
+  };
+
   // themed classes
   const container = `w-full h-fit p-3 transition-colors duration-200 flex items-start relative group ${isDark ? 'bg-black border-gray-700' : 'bg-white border-gray-100'}`;
   const countBadge = `${isDark ? 'bg-gray-700 text-gray-200' : 'bg-gray-100 text-gray-700'} w-8 h-8 select-none rounded-full flex-shrink-0 flex justify-center items-center font-bold mr-3 mt-0.5`;
@@ -163,14 +262,13 @@ const Task = ({
         </div>
       )}
 
-      {/* Image Preview Modal - Completely Restyled */}
+      {/* Image Preview Modal */}
       {showImageModal && (
         <div 
           className={`showSmoothy fixed h-screen w-screen inset-0 z-50 flex items-center justify-center p-4 backdrop-blur-sm ${isDark ? 'bg-gray-900/70' : 'bg-indigo-100/70'}`}
           onClick={() => setShowImageModal(false)}
         >
           <div className="relative max-w-4xl w-full max-h-[80vh] flex flex-col">
-            {/* Header with title and close button */}
             <div className="flex justify-between items-center  p-4 bg-gray-800 rounded-t-xl">
               <h3 className="text-white font-semibold text-lg truncate">{name}</h3>
               <button
@@ -184,7 +282,6 @@ const Task = ({
               </button>
             </div>
             
-            {/* Image container */}
             <div className="relative bg-black rounded-lg overflow-hidden flex-1 flex items-center justify-center">
               {!imageLoaded && (
                 <div className="absolute inset-0 flex items-center justify-center">
@@ -203,7 +300,6 @@ const Task = ({
               />
             </div>
             
-            {/* Footer with price and actions */}
             <div className=" p-4 bg-white dark:bg-gray-800 rounded-b-xl flex justify-between items-center">
               <div>
                 <div className="text-lg font-bold text-red-500 dark:text-red-400">-{price} ج.م</div>
@@ -218,9 +314,67 @@ const Task = ({
                 >
                   <RiDownloadLine className="text-lg" />
                 </button>
-                
-               
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Audio Preview Modal */}
+      {showAudioModal && record && (
+        <div
+          className={`showSmoothy fixed h-screen w-screen inset-0 z-50 flex items-center justify-center p-4 backdrop-blur-sm ${isDark ? 'bg-gray-900/70' : 'bg-indigo-100/70'}`}
+          onClick={closeAudioModal}
+        >
+          <div className="relative max-w-2xl w-full max-h-[60vh] flex flex-col bg-transparent">
+            <div className="flex justify-between items-center p-4 bg-gray-800 rounded-t-xl">
+              <h3 className="text-white font-semibold text-lg truncate">{name} - تسجيل</h3>
+              <button
+                className="p-2 rounded-full bg-white/20 hover:bg-white/30 transition-colors"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  closeAudioModal();
+                }}
+              >
+                <RiCloseLine className="text-white text-xl" />
+              </button>
+            </div>
+
+            <div className="bg-white dark:bg-gray-800 p-6 rounded-b-xl flex flex-col items-center gap-4">
+              <div className="w-full flex items-center justify-center">
+                {/* native audio element with controls */}
+                <audio
+                  ref={audioRef}
+                  src={record}
+                  controls
+                  onCanPlay={handleAudioCanPlay}
+                  onPlay={() => setIsPlaying(true)}
+                  onPause={() => setIsPlaying(false)}
+                  className="w-full"
+                />
+              </div>
+
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={togglePlayPause}
+                  className={`px-4 py-2 rounded-lg flex items-center gap-2 ${isDark ? 'bg-gray-700 text-white' : 'bg-indigo-50 text-indigo-700'}`}
+                >
+                  {isPlaying ? <RiStopCircleLine /> : <RiPlayCircleLine />}
+                  {isPlaying ? 'إيقاف' : 'تشغيل'}
+                </button>
+
+                <button
+                  onClick={downloadAudio}
+                  className="px-4 py-2 rounded-lg bg-indigo-100 dark:bg-indigo-900 text-indigo-600 dark:text-indigo-300"
+                >
+                  <RiDownloadLine />
+                  تحميل
+                </button>
+              </div>
+
+              {!audioLoaded && (
+                <div className="text-sm text-gray-500">جاري تجهيز الملف...</div>
+              )}
             </div>
           </div>
         </div>
@@ -267,6 +421,7 @@ const Task = ({
         </div>
       </div>
       
+      {/* Photo button */}
       {photo && (
         <div 
           className={`h-full p-2 mr-2 flex justify-center items-center cursor-pointer ${isDark ? 'text-indigo-50' : 'text-indigo-600'} group`}
@@ -274,12 +429,29 @@ const Task = ({
         >
           <div className="relative">
             <FaImage size={24} className={`${photoIcon} group-hover:scale-110 transition-transform`}/>
-           
           </div>
         </div>
-      )} 
+      )}
+
+      {/* Audio button (shows only if record exists) */}
+      {record && (
+        <div
+          className={`h-full p-2 mr-2 flex justify-center items-center cursor-pointer ${isDark ? 'text-indigo-50' : 'text-indigo-600'} group`}
+          onClick={openAudioModal}
+          title="تشغيل التسجيل"
+        >
+          <div className="relative">
+            <RiMusicLine size={22} className={`group-hover:scale-110 transition-transform ${isDark ? 'text-indigo-50' : 'text-indigo-600'}`} />
+            {/* small play badge when not in modal */}
+            <div className="absolute -right-1 -bottom-1 bg-white rounded-full p-0.5 shadow-sm">
+              <RiPlayCircleLine className="text-xs text-indigo-600" />
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
 
 export default Task;
+  
