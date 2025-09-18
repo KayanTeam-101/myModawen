@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { RiZoomInLine, RiCloseLine } from "react-icons/ri";
+import React, { useState, useRef, useEffect } from "react";
+import { RiZoomInLine, RiCloseLine, RiPlayCircleLine, RiDownloadLine, RiMusicLine } from "react-icons/ri";
 import { FaImage } from "react-icons/fa6";
 import { BsClipboard2MinusFill } from "react-icons/bs";
 
@@ -18,6 +18,12 @@ const List = () => {
   const [expandedDates, setExpandedDates] = useState({});
   const [searchTerm, setSearchTerm] = useState("");
   const [viewingImage, setViewingImage] = useState(null);
+
+  // New: audio modal state
+  const [viewingAudio, setViewingAudio] = useState(null); // { src, name, price }
+  const audioRef = useRef(null);
+  const [audioLoaded, setAudioLoaded] = useState(false);
+  const [isPlaying, setIsPlaying] = useState(false);
 
   // theme
   const THEME = typeof window !== 'undefined' ? (localStorage.getItem('theme') || 'light') : 'light';
@@ -50,6 +56,81 @@ const List = () => {
     setViewingImage(imageData);
   };
 
+  // AUDIO helpers
+  const showAudio = (src, name, price) => {
+    setViewingAudio({ src, name, price });
+    setAudioLoaded(false);
+    setIsPlaying(false);
+  };
+
+  const closeAudioModal = (e) => {
+    if (e) e.stopPropagation();
+    // stop playback
+    if (audioRef.current) {
+      try { audioRef.current.pause(); audioRef.current.currentTime = 0; } catch (err) {}
+    }
+    setViewingAudio(null);
+    setIsPlaying(false);
+  };
+
+  const handleAudioCanPlay = () => {
+    setAudioLoaded(true);
+  };
+
+  const togglePlayPause = async (e) => {
+    if (e) e.stopPropagation();
+    if (!audioRef.current) return;
+    if (isPlaying) {
+      audioRef.current.pause();
+      setIsPlaying(false);
+    } else {
+      try {
+        await audioRef.current.play();
+        setIsPlaying(true);
+      } catch (err) {
+        console.error('Audio play failed:', err);
+      }
+    }
+  };
+
+  const downloadAudio = async (e, src, filename = 'recording') => {
+    e.stopPropagation();
+    if (!src) return;
+    try {
+      if (src.startsWith('data:')) {
+        const a = document.createElement('a');
+        a.href = src;
+        a.download = `${filename}.webm`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+      } else {
+        const response = await fetch(src);
+        const blob = await response.blob();
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `${filename}.webm`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+      }
+    } catch (err) {
+      console.error('Error downloading audio:', err);
+    }
+  };
+
+  // cleanup audio element when component unmounts or modal closes
+  useEffect(() => {
+    return () => {
+      if (audioRef.current) {
+        try { audioRef.current.pause(); audioRef.current.src = ''; } catch (e) {}
+        audioRef.current = null;
+      }
+    };
+  }, []);
+
   return (
     <div className={`w-full max-w-2xl mx-auto py-6 px-3 showSmoothy ${containerText}`}>
       {/* Image Preview Modal */}
@@ -76,6 +157,62 @@ const List = () => {
             <div className="text-center mt-4">
               <div className={`font-semibold text-lg ${accent}`}>{viewingImage.name}</div>
               <div className={`text-sm ${isDark ? 'text-gray-300' : 'text-indigo-400'}`}>-{viewingImage.price} ج.م</div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Audio Preview Modal */}
+      {viewingAudio && (
+        <div
+          className={`fixed inset-0 ${isDark ? 'bg-gray-900/30' : 'bg-indigo-950/90'} backdrop-blur-md z-50 flex items-center justify-center p-4`}
+          onClick={closeAudioModal}
+        >
+          <div className="relative max-w-2xl max-h-[70vh] w-full">
+            <div className="bg-gray-800 rounded-t-xl p-4 flex justify-between items-center">
+              <div className="text-white font-semibold truncate">{viewingAudio.name} - تسجيل</div>
+              <button
+                className="p-2 rounded-full bg-white/10 hover:bg-white/20 transition"
+                onClick={(e) => { e.stopPropagation(); closeAudioModal(); }}
+              >
+                <RiCloseLine className="text-white text-xl" />
+              </button>
+            </div>
+
+            <div className="bg-white dark:bg-gray-800 p-6 rounded-b-xl flex flex-col items-center gap-4">
+              <div className="w-full">
+                <audio
+                  ref={audioRef}
+                  src={viewingAudio.src}
+                  controls
+                  onCanPlay={handleAudioCanPlay}
+                  onPlay={() => setIsPlaying(true)}
+                  onPause={() => setIsPlaying(false)}
+                  className="w-full"
+                />
+              </div>
+
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={togglePlayPause}
+                  className={`px-4 py-2 rounded-lg flex items-center gap-2 ${isDark ? 'bg-gray-700 text-white' : 'bg-indigo-50 text-indigo-700'}`}
+                >
+                  {isPlaying ? <RiCloseLine /> : <RiPlayCircleLine />}
+                  {isPlaying ? 'إيقاف' : 'تشغيل'}
+                </button>
+
+                <button
+                  onClick={(e) => downloadAudio(e, viewingAudio.src, viewingAudio.name || 'record')}
+                  className="px-4 py-2 rounded-lg bg-indigo-100 dark:bg-indigo-900 text-indigo-600 dark:text-indigo-300"
+                >
+                  <RiDownloadLine />
+                  تحميل
+                </button>
+              </div>
+
+              {!audioLoaded && (
+                <div className="text-sm text-gray-500">جاري تجهيز الملف...</div>
+              )}
             </div>
           </div>
         </div>
@@ -163,55 +300,77 @@ const List = () => {
                 }}
               >
                 <div className="py-2">
-                  {filteredItems.map((item, index) => (
-                    <div
-                      key={`${date}-${index}`}
-                      className={`py-3 px-5 flex items-center border-b last:border-0 transition ${isDark ? 'border-gray-700' : 'border-indigo-50'} hover:${isDark ? 'bg-gray-700/30' : 'bg-indigo-50/50'}`}
-                    >
-                      <div className="flex-1 min-w-0">
-                        <p className={`${isDark ? 'text-gray-100' : 'text-gray-800'} font-semibold`}>{item.name}</p>
-                        <div className={`flex items-center mt-1 text-sm ${isDark ? 'text-gray-300' : 'text-indigo-50'}`}>
-                          <svg
-                            className="w-3 h-3 mr-1"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            stroke="currentColor"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth={2}
-                              d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-                            />
-                          </svg>
-                          {item.time}
+                  {filteredItems.map((item, index) => {
+                    // Determine photo vs audio (handle legacy: audio in photo)
+                    const isPhotoAudio = item.photo && typeof item.photo === 'string' && item.photo.startsWith('data:audio');
+                    const recordSrc = item.record || (isPhotoAudio ? item.photo : null);
+                    const photoSrc = item.photo && !isPhotoAudio ? item.photo : null;
+
+                    return (
+                      <div
+                        key={`${date}-${index}`}
+                        className={`py-3 px-5 flex items-center border-b last:border-0 transition ${isDark ? 'border-gray-700' : 'border-indigo-50'} hover:${isDark ? 'bg-gray-700/30' : 'bg-indigo-50/50'}`}
+                      >
+                        <div className="flex-1 min-w-0">
+                          <p className={`${isDark ? 'text-gray-100' : 'text-gray-800'} font-semibold`}>{item.name}</p>
+                          <div className={`flex items-center mt-1 text-sm ${isDark ? 'text-gray-300' : 'text-indigo-50'}`}>
+                            <svg
+                              className="w-3 h-3 mr-1"
+                              fill="none"
+                              viewBox="0 0 24 24"
+                              stroke="currentColor"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                              />
+                            </svg>
+                            {item.time}
+                          </div>
+                        </div>
+
+                        <div className="flex items-center gap-3">
+                          <span className={`font-medium whitespace-nowrap ${accent}`}>-{item.price} ج.م</span>
+
+                          {/* Image button */}
+                          {photoSrc && (
+                            <div
+                              className="relative cursor-pointer group"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                showImage({
+                                  photo: photoSrc,
+                                  name: item.name,
+                                  price: item.price,
+                                });
+                              }}
+                            >
+                              <FaImage className={`text-lg group-hover:${isDark ? 'text-indigo-200' : 'text-indigo-600'} transition`} />
+                              <div className={`absolute -top-1 -right-1 ${isDark ? 'bg-indigo-500' : 'bg-indigo-500'} rounded-full w-3 h-3 flex items-center justify-center`}>
+                                <RiZoomInLine className="text-white text-[8px]" />
+                              </div>
+                            </div>
+                          )}
+
+                          {/* Audio button */}
+                          {recordSrc && (
+                            <div
+                              className="relative cursor-pointer group"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                showAudio(recordSrc, item.name, item.price);
+                              }}
+                              title="تشغيل التسجيل"
+                            >
+                              <RiMusicLine className={`text-lg ${isDark ? 'text-indigo-50' : 'text-indigo-600'} group-hover:scale-110 transition-transform`} />
+                            </div>
+                          )}
                         </div>
                       </div>
-
-                      <div className="flex items-center">
-                        <span className={`font-medium whitespace-nowrap ${accent}`}>-{item.price} ج.م</span>
-
-                        {item.photo && (
-                          <div
-                            className="relative cursor-pointer group"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              showImage({
-                                photo: item.photo,
-                                name: item.name,
-                                price: item.price,
-                              });
-                            }}
-                          >
-                            <FaImage className={`text-lg group-hover:${isDark ? 'text-indigo-200' : 'text-indigo-600'} transition`} />
-                            <div className={`absolute -top-1 -right-1 ${isDark ? 'bg-indigo-500' : 'bg-indigo-500'} rounded-full w-3 h-3 flex items-center justify-center`}>
-                              <RiZoomInLine className="text-white text-[8px]" />
-                            </div>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               </div>
             </div>

@@ -428,7 +428,7 @@ const Task = ({
           onClick={openImageModal}
         >
           <div className="relative">
-            <FaImage size={24} className={`${photoIcon} group-hover:scale-110 transition-transform`}/>
+            <FaImage size={20} className={`${photoIcon} group-hover:scale-110 transition-transform`}/>
           </div>
         </div>
       )}
