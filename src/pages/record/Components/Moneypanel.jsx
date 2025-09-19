@@ -115,9 +115,9 @@ let format = e =>{
                   <h2 className={`text-3xl font-black mt-2 ${isDark ? 'text-white' : 'text-gray-900'}`}>
                     <span className={`${inWallet > 0 ? (isDark ? 'text-white' : 'text-black') : 'text-red-600'}`}>{  new Intl.NumberFormat("en-US", { style: "currency", currency: "Egp",maximumSignificantDigits:3 }).format(
     inWallet)} </span>
-                    <span className="p-1 text-gray-600">EGP</span>
+                    <span className="p-1 text-gray-600"></span>
                     <span className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-300'} pl-2`}>متبقي من {  new Intl.NumberFormat("en-US", { style: "currency", currency: "Egp",maximumSignificantDigits:3 }).format(
-    balance)} <span className="pl-1 text-gray-600">EGP</span></span>
+    balance)} <span className="pl-1 text-gray-600"></span></span>
                   </h2>
                 </div>
                 <button
@@ -128,7 +128,7 @@ let format = e =>{
                   }}
                   aria-label="عرض مميزات بريميوم"
                 >
-                تعلم المزيد 
+                تعلم  
                 </button>
               </div>
               <div className="mt-2 flex justify-between items-center">
