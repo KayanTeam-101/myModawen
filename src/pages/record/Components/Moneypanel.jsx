@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from "react";
-import { RiWallet3Line, RiAddCircleLine, RiMoneyPoundCircleLine, RiInfoI } from "react-icons/ri";
+import { RiWallet3Line, RiAddCircleLine, RiMoneyPoundCircleLine, RiInfoI, RiStickyNoteAddFill } from "react-icons/ri";
 import { Utilities } from "../../../utilities/utilities.js";
 import premiumImage from '/premium.jpg';
 import Addbalance from "./Addbalance.jsx";
 import Additem from "./Additem.jsx";
 import Getpremium from "./Getpremium.jsx";
 import { BsInfo, BsPlus  } from "react-icons/bs";
+import ShoppingList from "./ShoppingList.jsx";
 
 // Moneypanel with conditional Tailwind classes for light / dark theme
 // Usage: the component reads localStorage.getItem('theme') and applies classes
@@ -13,6 +14,7 @@ import { BsInfo, BsPlus  } from "react-icons/bs";
 
 const Moneypanel = () => {
   const [showPremiumModal, setShowPremiumModal] = useState(false);
+  const [showList, setShowList] = useState(false);
   const [showAddBalance, setShowAddBalance] = useState(false);
   const [showAddItem, setShowAddItem] = useState(false);
   const [balance, setBalance] = useState(0);
@@ -31,7 +33,9 @@ const Moneypanel = () => {
     month: 'long',
     day: 'numeric'
   });
-
+let format = e =>{
+  return 
+}
   // Initialize or load balance
   useEffect(() => {
     const saved = localStorage.getItem('balance');
@@ -109,9 +113,11 @@ const Moneypanel = () => {
                 <div>
                   <p className={`text-sm opacity-80 ${smallText}`}>الرصيد</p>
                   <h2 className={`text-3xl font-black mt-2 ${isDark ? 'text-white' : 'text-gray-900'}`}>
-                    <span className={`${inWallet > 0 ? (isDark ? 'text-white' : 'text-black') : 'text-red-600'}`}>{inWallet}</span>
+                    <span className={`${inWallet > 0 ? (isDark ? 'text-white' : 'text-black') : 'text-red-600'}`}>{  new Intl.NumberFormat("Us", { style: "currency", currency: "Egp",maximumSignificantDigits:3 }).format(
+    inWallet)} </span>
                     <span className="p-1 text-gray-600">EGP</span>
-                    <span className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-300'} pl-2`}>متبقي من {balance} <span className="pl-1 text-gray-600">EGP</span></span>
+                    <span className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-300'} pl-2`}>متبقي من {  new Intl.NumberFormat("Us", { style: "currency", currency: "Egp",maximumSignificantDigits:3 }).format(
+    balance)} <span className="pl-1 text-gray-600">EGP</span></span>
                   </h2>
                 </div>
                 <button
@@ -134,7 +140,7 @@ const Moneypanel = () => {
 
           {/* Date Information */}
           <div
-            className={`rounded-4xl h-40 select-none active:opacity-80 transition-all p-4 flex justify-between items-center ${subtleBg}`}
+            className={`rounded-full h-20 select-none active:opacity-80 transition-all p-4 flex justify-between items-center ${subtleBg}`}
             onDoubleClick={() => setShowAddItem(true)}
           >
             <div className="flex items-center gap-2">
@@ -157,10 +163,15 @@ const Moneypanel = () => {
               aria-label="إضافة عنصر جديد"
             >
               <BsPlus  size={30} />
-              <p>إضافة عنصر جديد</p>
+              <p> مُشتري </p>
             </button>
-            
+            <button 
+            onClick={e => setShowList(true)}
+            className={`min-w-12  p-2 min-h-12 flex justify-center items-center rounded-full ${isDark ? 'bg-indigo-950 text-white' : 'bg-indigo-500/15 text-indigo-700'} ` } >
+              <RiStickyNoteAddFill size={25}/>
+            </button>
           </div>
+            
         </div>
       )}
 
@@ -183,6 +194,10 @@ const Moneypanel = () => {
 
       {showPremiumModal && (
         <Getpremium onClose={() => setShowPremiumModal(false)} />
+      )}
+      {showList && (
+      <ShoppingList onClose={() => setShowList(false)}/>
+
       )}
     </div>
   );
