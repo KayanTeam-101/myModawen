@@ -38,7 +38,7 @@ const IdentifyStructure = () => {
     },
     {
       title: "للإستخدام  الشخصي أو للأعمال التجارية",
-      description:   " يمكنك تدوين مشترياتك مثل ( شراء اغراض من السوبر ماركت, موصلات إلخ..) أو (شراء 5 بكتات كُتب , شرات 3 شاشات 42 بوصة, شراء 5 طن حديد)   ",
+      description:   " يمكنك تدوين مشترياتك مثل ( شراء أغراض من السوبر ماركت, موصلات, إلخ..) أو (شراء 5 بكتات كُتب , شرات 3 شاشات 42 بوصة, شراء 5 طن حديد)   ",
       illustration: (
         <div className="relative">
           <div className="w-48 h-48 bg-gradient-to-br from-cyan-400 to-blue-400 rounded-full flex items-center justify-center shadow-lg shadow-cyan-500/20">

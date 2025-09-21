@@ -94,7 +94,7 @@ const AddBalance = ({ onClose }) => {
         <div className="py-7 px-5 relative ">
           <div className="relative z-10">
             <div className="flex justify-center items-baseline">
-              <span className={`text-3xl font-bold mr-2 ${isDark ? 'text-gray-500' : 'text-indigo-500'}`}>EGP</span>
+              <span className={`text-3xl font-bold mr-2 ${isDark ? 'text-gray-500' : 'text-indigo-500'}`}></span>
               <div className="text-5xl font-bold tracking-tight">
                 <span className={`${isDark ? 'text-white' : 'text-gray-800'}`}>{formatCurrency(value)}</span>
               </div>

@@ -252,10 +252,7 @@ const AddItem = ({ onClose }) => {
 
     e.preventDefault();
 
-    if (!item.name.trim()) {
-      alert('الرجاء إدخال اسم العنصر');
-      return;
-    }
+ 
 
     if (!item.price || parseFloat(item.price) <= 0) {
       alert('الرجاء إدخال سعر صحيح');
@@ -313,6 +310,13 @@ const AddItem = ({ onClose }) => {
   const shortcutHoverBg = isDark ? 'bg-indigo-900/5' : 'bg-indigo-50';
   const accent = 'text-indigo-600';
   const buttonGradient = 'bg-gradient-to-r from-indigo-600 via-sky-400 to-purple-300';
+  const isValid =
+(Boolean(item.name?.trim()) &&          // has non-empty name
+  item.price !== undefined &&            // price present (change if 0 should be allowed/disallowed)
+  item.price !== null &&
+  item.price !== '' &&
+  !isRecording)  ||                      // not recording
+  Boolean(item.audio);                   // has audio
 
   return (
     <div 
@@ -556,9 +560,9 @@ const AddItem = ({ onClose }) => {
           <button
             onClick={() => utilities.sound()}
             type="submit"
-            disabled={((!item.name.trim() || !item.price)) || isRecording || !item.audio}
+            disabled={!isValid}
             className={`w-full py-4 rounded-xl font-bold text-white flex items-center justify-center gap-2 transition-colors active:opacity-40 ${
-              !isRecording && item.name.trim() && item.price && parseFloat(item.price) > 0
+              isValid
                 ? `${buttonGradient} shadow-md`
                 : 'bg-indigo-300 text-gray-500 cursor-not-allowed'
             }`}

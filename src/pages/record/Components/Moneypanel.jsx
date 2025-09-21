@@ -163,13 +163,9 @@ let format = e =>{
               aria-label="إضافة عنصر جديد"
             >
               <BsPlus  size={30} />
-              <p> مُشتري </p>
+              
             </button>
-            <button 
-            onClick={e => setShowList(true)}
-            className={`min-w-12  p-2 min-h-12 flex justify-center items-center rounded-full ${isDark ? 'bg-indigo-950 text-white' : 'bg-indigo-500/15 text-indigo-700'} ` } >
-              <RiStickyNoteAddFill size={25}/>
-            </button>
+       
           </div>
             
         </div>
