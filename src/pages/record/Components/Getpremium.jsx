@@ -26,7 +26,7 @@ const sections = [
   },
   {
     id: "install",
-    title: "كيفية التثبيت (PWA)",
+    title: "كيفية التثبيت",
     content: (
       <ol className="list-decimal list-inside">
         <li>افتح التطبيق في متصفح حديث (Chrome, Edge, Firefox).</li>

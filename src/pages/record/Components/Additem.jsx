@@ -556,7 +556,7 @@ const AddItem = ({ onClose }) => {
           <button
             onClick={() => utilities.sound()}
             type="submit"
-            disabled={(!item.name.trim() || !item.price || parseFloat(item.price) <= 0 || isRecording ) || item.audio}
+            disabled={((!item.name.trim() || !item.price)) || isRecording || !item.audio}
             className={`w-full py-4 rounded-xl font-bold text-white flex items-center justify-center gap-2 transition-colors active:opacity-40 ${
               !isRecording && item.name.trim() && item.price && parseFloat(item.price) > 0
                 ? `${buttonGradient} shadow-md`
