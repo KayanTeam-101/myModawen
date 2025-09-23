@@ -1,24 +1,50 @@
 import React, { useState, useEffect } from 'react';
-import {  FiCamera, FiCheck, FiUser, FiChevronLeft, } from 'react-icons/fi';
+import { FiBell, FiCheck, FiUser, FiChevronLeft } from 'react-icons/fi';
 
 const IdentifyStructure = () => {
   const [currentStep, setCurrentStep] = useState(0);
   const [name, setName] = useState('');
-  const [cameraGranted, setCameraGranted] = useState(false);
-  const [cameraRequested, setCameraRequested] = useState(false);
-  const [theme, setTheme] = useState('light'); // Changed default to light
+  const [notificationsGranted, setNotificationsGranted] = useState(false);
+  const [notificationsRequested, setNotificationsRequested] = useState(false);
+  const [theme, setTheme] = useState('light');
   const [showOnboarding, setShowOnboarding] = useState(true);
   
   const steps = [
     {
-      title: "مرحبا بك في مُدوّن",
-      description: "هُنا حيث يمكنك جدولة وفهم معاملاتك المالية أياً كانت كبيرة أو صغير ",
+      title: "مرحباً بك في مُدوّن",
+      description: "هُنا حيث يمكنك جدولة وفهم معاملاتك المالية أياً كانت كبيرة أو صغير بدون إضافة أي بطاقات ائتمان  لكن بدلاً من ذلك يمكنك وضع قيم رقمية ",
       illustration: (
         <div className="relative">
-          <div className="w-48 h-48 bg-gradient-to-br from-amber-400 to-orange-400 rounded-full flex items-center justify-center shadow-lg shadow-amber-500/20">
-            <div className="w-32 h-32 bg-amber-300 rounded-full opacity-40 animate-pulse"></div>
+          <div className="w-48 h-48 bg-gradient-to-br from-pink-400 to-indigo-500 rounded-full flex items-center justify-center shadow-xl shadow-blue-500/15">
+            <div className="w-32 h-32 bg-white rounded-full  "></div>
           </div>
-          <div className="absolute -top-2 -right-2 w-24 h-24 bg-violet-400 rounded-full opacity-40 mix-blend-lighten"></div>
+          <div className="absolute -top-2 -right-2 w-24 h-24 bg-blue-600 rounded-full opacity-40 mix-blend-lighten"></div>
+        </div>
+      ),
+      buttonText: "التالي"
+    },
+     {
+      title: "ما هذا؟",
+      description: "مُدون يعمل كــدفتر لتدوين المصروفات , لمعرفة في ماذا أنفقت اموالك و متي ,مع جدولة المصروفات بدقة",
+      illustration: (
+        <div className="relative">
+          <div className="w-48 h-48 bg-gradient-to-br from-green-400 to-teal-300 rounded-full flex items-center justify-center shadow-xl shadow-teal-500/20">
+            <div className="w-32 h-32 bg-white rounded-full   flex justify-center items-center text-7xl text-teal-500">؟</div>
+          </div>
+          <div className="absolute -bottom-2 -left-2 w-24 h-24 bg-blue-500 rounded-full opacity-40 mix-blend-lighten"></div>
+        </div>
+      ),
+      buttonText: "التالي"
+    },
+         {
+      title: "كيف يعمل !",
+      description: "بعد استكمال هذة الصفحة , سيظهر لك مستطيل مكتوب بداخله (إضافة رصيد) بعد الضغط عليه يمكنك اضافة المزانية, بعدها سيظهر مستطيل آخر يحتوي علي التاريخ و علامة الزائد , عند النقر علي علامة الزائد يمكنك اضافة عنصر مع كتابة سعر العنصر(الشئ المُشتَري)",
+      illustration: (
+        <div className="relative">
+          <div className="w-48 h-48 bg-gradient-to-br from-yellow-400 to-orange-300 rounded-full flex items-center justify-center shadow-lg shadow-orange-500/20">
+            <div className="w-32 h-32 bg-white rounded-full  animate-pulse"></div>
+          </div>
+          <div className="absolute -bottom-2 -left-2 w-24 h-24 bg-blue-400 rounded-full opacity-40 mix-blend-lighten"></div>
         </div>
       ),
       buttonText: "التالي"
@@ -56,6 +82,13 @@ const IdentifyStructure = () => {
     localStorage.setItem('theme', theme);
   }, [theme]);
 
+  // Check if notifications are already granted
+  useEffect(() => {
+    if (Notification.permission === 'granted') {
+      setNotificationsGranted(true);
+    }
+  }, []);
+
   // Validate Arabic input
   const handleNameChange = (e) => {
     const value = e.target.value;
@@ -65,21 +98,35 @@ const IdentifyStructure = () => {
     }
   };
 
-  const requestCameraAccess = async () => {
-    setCameraRequested(true);
+  const requestNotificationPermission = async () => {
+    setNotificationsRequested(true);
     try {
-      // Request camera access without showing the stream
-      const stream = await navigator.mediaDevices.getUserMedia({ 
-        video: true 
-      });
+      // Check if browser supports notifications
+      if (!('Notification' in window)) {
+        alert('هذا المتصفح لا يدعم الإشعارات');
+        setNotificationsGranted(false);
+        return;
+      }
+
+      // Request notification permission
+      const permission = await Notification.requestPermission();
       
-      // Immediately stop all tracks to release the camera
-      stream.getTracks().forEach(track => track.stop());
-      
-      setCameraGranted(true);
+      if (permission === 'granted') {
+        setNotificationsGranted(true);
+        // Optional: Show a test notification
+        if (Notification.permission === 'granted') {
+          new Notification('مرحباً في مُدون!', {
+            body: 'تم تفعيل الإشعارات بنجاح. سنخطرك بتذكيرات المصروفات المهمة.',
+            icon: '/favicon.ico',
+            dir: 'rtl'
+          });
+        }
+      } else {
+        setNotificationsGranted(false);
+      }
     } catch (err) {
-      console.error("Error accessing camera:", err);
-      setCameraGranted(false);
+      console.error("Error requesting notification permission:", err);
+      setNotificationsGranted(false);
     }
   };
 
@@ -89,7 +136,7 @@ const IdentifyStructure = () => {
     }
   };
 
-  const handleSkipCamera = () => {
+  const handleSkipNotifications = () => {
     setCurrentStep(4); // Skip to the next step (name input)
   };
 
@@ -99,7 +146,7 @@ const IdentifyStructure = () => {
       // Close the onboarding
       setShowOnboarding(false);
     }
-window.location.reload()
+    window.location.reload();
   };
 
   const handleCloseOnboarding = () => {
@@ -125,20 +172,11 @@ window.location.reload()
         return (
           <div className="flex items-center justify-center w-full h-full">
             <div className="relative transition-all duration-500 ease-in-out w-full max-w-md">
-              {/* Close button */}
-              <button 
-                onClick={handleCloseOnboarding}
-                className="absolute -top-12 right-0 text-gray-500 hover:text-gray-700 transition-colors duration-300"
-              >
-              </button>
-              
               {/* Phone mockup */}
-              <div className="bg-gradient-to-b from-gray-100 to-gray-200 rounded-3xl p-5 shadow-2xl shadow-blue-500/5 border border-gray-300">
+              <div className=" bg-white rounded-3xl p-2 shadow-2xl shadow-blue-500/5 ">
                 {/* Phone screen - Full height */}
-                <div className="bg-gradient-to-b from-white to-gray-100 rounded-2xl h-full p-6 flex flex-col items-center relative overflow-hidden">
+                <div className=" bg-whiterounded-2xl h-full p-6 flex flex-col items-center relative overflow-hidden">
                   {/* Decorative elements */}
-                  <div className="absolute -top-20 -right-20 w-40 h-40 bg-blue-200 rounded-full opacity-40"></div>
-                  <div className="absolute -bottom-20 -left-20 w-40 h-40 bg-purple-200 rounded-full opacity-40"></div>
                   
                   {/* Illustration */}
                   <div className="my-8 transform transition-all duration-700 hover:scale-105">
@@ -146,12 +184,12 @@ window.location.reload()
                   </div>
                   
                   {/* Title */}
-                  <h2 className="text-gray-800 text-2xl font-bold text-center mb-4">
+                  <h2 className="text-gray-800 text-2xl font-black  text-center mb-4">
                     {steps[currentStep].title}
                   </h2>
                   
                   {/* Description */}
-                  <p className="text-gray-600 text-sm text-center mb-8 px-4">
+                  <p className="text-gray-600 text-sm font-black text-center mb-8 px-4">
                     {steps[currentStep].description}
                   </p>
                   
@@ -191,52 +229,52 @@ window.location.reload()
                   
                   {/* Title */}
                   <h2 className="text-gray-800 text-2xl font-bold text-center mb-4 mt-4">
-                    تفعيل الكاميرا
+                    تفعيل الإشعارات
                   </h2>
                   
                   {/* Description */}
                   <p className="text-gray-600 text-sm text-center mb-8 px-4">
-                 يطلب مُدون إذن الكاميرا لتشغيل صفحة إضافة عنصر بإستخدام الكاميرا , إذا كنت لا تريد التفعيل الان الرجاء الضغط علي "تخطي"
+                    يطلب مُدون إذن الإشعارات لإرسال تذكيرات بمصروفاتك القادمة وتنبيهات مهمة. إذا كنت لا تريد التفعيل الان الرجاء الضغط علي "تخطي"
                   </p>
                   
-                  {/* Camera icon */}
+                  {/* Notification icon */}
                   <div className="w-48 h-48 bg-gray-100 rounded-2xl mb-8 overflow-hidden flex items-center justify-center border border-gray-300 shadow-inner">
                     <div className="flex flex-col items-center justify-center text-gray-500">
-                      <FiCamera className="text-6xl mb-4" />
-                      <p className="text-sm">Camera Access</p>
+                      <FiBell className="text-6xl mb-4" />
+                      <p className="text-sm">Notification Access</p>
                     </div>
                   </div>
                   
-                  {/* Request camera access button */}
+                  {/* Request notification access button */}
                   <div className="w-full mb-4">
                     <button 
-                      onClick={requestCameraAccess}
-                      disabled={cameraRequested}
+                      onClick={requestNotificationPermission}
+                      disabled={notificationsRequested || notificationsGranted}
                       className={`w-full font-black py-4 rounded-xl  flex items-center justify-center gap-2 transition-all duration-300 ${
-                        cameraGranted
+                        notificationsGranted
                           ? 'bg-green-500 text-white shadow-lg shadow-green-500/20'
-                          : cameraRequested
+                          : notificationsRequested
                           ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
                           : 'bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-400 hover:to-purple-400 text-white shadow-lg shadow-blue-500/20 hover:shadow-blue-500/30'
                       }`}
                     >
-                      {cameraGranted 
-                        ? 'تم قبول الاذن' 
-                        : cameraRequested 
-                        ? '...' 
-                        : 'إعطاء الاذن'
+                      {notificationsGranted 
+                        ? 'تم تفعيل الإشعارات' 
+                        : notificationsRequested 
+                        ? 'جاري الطلب...' 
+                        : 'تفعيل الإشعارات'
                       }
-                      <FiCamera />
+                      <FiBell />
                     </button>
                   </div>
                   
                   {/* Skip button */}
                   <div className="w-full mb-4">
                     <button 
-                      onClick={handleSkipCamera}
+                      onClick={handleSkipNotifications}
                       className="w-full py-4 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-xl font-medium flex items-center justify-center gap-2 transition-all duration-300"
                     >
-                     التخطي
+                     تخطي
                     </button>
                   </div>
                   
@@ -244,12 +282,7 @@ window.location.reload()
                   <div className="w-full mt-auto">
                     <button 
                       onClick={handleNext}
-                      disabled={!cameraGranted}
-                      className={`w-full py-4 rounded-xl font-medium flex items-center justify-center gap-2 transition-all duration-300 ${
-                        cameraGranted 
-                          ? 'bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-400 hover:to-purple-400 text-white shadow-lg shadow-blue-500/20 hover:shadow-blue-500/30' 
-                          : 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                      }`}
+                      className="w-full py-4 bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-400 hover:to-purple-400 text-white rounded-xl font-medium flex items-center justify-center gap-2 shadow-lg shadow-blue-500/20 hover:shadow-blue-500/30 transition-all duration-300"
                     >
                        التالي
                       <FiChevronLeft className="text-lg" />
@@ -358,35 +391,31 @@ window.location.reload()
   };
 
   if (!showOnboarding) {
-    return null; // This removes the onboarding from the DOM
+    return null;
   }
 
   return (
-    <div className="fixed top-0 left-0 w-screen h-screen bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center p-4 overflow-hidden z-50">
+    <div className="fixed top-0 left-0 w-screen h-screen bg-white flex items-center justify-center p-5 overflow-hidden z-50">
       {/* Background decorative elements */}
-      <div className="absolute -top-20 -left-20 w-72 h-72 bg-blue-200 rounded-full opacity-30 blur-xl"></div>
-      <div className="absolute -bottom-20 -right-20 w-72 h-72 bg-purple-200 rounded-full opacity-30 blur-xl"></div>
       
       {/* Main content container */}
-      <div className="relative w-full h-full flex items-center justify-center">
-        {/* Progress bar */}
-        {renderProgressBar()}
+      <div className="relative w-full  flex items-center justify-center">
         
         {/* Step content */}
         {renderStep()}
         
         {/* Step indicators */}
-        <div className="absolute bottom-8 left-0 right-0 flex justify-center gap-2">
+      </div>
+        <div className="absolute top-8 left-0 right-0 flex justify-center gap-2">
           {[0, 1, 2, 3, 4].map((step) => (
             <div 
               key={step}
               className={`w-2 h-2 rounded-full transition-all duration-300 ${
-                currentStep === step ? 'bg-blue-500 w-6' : 'bg-gray-300'
+                currentStep === step ? 'bg-gradient-to-r from-blue-500 to-indigo-400 w-6' : 'bg-gray-300'
               }`}
             ></div>
           ))}
         </div>
-      </div>
     </div>
   );
 };
