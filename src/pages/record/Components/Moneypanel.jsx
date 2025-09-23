@@ -113,10 +113,10 @@ let format = e =>{
                 <div>
                   <p className={`text-sm opacity-80 ${smallText}`}>الرصيد</p>
                   <h2 className={`text-3xl font-black mt-2 ${isDark ? 'text-white' : 'text-gray-900'}`}>
-                    <span className={`${inWallet > 0 ? (isDark ? 'text-white' : 'text-black') : 'text-red-600'}`}>{  new Intl.NumberFormat("en-US", { style: "currency", currency: "Egp",maximumSignificantDigits:3 }).format(
+                    <span className={`${inWallet > 0 ? (isDark ? 'text-white' : 'text-black') : 'text-red-600'}`}>{  new Intl.NumberFormat("en-US", { style: "currency", currency: "Egp",maximumSignificantDigits:6 }).format(
     inWallet)} </span>
                     <span className="p-1 text-gray-600"></span>
-                    <span className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-300'} pl-2`}>متبقي من {  new Intl.NumberFormat("en-US", { style: "currency", currency: "Egp",maximumSignificantDigits:3 }).format(
+                    <span className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-300'} pl-2`}>متبقي من {  new Intl.NumberFormat("en-US", { style: "currency", currency: "Egp",maximumSignificantDigits:6 }).format(
     balance)} <span className="pl-1 text-gray-600"></span></span>
                   </h2>
                 </div>

@@ -21,7 +21,7 @@ const AddBalance = ({ onClose }) => {
     if (value === '0' && num !== '.') {
       setValue(num);
     } else {
-      setValue(prev => prev + num);
+      value.length < 7 ? setValue(prev => prev + num) : null
     }
   };
   
@@ -51,7 +51,7 @@ const AddBalance = ({ onClose }) => {
     if (!amount) return '0.00';
     const n = parseFloat(amount);
     if (isNaN(n)) return '0.00';
-    return  new Intl.NumberFormat("en-US", { style: "currency", currency: "Egp",maximumSignificantDigits:3 }).format(
+    return  new Intl.NumberFormat("en-US", { style: "currency", currency: "Egp",maximumSignificantDigits:6 }).format(
     amount,
   );
   };
