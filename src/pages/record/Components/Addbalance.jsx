@@ -5,15 +5,22 @@ const AddBalance = ({ onClose }) => {
   const [value, setValue] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showModal, setShowModal] = useState(false);
+  const [isDark, setIsDark] = useState(false);
+  const [userLanguage, setUserLanguage] = useState('en-US'); // Default to English
   const modalRef = useRef(null);
 
-  // theme
-  const THEME = typeof window !== 'undefined' ? (localStorage.getItem('theme') || 'light') : 'light';
-  const isDark = THEME === 'dark';
-
+  // Fix: Detect both theme and language
   useEffect(() => {
-    setShowModal(true);
-    return () => {};
+    if (typeof window !== 'undefined') {
+      const THEME = localStorage.getItem('theme') || 'light';
+      setIsDark(THEME === 'dark');
+      
+      // Detect user's language from browser/OS
+      const browserLanguage = navigator.language || navigator.userLanguage || 'en-US';
+      setUserLanguage(browserLanguage);
+      
+      setShowModal(true);
+    }
   }, []);
 
   const handlePress = (num) => {
@@ -21,7 +28,7 @@ const AddBalance = ({ onClose }) => {
     if (value === '0' && num !== '.') {
       setValue(num);
     } else {
-      value.length < 7 ? setValue(prev => prev + num) : null
+      value.length < 7 ? setValue(prev => prev + num) : null;
     }
   };
   
@@ -43,7 +50,9 @@ const AddBalance = ({ onClose }) => {
     setShowModal(false);
     setTimeout(() => {
       onClose?.();
-      window.location.reload();
+      if (typeof window !== 'undefined') {
+        window.location.reload();
+      }
     }, 300);
   };
 
@@ -51,21 +60,57 @@ const AddBalance = ({ onClose }) => {
     if (!amount) return '0.00';
     const n = parseFloat(amount);
     if (isNaN(n)) return '0.00';
-    return  new Intl.NumberFormat("en-US", { style: "currency", currency: "Egp",maximumSignificantDigits:6 }).format(
-    amount,
-  );
+    
+    // Fix: Use detected user language instead of hardcoded Arabic
+    try {
+      return new Intl.NumberFormat(userLanguage, { 
+        style: "currency", 
+        currency: "EGP",
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2 
+      }).format(n);
+    } catch (error) {
+      // Fallback formatting based on language
+      if (userLanguage.startsWith('ar')) {
+        return `${n.toFixed(2)} ج.م`; // Arabic fallback
+      } else {
+        return `EGP ${n.toFixed(2)}`; // English fallback
+      }
+    }
   };
 
-  // themed classes & indigo accents
+  // Helper function to check if language is Arabic
+  const isArabic = () => {
+    return userLanguage.startsWith('ar');
+  };
+
+  // Fix: Use conditional classes instead of template literals for Tailwind
   const overlayBg = isDark ? 'bg-gray-900/70' : 'bg-indigo-100/70';
   const cardBg = isDark ? 'bg-gray-800 border-gray-700 text-gray-100' : 'bg-white border-gray-200 text-gray-900';
   const headingText = isDark ? 'text-white' : 'text-gray-800';
   const subtitleText = isDark ? 'text-gray-300' : 'text-gray-500';
   const decorative1 = isDark ? 'bg-indigo-700/20' : 'bg-indigo-200/40';
   const decorative2 = isDark ? 'bg-indigo-600/20' : 'bg-indigo-200/30';
-  const keyPrimaryBg = isDark ? 'bg-gray-700 border-gray-600 text-gray-200' : 'bg-white text-gray-800';
-  const keySecondaryBg = isDark ? 'bg-gray-700 border-gray-600 text-gray-200' : 'bg-gray-100 text-gray-600';
-  const confirmGradient = 'bg-gradient-to-r from-indigo-600 via-sky-400 to-purple-300';
+  const keyPrimaryBg = isDark ? 'bg-gray-700 hover:bg-gray-600 border-gray-600 text-gray-200' : 'bg-white hover:bg-gray-50 text-gray-800';
+  const keySecondaryBg = isDark ? 'bg-gray-700 hover:bg-gray-600 border-gray-600 text-gray-200' : 'bg-gray-100 hover:bg-gray-200 text-gray-600';
+  const confirmGradient = 'bg-gradient-to-r from-indigo-600 to-purple-500';
+
+  // Fix: KeyButton component with proper styling
+  const KeyButton = ({ children, onClick, variant = 'primary' }) => (
+    <button
+      onClick={onClick}
+      disabled={value.length > 6}
+      className={`
+        h-16 rounded-xl text-xl font-semibold transition-all duration-200 
+        focus:outline-none active:scale-95 border flex justify-center items-center
+        ${variant === 'primary' ? keyPrimaryBg : keySecondaryBg}
+        ${value.length > 6 ? 'opacity-50 cursor-not-allowed' : 'hover:scale-105'}
+        border-gray-300
+      `}
+    >
+      {children}
+    </button>
+  );
 
   return (
     <div 
@@ -78,28 +123,36 @@ const AddBalance = ({ onClose }) => {
         className={`${cardBg} rounded-2xl shadow-xl w-full max-w-md overflow-hidden border transition-all duration-300 transform ${
           showModal ? 'scale-100 opacity-100' : 'scale-95 opacity-0'
         }`}
+        dir={isArabic() ? "rtl" : "ltr"} // Set text direction based on language
       >
         {/* Header */}
         <div className={`flex justify-between items-center p-5 border-b ${isDark ? 'border-gray-700' : 'border-gray-100'}`}>
-          <h2 className={`text-xl font-bold ${headingText}`}>تعديل الرصيد </h2>
+          <h2 className={`text-xl font-bold ${headingText}`}>
+            {isArabic() ? 'تعديل الرصيد' : 'Edit Balance'}
+          </h2>
           <button 
             onClick={closeModal}
-            className={`p-2 rounded-full hover:${isDark ? 'bg-gray-700/40' : 'bg-gray-100'} transition-colors`}
+            className={`p-2 rounded-full transition-colors ${
+              isDark ? 'hover:bg-gray-700/40' : 'hover:bg-gray-100'
+            }`}
           >
-            <RiCloseLine className={`${isDark ? 'text-gray-200' : 'text-gray-500'} text-xl`} />
+            <RiCloseLine className={`text-xl ${isDark ? 'text-gray-200' : 'text-gray-500'}`} />
           </button>
         </div>
 
         {/* Display */}
-        <div className="py-7 px-5 relative ">
+        <div className="py-7 px-5 relative">
           <div className="relative z-10">
             <div className="flex justify-center items-baseline">
-              <span className={`text-3xl font-bold mr-2 ${isDark ? 'text-gray-500' : 'text-indigo-500'}`}></span>
               <div className="text-5xl font-bold tracking-tight">
-                <span className={`${isDark ? 'text-white' : 'text-gray-800'}`}>{formatCurrency(value)}</span>
+                <span className={isDark ? 'text-white' : 'text-gray-800'}>
+                  {formatCurrency(value)}
+                </span>
               </div>
             </div>
-            <p className={`text-center mt-3 ${subtitleText}`}>ادخل المبلغ المطلوب إضافته</p>
+            <p className={`text-center mt-3 text-sm ${subtitleText}`}>
+              {isArabic() ? 'ادخل المبلغ المطلوب إضافته' : 'Enter the amount you want to add'}
+            </p>
           </div>
           
           {/* Decorative elements */}
@@ -110,42 +163,51 @@ const AddBalance = ({ onClose }) => {
         {/* Number Pad */}
         <div className={`grid grid-cols-3 gap-3 p-5 ${isDark ? 'bg-gray-900/20' : 'bg-gray-50'}`}>
           {[1, 2, 3, 4, 5, 6, 7, 8, 9].map(num => (
-            <KeyButton key={num} onClick={() => handlePress(num.toString())} primaryBg={keyPrimaryBg}>
+            <KeyButton key={num} onClick={() => handlePress(num.toString())}>
               {num}
             </KeyButton>
           ))}
-          <KeyButton onClick={handleClear} variant="secondary" primaryBg={keySecondaryBg}>
-            <RiCloseLine className={`text-xl ${isDark ? 'text-gray-200' : 'text-gray-600'}`} />
+          
+          <KeyButton variant="secondary" onClick={handleClear}>
+            <RiCloseLine className="text-xl" />
           </KeyButton>
-          <KeyButton onClick={() => handlePress('0')} primaryBg={keyPrimaryBg}>0</KeyButton>
-          <KeyButton onClick={handleBackspace} variant="secondary" primaryBg={keySecondaryBg}>
-            <RiDeleteBack2Line className={`text-xl ${isDark ? 'text-gray-200' : 'text-gray-600'}`} />
+          
+          <KeyButton onClick={() => handlePress('0')}>
+            0
+          </KeyButton>
+          
+          <KeyButton variant="secondary" onClick={handleBackspace}>
+            <RiDeleteBack2Line className="text-xl" />
           </KeyButton>
         </div>
 
         {/* Decimal Button */}
-        
+        <div className="px-5 pb-3">
+          <KeyButton onClick={() => handlePress('.')}>
+            .
+          </KeyButton>
+        </div>
 
         {/* Confirm Button */}
         <div className="p-5 pt-0">
           <button
             onClick={handleSubmit}
-            disabled={!value || isSubmitting}
-            className={`w-full py-4 rounded-xl font-bold text-white transition-all flex items-center justify-center gap-2 active:scale-[0.98] ${
-              value && !isSubmitting
-                ? `${confirmGradient} shadow-md`
-                : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+            disabled={!value || parseFloat(value) <= 0 || isSubmitting}
+            className={`w-full py-4 rounded-xl font-bold text-white transition-all flex items-center justify-center gap-2 ${
+              value && parseFloat(value) > 0 && !isSubmitting
+                ? `${confirmGradient} shadow-md hover:shadow-lg active:scale-95`
+                : 'bg-gray-400 cursor-not-allowed'
             }`}
           >
             {isSubmitting ? (
               <div className="flex items-center">
-                <div className="w-5 h-5 border-t-2 border-white border-solid rounded-full animate-spin mr-2"></div>
-                جاري الإضافة...
+                <div className="w-5 h-5 border-t-2 border-white border-solid rounded-full animate-spin ml-2"></div>
+                {isArabic() ? 'جاري الإضافة...' : 'Adding...'}
               </div>
             ) : (
               <>
-                <RiCheckLine size={24} />
-                تأكيد تعديل الرصيد
+                <RiCheckLine size={20} />
+                {isArabic() ? 'تأكيد تعديل الرصيد' : 'Confirm Balance Update'}
               </>
             )}
           </button>
@@ -154,19 +216,5 @@ const AddBalance = ({ onClose }) => {
     </div>
   );
 };
-
-const KeyButton = ({ children, onClick, variant = 'primary', primaryBg = '' }) => (
-  <button
-    onClick={onClick}
-    className={`
-      h-16 rounded-xl text-xl font-semibold transition-all
-      focus:outline-none active:scale-95 border flex justify-center items-center
-      ${primaryBg} ${variant === 'primary' ? 'hover:brightness-105 shadow-sm' : 'hover:bg-opacity-90'}
-      border-gray-200
-    `}
-  >
-    {children}
-  </button>
-);
 
 export default AddBalance;

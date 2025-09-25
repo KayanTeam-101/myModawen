@@ -71,7 +71,7 @@ let format = e =>{
   const cardShadow = isDark ? 'shadow-md' : 'shadow-';
   const subtleBg = isDark ? 'bg-indigo-900/15' : 'bg-indigo-50';
   const infoText = isDark ? 'text-gray-300' : 'text-gray-500';
-  const smallText = isDark ? 'text-gray-400' : 'text-gray-500';
+  const smallText = isDark ? 'text-white' : 'text-gray-500';
   // main accent now consistently indigo
   const accentText = 'text-indigo-600';
   const buttonGradient = 'bg-gradient-to-r from-indigo-600 via-sky-400 to-purple-300';
@@ -87,7 +87,7 @@ let format = e =>{
                 <RiMoneyPoundCircleLine className={`${accentText} text-4xl`} />
               </div>
               <h3 className={`text-xl font-bold ${isDark ? 'text-white' : 'text-gray-800'} mb-2`}>لا يوجد رصيد</h3>
-              <p className={`${infoText} mb-6`}>أضف رصيدًا لبدء تتبع مصروفاتك</p>
+              <p className={`${infoText} mb-6`}>اضف قيم رقمة حسب الاموال التي معك</p>
               <button
                 onClick={() => {
                   handleSound();
@@ -111,7 +111,7 @@ let format = e =>{
             >
               <div className="flex justify-between items-start">
                 <div>
-                  <p className={`text-sm opacity-80 ${smallText}`}>الرصيد</p>
+                  <p className={`text-lg  font-black opacity-80 ${smallText}`}>الرصيد</p>
                   <h2 className={`text-3xl font-black mt-2 ${isDark ? 'text-white' : 'text-gray-900'}`}>
                     <span className={`${inWallet > 0 ? (isDark ? 'text-white' : 'text-black') : 'text-red-600'}`}>{  new Intl.NumberFormat("en-US", { style: "currency", currency: "Egp",maximumSignificantDigits:6 }).format(
     inWallet)} </span>
@@ -140,7 +140,7 @@ let format = e =>{
 
           {/* Date Information */}
           <div
-            className={`rounded-full h-20 select-none active:opacity-80 transition-all p-4 flex justify-between items-center ${subtleBg}`}
+            className={`rounded-full h-20 select-none active:opacity-80 transition-all p-4 flex justify-between items-center `}
             onDoubleClick={() => setShowAddItem(true)}
           >
             <div className="flex items-center gap-2">
@@ -154,17 +154,7 @@ let format = e =>{
               <p className={`text-sm ${smallText}`}>التاريخ</p>
               <p className={`${isDark ? 'text-white' : 'text-gray-900'} font-medium`}>{arabicDate}</p>
             </div>
-            <button
-              onClick={() => {
-                handleSound();
-                setShowAddItem(true);
-              }}
-              className={`min-w-12  p-2 min-h-12 flex justify-center items-center rounded-full ${isDark ? 'bg-indigo-950 text-white' : 'bg-indigo-500/15 text-indigo-700'}`}
-              aria-label="إضافة عنصر جديد"
-            >
-              <BsPlus  size={30} />
-              
-            </button>
+
        
           </div>
             

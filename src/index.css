@@ -31,6 +31,7 @@ a.active {
 .wide{
   animation: wide .5s cubic-bezier(0.39, 0.575, 0.565, 1);
 }
+::-webkit-scrollbar{display: none;}
 @keyframes showSmoothy {
   0%{
   opacity: 0;

@@ -1,11 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import Task from './task';
-import { BsClipboard2MinusFill } from "react-icons/bs";
+import { BsClipboard2MinusFill, BsPlus } from "react-icons/bs";
+import AddItem from './Additem';
 
 const TaskBar = () => {
   // State for managing data
   const [data, setData] = useState({});
-  
+    const [showAddItem, setShowAddItem] = useState(false);
+      const [balance, setBalance] = useState(0);
+    
   // Load data from localStorage on initial render
   useEffect(() => {
     const savedData = JSON.parse(localStorage.getItem('data')) || {};
@@ -15,7 +18,16 @@ const TaskBar = () => {
   // Get today's date key
   const today = new Date();
   const dateKey = `${today.getDate()}-${today.getMonth() + 1}-${today.getFullYear()}`;
-  
+   useEffect(() => {
+      const saved = localStorage.getItem('balance');
+      if (saved === null) {
+        localStorage.setItem('balance', '0');
+        setBalance(0);
+      } else {
+        setBalance(parseFloat(saved) || 0);
+      }
+    }, []);
+
   // Handle price updates
   const handlePriceChange = (date, id, newPrice) => {
     setData(prev => {
@@ -31,6 +43,10 @@ const TaskBar = () => {
     });
     window.location.reload();
   };
+  const THEME = typeof window !== 'undefined' ? (localStorage.getItem('theme') || 'light') : 'light';
+  const isDark = THEME === 'dark';
+
+
 const handleDelete = (dateKey, id) => {
   setData(prev => {
     const newData = { ...prev };
@@ -49,7 +65,7 @@ const handleDelete = (dateKey, id) => {
     : [];
 
   return (
-    <div className="w-full h-fit">
+    <div className="w-full h-10/12 overflow-y-scroll">
       {todayItems.length > 0 ? (
         todayItems.map((item) => (
           <Task
@@ -80,6 +96,25 @@ const handleDelete = (dateKey, id) => {
           لا توجد عناصر مضافة اليوم
 <BsClipboard2MinusFill size={150} className=' text-gray-200'/>
         </div>
+      )}
+       <button
+                   onClick={() => {
+                     setShowAddItem(true);
+                   }}
+                   className={`fixed bottom-20 left-7 min-w-12  p-2 min-h-12 flex justify-center items-center rounded-full ${isDark ? 'bg-indigo-950/40 backdrop-blur-lg text-white' : 'bg-indigo-500/15 text-indigo-700'}`}
+                   aria-label="إضافة عنصر جديد"
+                 >
+                   <BsPlus  size={35} />
+                   
+                 </button>
+
+                       {showAddItem && (
+        <AddItem onClose={() => {
+          const updated = parseFloat(localStorage.getItem('balance')) || 0;
+          setBalance(updated);
+          setShowAddItem(false);
+          window.location.reload();
+        }} />
       )}
     </div>
   );
