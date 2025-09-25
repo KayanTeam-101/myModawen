@@ -121,7 +121,7 @@ let format = e =>{
                   </h2>
                 </div>
                 <button
-                  className={`p- rounded-full text-white ${isDark ? 'bg-gray-700/40' : 'bg-black'} flex items-center justify-center`}
+                  className={`p-1.5 font-black rounded-full text-white ${isDark ? 'bg-gray-500/40' : 'bg-black'} animate-pulse flex items-center justify-center`}
                   onClick={() => {
                     handleSound();
                     setShowPremiumModal(true);

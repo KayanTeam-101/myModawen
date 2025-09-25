@@ -68,7 +68,7 @@ const handleDelete = (dateKey, id) => {
     <div className="w-full h-10/12 overflow-y-scroll">
       {todayItems.length > 0 ? (
         todayItems.map((item) => (
-          <Task
+       <>   <Task
             key={item.timestamp}
             id={item.timestamp}
             dateKey={item.date}
@@ -82,6 +82,8 @@ const handleDelete = (dateKey, id) => {
             record={item.record}
 
           />
+           
+          </>
         ))
       ) : (
         <div className="text-center py-28  flex justify-center items-center flex-col gap-10 text-gray-500 showSmoothy"    onClick={() => {
@@ -97,7 +99,8 @@ const handleDelete = (dateKey, id) => {
 <BsClipboard2MinusFill size={150} className=' text-gray-200'/>
         </div>
       )}
-       <button
+  
+    <button
                    onClick={() => {
                      setShowAddItem(true);
                    }}
@@ -106,8 +109,7 @@ const handleDelete = (dateKey, id) => {
                  >
                    <BsPlus  size={35} />
                    
-                 </button>
-
+                 </button>  
                        {showAddItem && (
         <AddItem onClose={() => {
           const updated = parseFloat(localStorage.getItem('balance')) || 0;

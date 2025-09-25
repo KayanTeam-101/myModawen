@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { FiBell, FiCheck, FiUser, FiChevronLeft, FiX, FiMoon, FiSunset, FiSun } from 'react-icons/fi';
+import React, { useState, useEffect, useRef } from 'react';
+import { FiBell, FiCheck, FiUser, FiChevronLeft, FiX, FiMoon, FiSun } from 'react-icons/fi';
 
 const IdentifyStructure = () => {
   const [currentStep, setCurrentStep] = useState(0);
@@ -8,14 +8,19 @@ const IdentifyStructure = () => {
   const [notificationsRequested, setNotificationsRequested] = useState(false);
   const [theme, setTheme] = useState('light');
   const [showOnboarding, setShowOnboarding] = useState(true);
+  const [isDisabled, setIsDisabled] = useState(false);
+  const [displayedText, setDisplayedText] = useState('');
+  const [isTyping, setIsTyping] = useState(false);
   
+  const typingTimeoutRef = useRef(null);
+
   const steps = [
     {
-      title: "مرحباً بك في مُدوّن",
+      title: "مرحباً بك في مُدوّن 👋",
       description: "هُنا حيث يمكنك جدولة وفهم معاملاتك المالية أياً كانت كبيرة أو صغير بدون إضافة أي بطاقات ائتمان  لكن بدلاً من ذلك يمكنك وضع قيم رقمية ",
       illustration: (
         <div className="relative">
-          <div className="w-48 h-48 bg-gradient-to-br from-pink-400 to-indigo-500 rounded-full flex items-center justify-center shadow-xl shadow-blue-500/15">
+          <div className="w-48 h-48 bg-gradient-to-br from-pink-400 via-sky-300/40 to-indigo-500 rounded-full flex items-center justify-center shadow-xl shadow-blue-500/15">
             <div className="w-32 h-32 bg-white rounded-full"></div>
           </div>
           <div className="absolute -top-2 -right-2 w-24 h-24 bg-blue-600 rounded-full opacity-40 mix-blend-lighten"></div>
@@ -24,7 +29,7 @@ const IdentifyStructure = () => {
       buttonText: "التالي"
     },
     {
-      title: "ما هذا؟",
+      title: "إية دا ؟!",
       description: "مُدون يعمل كــدفتر لتدوين المصروفات , لمعرفة في ماذا أنفقت اموالك و متي ,مع جدولة المصروفات بدقة",
       illustration: (
         <div className="relative">
@@ -37,7 +42,7 @@ const IdentifyStructure = () => {
       buttonText: "التالي"
     },
     {
-      title: "كيف يعمل !",
+      title: "ابدأ إستعمالة إزاي 🤔",
       description: "بعد استكمال هذة الصفحة , سيظهر لك مستطيل مكتوب بداخله (إضافة رصيد) بعد الضغط عليه يمكنك اضافة المزانية, بعدها سيظهر مستطيل آخر يحتوي علي التاريخ و علامة الزائد , عند النقر علي علامة الزائد يمكنك اضافة عنصر مع كتابة سعر العنصر(الشئ المُشتَري)",
       illustration: (
         <div className="relative">
@@ -83,7 +88,6 @@ const IdentifyStructure = () => {
     if (savedTheme) {
       setTheme(savedTheme);
     } else {
-      // Check system preference
       const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
       setTheme(prefersDark ? 'dark' : 'light');
     }
@@ -102,10 +106,44 @@ const IdentifyStructure = () => {
     }
   }, []);
 
+  // Typewriter effect for current step description
+  useEffect(() => {
+    // Clear any existing timeout
+    if (typingTimeoutRef.current) {
+      clearTimeout(typingTimeoutRef.current);
+    }
+
+    // Reset displayed text and start typing animation
+    setDisplayedText('');
+    setIsTyping(true);
+    
+    const currentDescription = steps[currentStep].description;
+    let index = 0;
+
+    const typeText = () => {
+      if (index < currentDescription.length) {
+        setDisplayedText(currentDescription.substring(0, index + 1));
+        index++;
+        typingTimeoutRef.current = setTimeout(typeText, 30); // Adjust typing speed here
+      } else {
+        setIsTyping(false);
+      }
+    };
+
+    // Start typing after a short delay
+    typingTimeoutRef.current = setTimeout(typeText, 300);
+
+    // Cleanup function
+    return () => {
+      if (typingTimeoutRef.current) {
+        clearTimeout(typingTimeoutRef.current);
+      }
+    };
+  }, [currentStep]);
+
   // Validate Arabic input
   const handleNameChange = (e) => {
     const value = e.target.value;
-    // Only allow Arabic letters and spaces
     if (value === '' || /^[\u0600-\u06FF\s]+$/.test(value)) {
       setName(value);
     }
@@ -114,7 +152,6 @@ const IdentifyStructure = () => {
   const requestNotificationPermission = async () => {
     setNotificationsRequested(true);
     try {
-      // Check if browser supports notifications
       if (!('Notification' in window)) {
         alert('هذا المتصفح لا يدعم الإشعارات');
         setNotificationsGranted(false);
@@ -122,12 +159,10 @@ const IdentifyStructure = () => {
         return;
       }
 
-      // Request notification permission
       const permission = await Notification.requestPermission();
       
       if (permission === 'granted') {
         setNotificationsGranted(true);
-        // Show a test notification
         new Notification('مرحباً في مُدون!', {
           body: 'تم تفعيل الإشعارات بنجاح. سنخطرك بتذكيرات المصروفات المهمة.',
           icon: '/favicon.ico',
@@ -145,9 +180,15 @@ const IdentifyStructure = () => {
   };
 
   const handleNext = () => {
+    setIsDisabled(true);
+    
     if (currentStep < steps.length - 1) {
       setCurrentStep(currentStep + 1);
     }
+    
+    setTimeout(() => {
+      setIsDisabled(false);
+    }, 5000);
   };
 
   const handlePrevious = () => {
@@ -157,23 +198,17 @@ const IdentifyStructure = () => {
   };
 
   const handleSkipNotifications = () => {
-    setCurrentStep(4); // Skip to the next step (name input)
+    setCurrentStep(4);
   };
 
   const handleGetStarted = () => {
     if (name.trim()) {
       localStorage.setItem('Identify', name);
-      // Close the onboarding
       setShowOnboarding(false);
-     window.location.reload();
+      window.location.reload();
     } else {
-      // Show error or prevent navigation
       alert('الرجاء إدخال اسمك قبل المتابعة');
     }
-  };
-
-  const handleCloseOnboarding = () => {
-    setShowOnboarding(false);
   };
 
   const renderStep = () => {
@@ -182,32 +217,22 @@ const IdentifyStructure = () => {
       case 1:
       case 2:
         return (
-          <div className="flex items-center justify-center w-full h-full ">
-            <div className="relative transition-all duration-500 ease-in-out w-full max-w-md ">
-       
-              
-              {/* Phone mockup */}
-              <div className="bg-white rounded-3xl p-2 shadow-2xl shadow-blue-500/5 ">
-                {/* Phone screen - Full height */}
+          <div className="flex items-center justify-center w-full h-full">
+            <div className="relative transition-all duration-500 ease-in-out w-full max-w-md">
+              <div className="bg-white rounded-3xl p-2 shadow-2xl shadow-blue-500/5">
                 <div className="bg-white rounded-2xl h-full p-6 flex flex-col items-center relative overflow-hidden">
-                  {/* Decorative elements */}
-                  
-                  {/* Illustration */}
                   <div className="my-8 transform transition-all duration-700 hover:scale-105">
                     {steps[currentStep].illustration}
                   </div>
                   
-                  {/* Title */}
                   <h2 className="text-gray-800 text-2xl font-black text-center mb-4">
                     {steps[currentStep].title}
                   </h2>
                   
-                  {/* Description */}
-                  <p className="text-gray-600 text-sm font-black text-center mb-8 px-4 leading-relaxed">
-                    {steps[currentStep].description}
+                  <p className="text-gray-900 text-sm font-black text-center mb-8 px-4 leading-relaxed min-h-[120px] flex items-center justify-center animate-pulse">
+                    {displayedText}
                   </p>
                   
-                  {/* Navigation buttons */}
                   <div className="flex gap-3 w-full mt-auto">
                     {currentStep > 0 && (
                       <button 
@@ -220,9 +245,14 @@ const IdentifyStructure = () => {
                     )}
                     <button 
                       onClick={handleNext}
-                      className={`py-4 bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-400 hover:to-purple-400 text-white rounded-xl font-medium flex items-center justify-center gap-2 shadow-lg shadow-blue-500/20 hover:shadow-blue-500/30 transition-all duration-300 transform hover:-translate-y-1 ${
-                        currentStep > 0 ? 'flex-1' : 'w-full'
-                      }`}
+                      disabled={isDisabled}
+                      className={`py-4 ${
+                        isDisabled 
+                          ? 'bg-gradient-to-r from-gray-300 to-slate-100 cursor-not-allowed' 
+                          : 'bg-gradient-to-r from-indigo-600 via-sky-400 to-purple-300 shadow-lg shadow-blue-500/20 hover:shadow-blue-500/30'
+                      } text-white rounded-xl font-medium flex items-center justify-center gap-2 transition-all duration-300 ${
+                        isDisabled ? '' : 'transform hover:-translate-y-1'
+                      } ${currentStep > 0 ? 'flex-1' : 'w-full'}`}
                     >
                       {steps[currentStep].buttonText}
                       <FiChevronLeft className="text-lg" />
@@ -235,36 +265,26 @@ const IdentifyStructure = () => {
         );
       case 3:
         return (
-          <div className="flex items-center justify-center w-full h-full showSmoothy">
+          <div className="flex items-center justify-center w-full h-full">
             <div className="relative transition-all duration-500 ease-in-out w-full max-w-md">
-        
-              {/* Phone mockup */}
-              <div className="rounded-4xl p-5 shadow-2xl shadow-blue-500/5 border border-gray-300">
-                {/* Phone screen - Full height */}
+              <div className="rounded-3xl p-5 shadow-2xl shadow-blue-500/5 border border-gray-300">
                 <div className="bg-gradient-to-b from-white to-gray-50 rounded-2xl h-full p-6 flex flex-col items-center relative overflow-hidden">
-                  {/* Decorative elements */}
-                  
-                  {/* Title */}
                   <h2 className="text-gray-800 text-2xl font-bold text-center mb-4 mt-4">
                     تفعيل الإشعارات
                   </h2>
                   
-                  {/* Description */}
                   <p className="text-gray-600 text-sm text-center mb-8 px-4 leading-relaxed">
-                    يطلب مُدون إذن الإشعارات لإرسال تذكيرات بمصروفاتك القادمة وتنبيهات مهمة. إذا كنت لا تريد التفعيل الان الرجاء الضغط علي "تخطي"
+                    لتلقي تذكيرات مهمة حول مصروفاتك وجدولة الميزانية، يرجى تفعيل الإشعارات. يمكنك دائمًا تعديل هذا الإعداد لاحقًا في إعدادات المتصفح.
                   </p>
                   
-                  {/* Notification icon */}
-                  <div className="w-48 h-48 bg-gray-100 rounded-2xl mb-8 overflow-hidden flex items-center justify-center border border-gray-300 shadow-inner"
-                                        onClick={requestNotificationPermission}
->
+                  <div className="w-48 h-48 bg-gray-100 rounded-2xl mb-8 overflow-hidden flex items-center justify-center border border-gray-300 shadow-inner cursor-pointer hover:bg-gray-200 transition-colors"
+                        onClick={requestNotificationPermission}>
                     <div className="flex flex-col items-center justify-center text-gray-500">
                       <FiBell className="text-6xl mb-4" />
                       <p className="text-sm">Notification Access</p>
                     </div>
                   </div>
                   
-                  {/* Request notification access button */}
                   <div className="w-full mb-4">
                     <button 
                       onClick={requestNotificationPermission}
@@ -287,17 +307,15 @@ const IdentifyStructure = () => {
                     </button>
                   </div>
                   
-                  {/* Skip button */}
                   <div className="w-full mb-4">
                     <button 
                       onClick={handleSkipNotifications}
                       className="w-full py-4 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-xl font-medium flex items-center justify-center gap-2 transition-all duration-300"
                     >
-                     تخطي
+                      تخطي
                     </button>
                   </div>
                   
-                  {/* Navigation buttons */}
                   <div className="flex gap-3 w-full mt-auto">
                     <button 
                       onClick={handlePrevious}
@@ -310,7 +328,7 @@ const IdentifyStructure = () => {
                       onClick={handleNext}
                       className="flex-1 py-4 bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-400 hover:to-purple-400 text-white rounded-xl font-medium flex items-center justify-center gap-2 shadow-lg shadow-blue-500/20 hover:shadow-blue-500/30 transition-all duration-300"
                     >
-                       التالي
+                      التالي
                       <FiChevronLeft className="text-lg" />
                     </button>
                   </div>
@@ -321,22 +339,14 @@ const IdentifyStructure = () => {
         );
       case 4:
         return (
-          <div className="flex items-center justify-center w-full h-full showSmoothy">
+          <div className="flex items-center justify-center w-full h-full">
             <div className="relative transition-all duration-500 ease-in-out w-full max-w-md">
-        
-              
-              {/* Phone mockup */}
               <div className="rounded-3xl p-5 shadow-2xl shadow-blue-500/5 border border-gray-300">
-                {/* Phone screen - Full height */}
                 <div className="bg-gradient-to-b from-white to-gray-50 rounded-2xl h-full p-6 flex flex-col items-center relative overflow-hidden">
-                  {/* Decorative elements */}
-                  
-                  {/* Title */}
                   <h2 className="text-gray-600 font-bold text-center mb-4 mt-4">
-                   هنحتاج بس اسمك , و المظهر للبرنامج حيث كان وضع ليلي أو نهاري
+                    متبقي خطوات آخيرة
                   </h2>
                   
-                  {/* Name input */}
                   <div className="w-full mb-6">
                     <label className="text-gray-600 text-sm mb-2 block">اسمك (اللغة العريبة فقط)</label>
                     <div className="relative">
@@ -355,7 +365,6 @@ const IdentifyStructure = () => {
                     </div>
                   </div>
                   
-                  {/* Theme selection */}
                   <div className="w-full mb-8">
                     <label className="text-gray-600 text-sm mb-2 block">المظهر</label>
                     <div className="flex gap-4">
@@ -384,7 +393,6 @@ const IdentifyStructure = () => {
                     </div>
                   </div>
                   
-                  {/* Navigation buttons */}
                   <div className="flex gap-3 w-full mt-auto">
                     <button 
                       onClick={handlePrevious}
@@ -394,7 +402,7 @@ const IdentifyStructure = () => {
                       السابق
                     </button>
                     <button 
-                      onDoubleClick={handleGetStarted}
+                      onClick={handleGetStarted}
                       disabled={!name.trim()}
                       className={`flex-1 py-4 rounded-xl font-medium flex items-center justify-center gap-2 transition-all duration-300 ${
                         name.trim() 
@@ -422,15 +430,9 @@ const IdentifyStructure = () => {
 
   return (
     <div className="fixed inset-0 bg-white flex items-center justify-center p-5 z-50">
-      {/* Background decorative elements */}
-      
-      {/* Main content container */}
       <div className="relative w-full max-w-lg flex items-center justify-center">
-        
-        {/* Step content */}
         {renderStep()}
         
-        {/* Step indicators */}
         <div className="absolute top-4 left-0 right-0 flex justify-center gap-2">
           {steps.map((_, index) => (
             <div 

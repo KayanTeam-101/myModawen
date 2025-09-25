@@ -182,12 +182,7 @@ const AddBalance = ({ onClose }) => {
         </div>
 
         {/* Decimal Button */}
-        <div className="px-5 pb-3">
-          <KeyButton onClick={() => handlePress('.')}>
-            .
-          </KeyButton>
-        </div>
-
+  
         {/* Confirm Button */}
         <div className="p-5 pt-0">
           <button
