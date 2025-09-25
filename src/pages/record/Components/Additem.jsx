@@ -10,6 +10,7 @@ import {
   RiStopCircleLine
 } from 'react-icons/ri';
 import { Utilities } from '../../../utilities/utilities';
+import { FaCheckCircle } from 'react-icons/fa';
 
 const AddItem = ({ onClose }) => {
   const utilities = new Utilities();
@@ -478,7 +479,7 @@ const AddItem = ({ onClose }) => {
           {/* Audio Recording */}
           <div className="mb-6">
             <label className={`block text-sm font-medium mb-2 ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>
-              تسجيل صوتي (اختياري)
+              تسجيل صوتي (بديل سريع للكتابة )
             </label>
             
             <div className={`border-2 ${isRecording ? 'border-indigo-400' : ''} rounded-xl p-4 transition-colors ${isDark ? 'border-gray-600 bg-gray-800/30' : 'border-indigo-300 bg-indigo-50'}`}>
@@ -507,16 +508,16 @@ const AddItem = ({ onClose }) => {
                   <button
                     type="button"
                     onClick={startRecording}
-                    className={`flex items-center justify-center px-4 py-2 rounded-lg ${isDark ? 'bg-red-600 hover:bg-red-700' : 'bg-red-500 hover:bg-red-600'} text-white transition-colors`}
+                    className={`flex items-center justify-center p-3 rounded-full ${isDark ? 'bg-rose-600 hover:bg-rose-700' : 'bg-rose-500 hover:bg-rose-600'} text-white transition-colors`}
                   >
-                    <RiMicLine className="mr-2" />
-                    بدء التسجيل
+                    <RiMicLine className="" size={22} />
+                   
                   </button>
                 ) : (
                   <button
                     type="button"
                     onClick={stopRecording}
-                    className={`flex items-center justify-center px-4 py-2 rounded-lg ${isDark ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gray-600 hover:bg-gray-700'} text-white transition-colors`}
+                    className={`flex items-center justify-center px-4 py-2 rounded-xl ${isDark ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gray-600 hover:bg-gray-700'} text-white transition-colors`}
                   >
                     <RiMicOffLine className="mr-2" />
                     إيقاف التسجيل
@@ -529,7 +530,7 @@ const AddItem = ({ onClose }) => {
                       <button
                         type="button"
                         onClick={playAudio}
-                        className={`flex items-center justify-center px-4 py-2 rounded-lg ${isDark ? 'bg-teal-600 hover:bg-teal-700' : 'bg-teal-500 hover:bg-teal-600'} text-white transition-colors`}
+                        className={`flex items-center justify-center px-4 py-2 rounded-xl ${isDark ? 'bg-teal-600 hover:bg-teal-700' : 'bg-teal-500 hover:bg-teal-600'} text-white transition-colors`}
                       >
                         <RiPlayCircleLine className="mr-2" />
                         تشغيل
@@ -538,7 +539,7 @@ const AddItem = ({ onClose }) => {
                       <button
                         type="button"
                         onClick={stopAudio}
-                        className={`flex items-center justify-center px-4 py-2 rounded-lg ${isDark ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gray-600 hover:bg-gray-700'} text-white transition-colors`}
+                        className={`flex items-center justify-center px-4 py-2 rounded-xl ${isDark ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gray-600 hover:bg-gray-700'} text-white transition-colors`}
                       >
                         <RiStopCircleLine className="mr-2" />
                         إيقاف
@@ -550,7 +551,7 @@ const AddItem = ({ onClose }) => {
               
               {item.audioBlob && !isRecording && (
                 <p className={`text-center mt-3 text-sm ${isDark ? 'text-green-400' : 'text-green-600'}`}>
-                 تم حفظ التسجيل الصوتي
+                 تم حفظ التسجيل الصوتي <FaCheckCircle className='text-green-500' size={20} />
                 </p>
               )}
             </div>

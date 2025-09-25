@@ -96,19 +96,6 @@ const PWAInstallButton = () => {
     );
   }
 
-  if (!deferredPrompt) {
-    return (
-      <div className="text-center p-4 bg-blue-100 dark:bg-blue-900/30 rounded-lg border border-blue-200 dark:border-blue-700">
-        <p className="text-blue-700 dark:text-blue-300 text-sm flex items-center justify-center gap-2">
-          <span className="text-lg">🔄</span>
-          جاري تحضير خيار التثبيت...
-        </p>
-        <p className="text-blue-600 dark:text-blue-400 text-xs mt-1">
-          قد يحتاج الأمر بضع ثوانٍ
-        </p>
-      </div>
-    );
-  }
 
   return (
     <div className="space-y-3">
@@ -134,7 +121,7 @@ const sections = [
     content: (
       <>
         <p className="mb-4">
-          <strong>مُدوّن</strong> هو تطبيق بسيط وعملي لتنظيم المصروفات اليومية. 
+          <strong>مُدوّن</strong> هو دفتر إلكتروني لتتبع و تنظيم المصروفات بطريقة سهلة و سلسة
           تم تصميمه ليكون سهل الاستخدام مع الحفاظ على الخصوصية الكاملة لبياناتك.
         </p>
         <div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-3 border border-blue-200 dark:border-blue-800">
