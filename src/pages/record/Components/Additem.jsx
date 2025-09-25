@@ -482,14 +482,14 @@ const AddItem = ({ onClose }) => {
               تسجيل صوتي (بديل سريع للكتابة )
             </label>
             
-            <div className={`border-2 ${isRecording ? 'border-indigo-400' : ''} rounded-xl p-4 transition-colors ${isDark ? 'border-gray-600 bg-gray-800/30' : 'border-indigo-300 bg-indigo-50'}`}>
+            <div className={` ${isRecording ? 'border-indigo-400' : ''} rounded-xl p-4 transition-colors ${isDark ? ' bg-gray-800/30' : ' '}`}>
               {/* Audio visualization canvas */}
               <div className="mb-4 relative">
                 <canvas 
                   ref={canvasRef} 
                   width="300" 
                   height="80"
-                  className={`w-full h-20 rounded-lg ${isDark ? 'bg-gray-900' : 'bg-gray-100'}`}
+                  className={`w-full h-20 rounded-lg `}
                 />
                 
                 {isRecording && (
@@ -551,7 +551,7 @@ const AddItem = ({ onClose }) => {
               
               {item.audioBlob && !isRecording && (
                 <p className={`text-center mt-3 text-sm ${isDark ? 'text-green-400' : 'text-green-600'}`}>
-                 تم حفظ التسجيل الصوتي <FaCheckCircle className='text-green-500' size={20} />
+               <FaCheckCircle className='text-green-500' size={20} />
                 </p>
               )}
             </div>

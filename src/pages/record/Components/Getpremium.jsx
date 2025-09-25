@@ -98,19 +98,7 @@ const PWAInstallButton = () => {
 
 
   return (
-    <div className="space-y-3">
-      <button
-        onClick={handleInstallClick}
-        className="w-full py-4 px-6 bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 hover:from-indigo-700 hover:via-purple-700 hover:to-pink-700 text-white rounded-xl font-bold flex items-center justify-center gap-3 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-[1.02] active:scale-95"
-      >
-        <RiDownloadLine className="text-xl" />
-        <span>تثبيت التطبيق على جهازي</span>
-      </button>
-      
-      <p className="text-center text-xs text-gray-500 dark:text-gray-400">
-        ⚡ سيعمل التطبيق أسرع وبدون اتصال إنترنت
-      </p>
-    </div>
+  null
   );
 };
 
@@ -144,18 +132,7 @@ const sections = [
           </p>
         </div>
         
-        {/* التثبيت التلقائي */}
-        <div className="space-y-3">
-          <h4 className="font-semibold text-gray-700 dark:text-gray-300 text-lg border-r-4 border-indigo-500 pr-2">
-            التثبيت التلقائي (مُوصى به)
-          </h4>
-          <div className="bg-indigo-50 dark:bg-indigo-900/20 rounded-lg p-4">
-            <p className="text-indigo-800 dark:text-indigo-200 text-sm mb-3">
-              استخدم الزر أدناه لتثبيت التطبيق بضغطة واحدة:
-            </p>
-            <PWAInstallButton />
-          </div>
-        </div>
+  
 
         {/* التثبيت اليدوي */}
         <div className="space-y-3">

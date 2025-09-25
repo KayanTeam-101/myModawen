@@ -2,15 +2,13 @@ import React, { useEffect, useState, useRef, useCallback } from "react";
 import {
   BsMoon,
   BsSun,
-  BsShare,
-  BsClipboard,
   BsUpload,
   BsCheckCircle,
-  BsWhatsapp,
-  BsTelegram,
-  BsTwitter,
-  BsFacebook,
   BsExclamationTriangle,
+  BsDownload,
+  BsCalendar,
+  BsDatabase,
+  BsCheck2,
 } from "react-icons/bs";
 
 /* =========================
@@ -44,7 +42,6 @@ const sortedDates = (obj) =>
   Object.keys(obj || {}).sort((a, b) => {
     const [da, ma, ya] = a.split("-").map(Number);
     const [db, mb, yb] = b.split("-").map(Number);
-    // Newest → Oldest
     return new Date(yb, mb - 1, db) - new Date(ya, ma - 1, da);
   });
 
@@ -67,9 +64,8 @@ const applyThemeSync = (theme) => {
   const root = document.documentElement;
   const isDark = theme === THEMES.DARK;
   root.classList.toggle("dark", isDark);
-  // Mobile address bar color (nice touch)
   const meta = document.querySelector('meta[name="theme-color"]');
-  if (meta) meta.setAttribute("content", isDark ? "#0b1220" : "#f9fafb");
+  if (meta) meta.setAttribute("content", isDark ? "#0f172a" : "#f8fafc");
 };
 
 const getInitialTheme = () => {
@@ -80,7 +76,6 @@ const getInitialTheme = () => {
       return saved;
     }
     
-    // If no saved theme, check system preference
     const systemPrefersDark = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
     const initial = systemPrefersDark ? THEMES.DARK : THEMES.LIGHT;
     applyThemeSync(initial);
@@ -92,7 +87,109 @@ const getInitialTheme = () => {
 };
 
 /* =========================
-   Component
+   Enhanced Components
+   ========================= */
+const ThemeToggle = ({ isDark, onToggle }) => {
+  return (
+    <button
+      onClick={onToggle}
+      className={`relative inline-flex h-8 w-14 items-center rounded-full transition-all duration-300 ${
+        isDark 
+          ? "bg-gradient-to-r from-purple-600 to-blue-600" 
+          : "bg-gradient-to-r from-amber-300 to-orange-400"
+      } shadow-lg hover:shadow-xl transform hover:scale-105`}
+      aria-pressed={isDark}
+    >
+      <span className="sr-only">تبديل وضع المظهر</span>
+      <span
+        className={` h-6 w-6 transform rounded-full bg-white shadow-lg transition-all duration-300 flex items-center justify-center ${
+          isDark ? "-translate-x-1" : "-translate-x-7"
+        }`}
+      >
+        {isDark ? (
+          <BsMoon className="text-purple-600 text-xs" />
+        ) : (
+          <BsSun className="text-amber-500 text-xs" />
+        )}
+      </span>
+    </button>
+  );
+};
+
+const StatCard = ({ title, value, icon, color, subtitle }) => (
+  <div className={`rounded-2xl p-6 text-white  bg-gradient-to-br ${color} relative overflow-hidden group transform hover:scale-105 transition-all duration-300`}>
+    <div className="absolute -right-4 -top-4 w-20 h-20 bg-white/10 rounded-full group-hover:scale-150 transition-transform duration-500"></div>
+    <div className="relative z-10">
+      <div className="flex items-center justify-between">
+        <div>
+          <div className="text-sm opacity-90 font-medium">{title}</div>
+          <div className="text-2xl font-black mt-2">{value}</div>
+          {subtitle && <div className="text-xs opacity-80 mt-1">{subtitle}</div>}
+        </div>
+        <div className="bg-white/20 p-3 -translate-y-5 rounded-full text-xl backdrop-blur-sm">
+          {icon}
+        </div>
+      </div>
+    </div>
+  </div>
+);
+
+const ShareButton = ({ onClick, icon, text, color }) => (
+  <button
+    onClick={onClick}
+    className="flex items-center justify-center gap-3 p-4 rounded-xl bg-white/10 backdrop-blur-sm border border-white/20 hover:bg-white/20 transition-all duration-300 transform hover:scale-105 group"
+  >
+    <span className={`text-xl group-hover:scale-110 transition-transform ${color}`}>{icon}</span>
+    <span className="text-white font-medium text-sm">{text}</span>
+  </button>
+);
+
+const DateCheckbox = ({ date, isSelected, onToggle, itemCount, isDark }) => (
+  <div
+    onClick={() => onToggle(date)}
+    className={`p-4 rounded-xl border-2 cursor-pointer transition-all duration-300 transform hover:scale-105 ${
+      isSelected
+        ? isDark 
+          ? "bg-gradient-to-r from-green-500/20 to-emerald-500/20 border-green-500/50 shadow-lg" 
+          : "bg-gradient-to-r from-green-50 to-emerald-50 border-green-200 shadow-lg"
+        : isDark 
+          ? "bg-slate-800/50 border-slate-700 hover:border-slate-600" 
+          : "bg-white border-gray-200 hover:border-gray-300"
+    } group`}
+  >
+    <div className="flex items-center justify-between">
+      <div className="flex items-center gap-4">
+        <div className={`w-6 h-6 rounded-lg border-2 flex items-center justify-center transition-all duration-300 ${
+          isSelected
+            ? "bg-green-500 border-green-500"
+            : isDark
+            ? "bg-slate-700 border-slate-600"
+            : "bg-gray-100 border-gray-300"
+        }`}>
+          {isSelected && <BsCheck2 className="text-white text-sm" />}
+        </div>
+        <div>
+          <div className={`font-semibold ${isSelected ? 'text-green-600 dark:text-green-400' : isDark ? 'text-slate-200' : 'text-gray-800'}`}>
+            {formatDateLocalized(date)}
+          </div>
+          <div className={`text-sm ${isDark ? 'text-slate-400' : 'text-gray-600'}`}>{date}</div>
+        </div>
+      </div>
+      <div className={`px-3 py-1 rounded-full text-xs font-medium ${
+        isSelected
+          ? "bg-green-500 text-white"
+          : isDark
+          ? "bg-slate-700 text-slate-300"
+          : "bg-gray-100 text-gray-600"
+      }`}>
+        {itemCount} عنصر
+      </div>
+    </div>
+  </div>
+);
+
+/* =========================
+   Main Component
    ========================= */
 const SettingsPage = () => {
   const [theme, setTheme] = useState(getInitialTheme);
@@ -184,7 +281,7 @@ const SettingsPage = () => {
   }, [dates]);
 
   const pickLast7 = useCallback(() => {
-    setSelected(dates.slice(0, 7)); // newest 7 (dates are sorted desc)
+    setSelected(dates.slice(0, 7));
   }, [dates]);
 
   const buildSelected = useCallback(() => {
@@ -218,28 +315,19 @@ const SettingsPage = () => {
         }
         case SOCIAL_PLATFORMS.TELEGRAM: {
           window.open(
-            `https://t.me/share/url?url=${encodeURIComponent(appUrl)}&text=${encodeURIComponent(
-              payload
-            )}`,
+            `https://t.me/share/url?url=${encodeURIComponent(appUrl)}&text=${encodeURIComponent(payload)}`,
             "_blank"
           );
           break;
         }
         case SOCIAL_PLATFORMS.TWITTER: {
-          // X/Twitter has length limits; we still try
-          window.open(
-            `https://twitter.com/intent/tweet?text=${encodeURIComponent(payload)}`,
-            "_blank"
-          );
+          window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(payload)}`, "_blank");
           break;
         }
         case SOCIAL_PLATFORMS.FACEBOOK: {
-          // FB sharer needs a URL; put JSON in clipboard + use quote param
           await navigator.clipboard.writeText(payload);
           window.open(
-            `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(
-              appUrl
-            )}&quote=${encodeURIComponent("تم نسخ البيانات إلى الحافظة 👇")}`,
+            `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(appUrl)}&quote=${encodeURIComponent("تم نسخ البيانات إلى الحافظة 👇")}`,
             "_blank"
           );
           show("تم نسخ JSON؛ افتح المشاركة والصقه إذا احتجت", "info", 4000);
@@ -328,357 +416,230 @@ const SettingsPage = () => {
     };
     reader.onerror = () => show("خطأ في قراءة الملف", "error");
     reader.readAsText(file);
-    // allow re-importing the same file
     e.target.value = null;
   };
 
-  /* UI helpers */
-  const SmallCard = ({ title, value, color = "from-indigo-500 to-indigo-600" }) => (
-    <div className={`rounded-2xl p-4 text-white shadow-lg bg-gradient-to-r ${color}`}>
-      <div className="flex items-center justify-between">
-        <div>
-          <div className="text-sm opacity-90">{title}</div>
-          <div className="text-xl font-bold mt-1">{value}</div>
-        </div>
-        <div className="bg-white/20 p-3 rounded-full" />
-      </div>
-    </div>
-  );
-
-  const ShareItem = ({ onClick, icon, text }) => (
-    <button
-      onClick={onClick}
-      className="w-full text-right px-4 py-2 hover:bg-indigo-50 dark:hover:bg-slate-800 flex items-center"
-    >
-      <span className="ml-3">{icon}</span>
-      <span className="text-indigo-800 dark:text-slate-100">{text}</span>
-    </button>
-  );
-
-  /* =========================
-     Render
-     ========================= */
   return (
     <div
-      className={`min-h-screen ${isDark ? 'bg-black' : 'bg-gradient-to-br from-indigo-50 to-white'} transition p-4 md:p-6 showSmoothy`}
+      className={`min-h-screen ${isDark ? 'bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900' : 'bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50'} transition-all duration-500 p-4 md:p-6`}
       dir="rtl"
     >
-      <div className={`${isDark ? 'bg-slate-800' : 'bg-white'} rounded-2xl shadow-lg p-5 mb-6`}>
-        <div className="flex items-center justify-between flex-wrap gap-4">
-          <div className="flex items-center gap-4">
-            <div className={`p-3 rounded-lg ${isDark ? 'bg-slate-700' : 'bg-indigo-50'}`}>
-              {isDark ? (
-                <BsMoon className="text-indigo-400" size={20} />
-              ) : (
-                <BsSun className="text-indigo-600" size={20} />
-              )}
+      {/* Header */}
+      <div className="max-w-6xl mx-auto">
+        <div className={`rounded-3xl p-8 mb-8  `}>
+          <div className="flex items-center justify-between flex-wrap gap-6">
+            <div className="flex items-center gap-6">
+              <div className={`p-4 rounded-2xl ${isDark ? 'bg-gradient-to-br from-purple-600/20 to-blue-600/20' : 'bg-gradient-to-br from-blue-100 to-purple-100'} shadow-lg`}>
+                {isDark ? (
+                  <BsMoon className="text-purple-400 text-2xl" />
+                ) : (
+                  <BsSun className="text-amber-500 text-2xl" />
+                )}
+              </div>
+              <div>
+                <h1 className={`text-3xl font-black ${isDark ? 'text-white' : 'text-slate-900'} mb-2`}>الإعدادات</h1>
+                <p className={`text-lg ${isDark ? 'text-slate-300' : 'text-slate-600'}`}>إدارة البيانات والمظهر</p>
+              </div>
             </div>
-            <div>
-              <div className={`text-lg font-black ${isDark ? 'text-slate-100' : 'text-indigo-900'}`}>المظهر</div>
+
+            <div className="flex items-center gap-4">
+              <span className={`font-medium ${isDark ? 'text-slate-300' : 'text-slate-600'}`}>
+                {isDark ? 'الوضع الليلي' : 'الوضع النهاري'}
+              </span>
+              <ThemeToggle isDark={isDark} onToggle={onThemeToggle} />
             </div>
           </div>
-
-          {/* Theme switch */}
-          <ThemeToggle isDark={isDark} onToggle={onThemeToggle} />
         </div>
-      </div>
-      <div className="max-w-4xl mx-auto">
+
         {/* Summary Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-5 mb-6">
-          <SmallCard title="تواريخ محفوظة" value={`${dates.length}`} color="from-indigo-500 to-indigo-600" />
-          <SmallCard title="محدد الآن" value={`${selected.length}`} color="from-emerald-500 to-teal-500" />
-          <SmallCard
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+          <StatCard
+            title="تواريخ محفوظة"
+            value={dates.length}
+            icon={<BsCalendar className="text-xl" />}
+            color="from-blue-500 to-cyan-500"
+            subtitle="إجمالي الأيام"
+          />
+          <StatCard
+            title="محدد الآن"
+            value={selected.length}
+            icon={<BsCheck2 className="text-xl" />}
+            color="from-emerald-500 to-teal-500"
+            subtitle="جاهز للمشاركة"
+          />
+          <StatCard
             title="حجم البيانات"
-            value={`${(JSON.stringify(dataObj).length / 1024).toFixed()} KB`}
-            color="from-pink-500 to-yellow-500"
+            value={`${(JSON.stringify(dataObj).length / 1024).toFixed(1)} KB`}
+            icon={<BsDatabase className="text-xl" />}
+            color="from-purple-500 to-pink-500"
+            subtitle="التخزين المحلي"
           />
         </div>
 
-        {/* Share by days */}
-        <div className={`rounded-2xl shadow-lg p-5 mb-6 ${isDark ? 'bg-slate-800' : 'bg-white'}`}>
-          <div className="flex items-start justify-between mb-4 flex-wrap gap-4">
+        {/* Share Section */}
+        <div className={`rounded-3xl p-8 mb-8  ${isDark ? 'bg-slate-800/80 backdrop-blur-sm' : 'bg-white/80 backdrop-blur-sm'} border ${isDark ? 'border-slate-700' : 'border-white/50'}`}>
+          <div className="flex items-center justify-between mb-8 flex-wrap gap-4">
             <div>
-              <h2 className={`text-lg font-bold ${isDark ? 'text-slate-100' : 'text-indigo-900'}`}>شارك بيانات حسب الأيام</h2>
+              <h2 className={`text-2xl font-black mb-2 ${isDark ? 'text-white' : 'text-slate-900'}`}>مشاركة البيانات</h2>
+              <p className={`${isDark ? 'text-slate-400' : 'text-slate-600'}`}>اختر الأيام التي تريد مشاركتها</p>
             </div>
 
-            <div className="flex flex-col items-end">
-              <div className={`text-sm ${isDark ? 'text-slate-300' : 'text-indigo-600'}`}>
+            <div className="flex items-center gap-4">
+              <div className={`text-lg font-bold ${isDark ? 'text-slate-300' : 'text-slate-700'}`}>
                 {selected.length} / {dates.length}
               </div>
-
-              <div className="mt-3 flex items-center gap-3 flex-wrap">
+              
+              <div className="flex gap-3">
                 <button
                   onClick={selectAll}
-                  className={`px-3 py-2 rounded-lg ${isDark ? 'bg-slate-700 text-slate-200 hover:bg-slate-600' : 'bg-indigo-50 text-indigo-700 hover:bg-indigo-100'} transition`}
+                  className={`px-4 py-2 rounded-xl font-medium transition-all duration-300 transform hover:scale-105 ${
+                    isDark 
+                      ? 'bg-slate-700 text-slate-200 hover:bg-slate-600' 
+                      : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+                  }`}
                 >
                   {selected.length === dates.length ? "إلغاء الكل" : "تحديد الكل"}
                 </button>
                 <button
                   onClick={pickLast7}
-                  className={`px-3 py-2 rounded-lg ${isDark ? 'bg-slate-700 text-slate-200 hover:bg-slate-600' : 'bg-indigo-50 text-indigo-700 hover:bg-indigo-100'} transition`}
+                  className={`px-4 py-2 rounded-xl font-medium transition-all duration-300 transform hover:scale-105 ${
+                    isDark 
+                      ? 'bg-slate-700 text-slate-200 hover:bg-slate-600' 
+                      : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+                  }`}
                 >
-                  آخر 7
+                  آخر 7 أيام
                 </button>
-
-                <div className="relative" ref={shareRef}>
-                  <button
-                    onClick={handleShare}
-                    disabled={selected.length === 0}
-                    className={`px-3 py-2 rounded-lg ${
-                      selected.length === 0
-                        ? isDark 
-                          ? "bg-slate-700 text-slate-400 cursor-not-allowed" 
-                          : "bg-gray-100 text-gray-400 cursor-not-allowed"
-                        : "bg-gradient-to-r from-indigo-600 to-indigo-700 text-white shadow"
-                    } transition`}
-                  >
-                    <BsShare className="inline-block ml-2" /> مشاركة
-                  </button>
-
-                  {/* Share dropdown */}
-                  {showShareOptions && (
-                    <div className={`absolute right-0 mt-2 w-44 rounded-lg shadow-md ${isDark ? 'bg-slate-900 ring-slate-800' : 'bg-white ring-indigo-100'} ring-1 z-40`}>
-                      <ShareItem onClick={() => shareVia(SOCIAL_PLATFORMS.CLIPBOARD)} icon={<BsClipboard />} text="نسخ" />
-                      <ShareItem
-                        onClick={() => shareVia(SOCIAL_PLATFORMS.WHATSAPP)}
-                        icon={<BsWhatsapp className="text-green-500" />}
-                        text="واتساب"
-                      />
-                      <ShareItem
-                        onClick={() => shareVia(SOCIAL_PLATFORMS.TELEGRAM)}
-                        icon={<BsTelegram className="text-blue-400" />}
-                        text="تيليجرام"
-                      />
-                      <ShareItem
-                        onClick={() => shareVia(SOCIAL_PLATFORMS.TWITTER)}
-                        icon={<BsTwitter className="text-blue-400" />}
-                        text="تويتر"
-                      />
-                      <ShareItem
-                        onClick={() => shareVia(SOCIAL_PLATFORMS.FACEBOOK)}
-                        icon={<BsFacebook className="text-blue-600" />}
-                        text="فيسبوك"
-                      />
-                    </div>
-                  )}
-                </div>
               </div>
             </div>
           </div>
 
+          {/* Dates Grid */}
           {dates.length === 0 ? (
-            <div className={`text-center ${isDark ? 'text-slate-300' : 'text-indigo-600'} py-8`}>
-              لا توجد بيانات مخزنة حالياً.
+            <div className={`text-center py-12 rounded-2xl ${isDark ? 'bg-slate-900/50' : 'bg-slate-100/50'}`}>
+              <BsDatabase className={`text-4xl mx-auto mb-4 ${isDark ? 'text-slate-600' : 'text-slate-400'}`} />
+              <p className={`text-lg ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>لا توجد بيانات مخزنة حالياً</p>
             </div>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 max-h-56 overflow-auto">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 max-h-96 overflow-auto p-2">
               {dates.map((d) => (
-                <label
+                <DateCheckbox
                   key={d}
-                  className={`flex items-center justify-between p-3 rounded-lg border cursor-pointer transition ${
-                    selected.includes(d)
-                      ? isDark 
-                        ? "bg-slate-700 text-indigo-300 border-slate-600" 
-                        : "bg-indigo-50 text-indigo-500 border-indigo-200"
-                      : isDark 
-                        ? "bg-slate-900 border-slate-700" 
-                        : "bg-white border-gray-100"
-                  }`}
-                >
-                  <div className="flex items-center gap-3">
-                    <input
-                      type="checkbox"
-                      checked={selected.includes(d)}
-                      onChange={() => toggleDate(d)}
-                      className="rounded text-indigo-600 focus:ring-indigo-500"
-                    />
-                    <div>
-                      <div className={`text-sm font-medium ${isDark ? 'text-slate-100' : 'text-indigo-800'}`}>
-                        {formatDateLocalized(d)}
-                      </div>
-                      <div className={`text-xs ${isDark ? 'text-slate-300' : 'text-indigo-600'}`}>{d}</div>
-                    </div>
-                  </div>
-                  <div className={`text-xs ${isDark ? 'text-slate-400' : 'text-indigo-500'}`}>
-                    {(dataObj[d] || []).length} عنصر
-                  </div>
-                </label>
+                  date={d}
+                  isSelected={selected.includes(d)}
+                  onToggle={toggleDate}
+                  itemCount={(dataObj[d] || []).length}
+                  isDark={isDark}
+                />
               ))}
             </div>
           )}
 
-          {/* Actions */}
-          <div className="mt-4 flex flex-wrap gap-3">
-            <button
-              onClick={handleCopy}
-              disabled={selected.length === 0}
-              className={`px-4 py-2 rounded-lg border ${
-                selected.length === 0
-                  ? isDark 
-                    ? "bg-slate-700 text-slate-400 border-slate-600 cursor-not-allowed" 
-                    : "bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed"
-                  : isDark 
-                    ? "bg-slate-900 text-slate-100 border-slate-700 hover:shadow" 
-                    : "bg-white text-indigo-700 border-indigo-100 hover:shadow"
-              }`}
-            >
-              نسخ المحدد
-            </button>
+          {/* Action Buttons */}
+          <div className="flex flex-wrap gap-4 mt-8 pt-8 border-t border-slate-700/30">
+        
+
             <button
               onClick={handleDownloadSelected}
               disabled={selected.length === 0}
-              className={`px-4 py-2 rounded-lg border ${
+              className={`px-6 py-3 rounded-xl font-semibold flex items-center gap-3 transition-all duration-300 ${
                 selected.length === 0
                   ? isDark 
-                    ? "bg-slate-700 text-slate-400 border-slate-600 cursor-not-allowed" 
-                    : "bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed"
+                    ? "bg-slate-700 text-slate-400 cursor-not-allowed" 
+                    : "bg-gray-200 text-gray-400 cursor-not-allowed"
                   : isDark 
-                    ? "bg-slate-900 text-emerald-300 border-emerald-900/40 hover:shadow" 
-                    : "bg-white text-green-700 border-green-100 hover:shadow"
+                    ? "bg-slate-700 text-emerald-300 hover:bg-slate-600" 
+                    : "bg-white text-green-600 hover:bg-slate-50"
               }`}
             >
+              <BsDownload />
               تحميل المحدد
             </button>
+
             <button
               onClick={handleDownloadAll}
               disabled={dates.length === 0}
-              className={`px-4 py-2 rounded-lg border ${
+              className={`px-6 py-3 rounded-xl font-semibold flex items-center gap-3 transition-all duration-300 ${
                 dates.length === 0
                   ? isDark 
-                    ? "bg-slate-700 text-slate-400 border-slate-600 cursor-not-allowed" 
-                    : "bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed"
+                    ? "bg-slate-700 text-slate-400 cursor-not-allowed" 
+                    : "bg-gray-200 text-gray-400 cursor-not-allowed"
                   : isDark 
-                    ? "bg-slate-900 text-slate-100 border-slate-700 hover:shadow" 
-                    : "bg-white text-gray-700 border-gray-100 hover:shadow"
+                    ? "bg-slate-700 text-slate-200 hover:bg-slate-600" 
+                    : "bg-white text-slate-700 hover:bg-slate-50"
               }`}
             >
+              <BsDownload />
               تنزيل الكل
             </button>
           </div>
         </div>
 
-        {/* Import / Set data */}
-        <div className={`rounded-2xl shadow-lg p-5 mb-8 border ${isDark ? 'bg-slate-800 border-slate-700' : 'bg-white border-indigo-100'}`}>
-          <div className="flex items-center justify-between mb-3 flex-wrap gap-3">
+        {/* Import Section */}
+        <div className={`rounded-3xl p-8 shadow-2xl ${isDark ? 'bg-slate-800/80 backdrop-blur-sm' : 'bg-white/80 backdrop-blur-sm'} border ${isDark ? 'border-slate-700' : 'border-white/50'}`}>
+          <div className="flex items-center justify-between mb-6 flex-wrap gap-4">
             <div>
-              <h3 className={`text-lg font-bold ${isDark ? 'text-slate-100' : 'text-indigo-900'}`}>استيراد / لصق بيانات</h3>
+              <h3 className={`text-2xl font-black mb-2 ${isDark ? 'text-white' : 'text-slate-900'}`}>تسجيل بيانات</h3>
+              <p className={`${isDark ? 'text-slate-400' : 'text-slate-600'}`}>إضافة بيانات تمت مشاركتها من شخص آخر</p>
             </div>
           </div>
 
-          <textarea
-            rows={6}
-            value={importText}
-            onChange={(e) => setImportText(e.target.value)}
-            placeholder='مثال: {"01-01-2024":[{"name":"منتج","price":"10","time":"12:30"}]}'
-            className={`w-full p-3 border rounded-lg text-sm font-mono ${
-              isDark 
-                ? 'bg-slate-700 border-slate-600 text-slate-100' 
-                : 'bg-indigo-50 border-gray-100 text-indigo-900'
-            }`}
-            aria-label="مساحة لإدخال بيانات JSON"
-          />
+        
 
-          <div className="mt-3 flex flex-wrap gap-3 items-center">
-            <button
-              onClick={handleSetFromText}
-              disabled={!importText.trim()}
-              className={`px-4 py-2 rounded-lg flex items-center ${
-                !importText.trim()
-                  ? isDark 
-                    ? "bg-slate-700 text-slate-400" 
-                    : "bg-gray-100 text-gray-400"
-                  : "bg-gradient-to-r from-teal-400 to-cyan-500 text-white shadow"
-              }`}
-            >
-              <BsUpload className="ml-2" /> حفظ
-            </button>
-
-            <label className={`px-4 py-2 rounded-lg border inline-flex items-center gap-2 hover:shadow ${
+          <div className="flex flex-wrap gap-4 mt-6">
+       
+            <label className={`px-6 py-3 rounded-xl font-semibold flex items-center gap-3 cursor-pointer transition-all duration-300 transform hover:scale-105 ${
               isDark 
-                ? 'bg-slate-900 border-slate-700 text-slate-200' 
-                : 'bg-white border-gray-100 text-gray-700'
-            } cursor-pointer`}>
-              <BsUpload /> رفع ملف
+                ? 'bg-slate-700 text-slate-200 hover:bg-slate-600' 
+                : 'bg-white text-slate-700 hover:bg-slate-50'
+            } shadow-lg hover:shadow-xl`}>
+              <BsUpload />
+              رفع ملف
               <input ref={fileRef} onChange={handleFile} type="file" accept=".json,application/json" className="hidden" />
             </label>
 
-            <button
-              onClick={() => {
-                setImportText(JSON.stringify(dataObj, null, 2));
-                show("تم لصق البيانات الحالية");
-              }}
-              className={`px-4 py-2 rounded-lg border hover:shadow ${
-                isDark 
-                  ? 'bg-slate-900 border-slate-700 text-slate-200' 
-                  : 'bg-white border-gray-100 text-gray-700'
-              }`}
-            >
-              لصق الحالية
-            </button>
+        
           </div>
         </div>
 
-        <footer className={`text-center text-sm ${isDark ? 'text-slate-400' : 'text-indigo-600'}`}>
-          localStorage.data — احفظ بياناتك محلياً · localStorage.theme = "{theme}"
+        {/* Footer */}
+        <footer className={`text-center py-8 ${isDark ? 'text-slate-500' : 'text-slate-600'}`}>
+          <div className="flex items-center justify-center gap-2 text-sm">
+            <BsDatabase className="text-slate-400" />
+            <span>التخزين المحلي · الوضع الحالي: {isDark ? 'ليلي' : 'نهاري'}</span>
+          </div>
         </footer>
 
-        {/* Toast */}
+        {/* Toast Notification */}
         {message && (
           <div
-            className={`fixed left-1/2 transform -translate-x-1/2 bottom-8 z-50 px-4 py-3 rounded-lg shadow-md text-white flex items-center ${
-              message.type === "error" ? "bg-red-600" : "bg-indigo-600"
-            }`}
+            className={`fixed left-1/2 transform -translate-x-1/2 bottom-8 z-50 px-6 py-4 rounded-2xl shadow-2xl text-white flex items-center gap-3 backdrop-blur-sm border ${
+              message.type === "error" 
+                ? "bg-red-500/90 border-red-400/50" 
+                : "bg-green-500/90 border-green-400/50"
+            } animate-bounce-in`}
           >
-            {message.type === "error" ? <BsExclamationTriangle className="ml-2" /> : <BsCheckCircle className="ml-2" />}
-            <div className="text-sm">{message.text}</div>
+            {message.type === "error" ? 
+              <BsExclamationTriangle className="text-xl" /> : 
+              <BsCheckCircle className="text-xl" />
+            }
+            <div className="font-medium">{message.text}</div>
           </div>
         )}
       </div>
 
-      {/* Minimal global styles for color vars & switch */}
-      <style>{`
-        :root { --bg-color: #f9fafb; --text-color: #0b1220; }
-        .dark { --bg-color: #0b1220; --text-color: #f7fafc; }
-        body { background-color: var(--bg-color); color: var(--text-color); transition: background-color .25s, color .25s; }
-
-        .switch-input { position: absolute; opacity: 0; }
-        .switch-label {
-          display: inline-block; width: 56px; height: 28px; background: #e6e9f7;
-          border-radius: 9999px; padding: 2px; cursor: pointer; transition: background .2s; position: relative;
+      {/* Custom Styles */}
+      <style jsx>{`
+        @keyframes bounce-in {
+          0% { transform: translateX(-50%) translateY(100px); opacity: 0; }
+          50% { transform: translateX(-50%) translateY(-10px); opacity: 1; }
+          100% { transform: translateX(-50%) translateY(0); opacity: 1; }
         }
-        .switch-label .knob {
-          display: block; width: 24px; height: 24px; background: #fff; border-radius: 9999px;
-          box-shadow: 0 2px 6px rgba(16,24,40,.12); transform: translateX(0);
-          transition: transform .18s cubic-bezier(.2,.9,.3,1);
+        .animate-bounce-in {
+          animation: bounce-in 0.5s ease-out;
         }
-        .switch-input:checked + .switch-label {
-          background: linear-gradient(90deg,#6366f1,#4f46e5);
-        }
-        .switch-input:checked + .switch-label .knob { transform: translateX(28px); }
-        .switch-input:focus + .switch-label { outline: 2px solid #6366f1; outline-offset: 2px; }
-
-        @media (max-width: 640px) { .showSmoothy { padding-bottom: 96px; } }
       `}</style>
     </div>
-  );
-};
-
-const ThemeToggle = ({ isDark, onToggle }) => {
-  return (
-    <button
-      onClick={onToggle}
-      className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-        isDark ? "bg-indigo-600" : "bg-gray-300"
-      }`}
-      aria-pressed={isDark}
-    >
-      <span className="sr-only">تبديل وضع المظهر</span>
-      <span
-        className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-          isDark ? "-translate-x-6" : "-translate-x-1"
-        }`}
-      />
-    </button>
   );
 };
 
